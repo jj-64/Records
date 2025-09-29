@@ -32,11 +32,11 @@ A list with results from both stages:
 \item{Var_Z}{Estimated variance of \code{Z}.}
 \item{stat}{Standardized stage 1 test statistic.}
 \item{p_value}{p_value of the stage 1 test.}
-\item{dec}{Decision of stage 1: \code{"Sameslope"} or \code{"NO"}.}
+\item{decision}{Decision of stage 1: \code{"Sameslope"} or \code{"NO"}.}
 \item{z_A}{Stage 2 standardized slope for first block comparison.}
 \item{z_B}{Stage 2 standardized slope for third block comparison.}
 \item{slope_SD}{Estimated standard deviation of slope differences (stage 2).}
-\item{dec}{Final decision: \code{"LDM"} or \code{"NO"}.}
+\item{decision}{Final decision: \code{"LDM"} or \code{"NO"}.}
 }
 }
 \description{
