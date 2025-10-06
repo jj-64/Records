@@ -19,7 +19,7 @@ A list with components:
 (either z-statistic or quantile interval).}
 \item{theta_hat}{Estimated drift parameter \eqn{\theta}.}
 \item{v_theta_hat}{Estimated variance for drift parameter \eqn{\theta}.}
-\item{dec}{Decision: \code{"LDM"} if accepted, \code{"NO"} otherwise.}
+\item{decision}{Decision: \code{"LDM"} if accepted, \code{"NO"} otherwise.}
 }
 }
 \description{

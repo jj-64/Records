@@ -1,5 +1,5 @@
 
-partition <- function(X, min_expected = 1, warmup = 2, k = NULL) {
+partition <- function(X, min_expected = 1, warmup = 2, K = NULL) {
   gaps <- rec_gaps(X)
 
   # drop early gaps if warmup > 0
@@ -8,9 +8,9 @@ partition <- function(X, min_expected = 1, warmup = 2, k = NULL) {
   }
 
   # Case 1: user specifies number of partitions
-  if (!is.null(k)) {
-    # use quantiles to split into k groups
-    breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = k + 1))))
+  if (!is.null(K)) {
+    # use quantiles to split into K groups
+    breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = K + 1))))
     #breaks <- c(breaks, Inf)  # ensure full coverage
   } else {
     # Case 2: adaptive rule based on unique values
@@ -25,8 +25,8 @@ partition <- function(X, min_expected = 1, warmup = 2, k = NULL) {
   break_points <- breaks   # Track breaks explicitly
 
 
-  # Adaptively merge small bins if expected counts are too low only if k not fixed
-  if (is.null(k)) {
+  # Adaptively merge small bins if expected counts are too low only if K not fixed
+  if (is.null(K)) {
     while (any(freq_table < min_expected) && length(freq_table) > 1) {
       idx <- which.min(freq_table)
 
@@ -53,74 +53,171 @@ partition <- function(X, min_expected = 1, warmup = 2, k = NULL) {
   ))
 }
 
+#' Partition record gaps adaptively
+#'
+#' Partitions record gaps into bins for Pearson-type tests.
+#' Ensures at least two partitions remain after merging.
+#'
+#' @param X Numeric vector (time series).
+#' @param min_expected Minimum expected count per bin (default = 1).
+#' @param warmup Number of initial gaps to drop (default = 2).
+#' @param K Optional. If given, force exactly K partitions using quantiles.
+#' @return A list with:
+#'   \item{j}{Partition start points}
+#'   \item{nk}{Frequencies in each partition}
+#'   \item{labels}{Readable bin labels}
+#' @export
+
+#' Partition record gaps adaptively (with padding)
+#'
+#' Partitions record gaps into bins for Pearson-type tests.
+#' Ensures at least 3 partitions by padding with zero-frequency bins if necessary.
+#'
+#' @param X Numeric vector (time series).
+#' @param min_expected Minimum expected count per bin (default = 1).
+#' @param warmup Number of initial gaps to drop (default = 2).
+#' @param K Optional. If given, force exactly K partitions using quantiles.
+#' @return A list with:
+#'   \item{j}{Partition start points}
+#'   \item{nk}{Frequencies in each partition}
+#'   \item{labels}{Readable bin labels}
+#' @export
+partition2 <- function(X, min_expected = 1, warmup = 2, K = NULL, estimated = TRUE) {
+  gaps <- rec_gaps(X)
+
+  min_K = 2+ifelse(estimated, 1, 0)
+
+  # Drop warmup
+  if (length(gaps) >= (warmup + 5)) {
+    gaps <- gaps[-seq_len(warmup)]
+  }
+
+  # Step 1: Build initial breakpoints
+  if (!is.null(K)) {
+    breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = K + 1))))
+  } else {
+    num_groups <- min(length(unique(gaps)) + 1 + ifelse(estimated, 1, 0) , min_K)
+    breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = num_groups + 1))))
+  }
+  breaks <- c(breaks, Inf)
+
+  # Step 2: Initial grouping
+  grouped_vec <- cut(gaps, breaks = breaks, include.lowest = TRUE, right = FALSE)
+  freq_table <- table(grouped_vec)
+  break_points <- breaks
+
+  # Step 3: Merge bins if too small (only when K not fixed)
+  if (is.null(K)) {
+    while (any(freq_table < min_expected) && length(freq_table) > 2) {
+      idx <- which.min(freq_table)
+
+      if (idx == length(freq_table)) {
+        freq_table[idx - 1] <- freq_table[idx - 1] + freq_table[idx]
+        freq_table <- freq_table[-idx]
+        break_points <- break_points[-idx]
+      } else {
+        freq_table[idx + 1] <- freq_table[idx + 1] + freq_table[idx]
+        freq_table <- freq_table[-idx]
+        break_points <- break_points[-(idx + 1)]
+      }
+    }
+  }
+
+  # Step 4: Ensure at least 3 partitions by padding
+  # while (length(freq_table) < 3) {
+  #   unique_gaps <- sort(unique(gaps))
+  #   candidate <- 1
+  #   while (candidate %in% unique_gaps || candidate %in% break_points) {
+  #     candidate <- candidate + 1
+  #   }
+  #
+  #   # insert before Inf
+  #   freq_table <- c(freq_table, 0)
+  #   break_points <- c(break_points[-length(break_points)], candidate, Inf)
+  # }
+
+  # Step 5: Build interval labels
+  interval_labels <- paste0("[", break_points[-length(break_points)], ",", break_points[-1], ")")
+
+  return(list(
+    j = break_points[-length(break_points)], # partition start points
+    nk = as.numeric(freq_table),             # frequencies
+    labels = interval_labels                 # readable bin labels
+  ))
+}
+
+
 # Pearson chi-square test for Yang
-Test_Yang_Pearson <- function(X, Partition = NA, gamma = NULL, k=NULL, estimated = TRUE, alpha = 0.05) {
+Test_YNM_Pearson <- function(X, Partition = NA, gamma = NULL, K=NULL, estimated = TRUE, alpha = 0.05) {
+
+  if (sum(is_rec(X)) <=4) {
+              return(list(decision = "NO"))}
 
   # helper: chi-squared term
   x2_term <- function(m_1, pi, n) (n - pi * m_1)^2 / (pi * m_1)
 
   # helper: chi-square loss function when estimating gamma
-  x2_term_g <- function(gamma, k, nk, j) {
-    P_j <- numeric(k)
-    for (k in 1:(k - 1)) {
-      p_j <- (gamma - 1) / gamma^(j[k]:(j[k + 1] - 1))
-      P_j[k] <- sum(na.omit(p_j))
-    }
-    P_j[k] <- 1 - sum(P_j[1:(k - 1)])  # last bin absorbs remainder
-
-    m_1 <- sum(nk)
-    sum(x2_term(m_1, P_j, nk))
-  }
+  x2_term_g <- function(gamma, K, nk, j) {
+      P_j <- numeric(K)
+      if (K>1){
+        for (s in 1:(K - 1)) {
+          p_j <- (gamma - 1) / gamma^(j[s]:(j[s + 1] - 1))
+          P_j[s] <- sum(na.omit(p_j))
+        }
+        P_j[K] <- 1 - sum(P_j[1:(K - 1)])  # last bin absorbs remainder
+      } else {
+        P_j =  (gamma - 1) / gamma^(j)
+      }
+      m_1 <- sum(nk)
+      return(sum(x2_term(m_1, P_j, nk)))
+                                         }
 
   # Partition handling
-  if (is.na(Partition)[1]) Partition <- partition(X, k=k)
+  if (is.na(Partition)[1]) Partition <- partition(X, K=K)
 
-  k <- length(Partition$nk)
+  K <- length(Partition$nk)
   nk <- Partition$nk
   j <- Partition$j
   m_1 <- sum(nk)
 
-  # If gamma not provided -> estimate it
+  if (K < (2+ifelse(estimated, 1, 0))) {print("Test cannot be performed: partitions K are not sufficient")
+  return(list("decision" = NA))}
+
+   # If gamma not provided -> estimate it
   if (is.null(gamma)) {
-    gammas <- seq(1.000001, 10, by = 0.01)
-    chi_values <- sapply(gammas, function(g) x2_term_g(g, k, nk, j))
+    gammas <- seq(1.000001, 5, by = 0.01)
+    chi_values <- sapply(gammas, function(g) x2_term_g(g, K, nk, j))
     gamma <- gammas[which.min(chi_values)]
+    obs_stat <-min(chi_values)
     estimated <- TRUE
-  }
-
-  # Compute probabilities P_j under H0 with chosen gamma
-  P_j <- numeric(k)
-  for (k in 1:(k - 1)) {
-    p_j <- (gamma - 1) / gamma^(j[k]:(j[k + 1] - 1))
-    P_j[k] <- sum(na.omit(p_j))
-  }
-  P_j[k] <- 1 - sum(P_j[1:(k - 1)])
-
-  # Compute observed statistic
-  obs_stat <- sum(x2_term(m_1, P_j, nk))
+                      }
+    else{
+      obs_stat = x2_term_g(gamma, K, nk, j)
+      estimated <- FALSE
+    }
 
   # Adjust degrees of freedom if gamma estimated
-  df <- k - 1 - ifelse(estimated, 1, 0)
+  df <- K - 1 - ifelse(estimated, 1, 0)
 
   # Critical value and p-value
   crit_val <- qchisq(p = 1 - alpha, df = df)
   p_value <- 1 - pchisq(q = obs_stat, df = df)
 
   # Decision
-  dec <- ifelse(obs_stat < crit_val, "Yang", "NO")
+  decision <- ifelse(obs_stat < crit_val, "YNM", "NO")
 
   return(list(
     stat = obs_stat,
     p_value = p_value,
     gamma = gamma,
     df = df,
-    decision = dec
+    decision = decision
   ))
 }
 
 
 ## Test lisse
-Test_Yang_Smooth <- function(X, alpha = 0.05) {
+Test_YNM_Smooth <- function(X, alpha = 0.05) {
 
   # Meixner-like polynomials
   h2 <- function(x, a) x*(x-1) - 4*a*x + 2*a^2
@@ -231,10 +328,10 @@ Quantile_Yang=function(T,gamma, alpha= 0.05){
 #' @examples
 #' set.seed(123)
 #' x <- LDM_series(T=50, theta=0.5, dist="gumbel", loc=0, scale=1)
-#' Test_Yang_NT(x)
+#' Test_YNM_NT(x)
 #' y= VGAM::rgumbel(50,0,1)
-#' Test_Yang_NT(y)
-Test_Yang_NT <- function(X, gamma = NA, alpha = 0.05) {
+#' Test_YNM_NT(y)
+Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
   T <- length(X)
   obs <- rec_counts(X)
 
@@ -244,11 +341,11 @@ Test_Yang_NT <- function(X, gamma = NA, alpha = 0.05) {
   }
 
   # --- Variance and test statistic ---
-  v_gamma <- Estim_gamma_indicator_Variance(T = T, gamma = gamma)
+  v_gamma <- Estim_gamma_indicator_Variance(T = T, gamma = gamma, approximate = FALSE)
   z_theo <- (gamma-1) / sqrt(v_gamma)
 
   # --- First check using normal approximation: Ho: Gamma =1 ---
-  if (z_theo <= qnorm(1-alpha/2) & z_theo >= qnorm(alpha/2)) {  ## Gamma = 1
+  if ( z_theo <= qnorm(1-alpha/2) & z_theo >= qnorm(alpha/2) ) {  ## Gamma = 1
     decision <- "NO"
     stat_theo <- z_theo
   } else {
@@ -256,8 +353,8 @@ Test_Yang_NT <- function(X, gamma = NA, alpha = 0.05) {
     probs <- vapply(1:T, function(i) NT_Yang(m = i, T = T, gamma = gamma), numeric(1))
     cdf <- cumsum(probs)
 
-    lower <- which.min(abs(cdf - (alpha / 2)))
-    upper <- which.min(abs(cdf - (1 - alpha / 2)))
+    lower <- which.min(abs(cdf - (alpha / 2)))  ##Quantile_Yang(T=T, gamma=gamma, alpha= alpha)[1]
+    upper <- which.min(abs(cdf - (1 - alpha / 2)))  ###Quantile_Yang(T=T, gamma=gamma, alpha= alpha)[2]
 
     stat_theo <- c(lower, upper)
     decision <- ifelse(obs >= max(lower, 1) && obs <= upper, "Yang", "NO")
@@ -277,15 +374,94 @@ Test_Yang_NT <- function(X, gamma = NA, alpha = 0.05) {
 #The usual test assumes Gaps are i.i.d. Geom(p). If gaps are nonstationary (e.g. short early gaps, longer later gaps) the single-sample mean
 #is dominated by early small gaps → p biased high → expected tail mass under the null is underestimated → observed long gaps look unsurprising → test fails to reject.
 #So the issue is not the chi-square per se but the (false) assumption of stationarity/homogeneity of gap distribution across time.
-
-Test_Yang_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
+#' Test for Yang–Nevzorov Geometric Record Gaps
+#'
+#' Performs a goodness-of-fit test for the Yang–Nevzorov model by examining
+#' the distribution of record time gaps in a sequence of observations.
+#' The procedure estimates the geometric parameter, computes a chi-squared
+#' statistic on grouped frequencies, and evaluates whether the observed record
+#' gaps are consistent with a geometric distribution.
+#'
+#' @details
+#' Let \eqn{G_i} denote the observed record gaps. Under the Yang–Nevzorov
+#' model, the gaps are approximately geometrically distributed with parameter
+#' \eqn{\hat{p} = 1 / \bar{G}}. The test proceeds as follows:
+#'
+#' 1. Estimate \eqn{p} and the implied \eqn{\hat{\gamma} = 1 / (1 - \hat{p})}.
+#' 2. Compute expected frequencies for the first \eqn{K-1} categories and
+#' group all larger gaps into the \eqn{K}-th bin.
+#' 3. Form the Pearson chi-squared statistic:
+#'    \deqn{ \chi^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}, }
+#'    with \eqn{df = (K - 1) - 1} degrees of freedom (adjusted for the
+#'    estimated parameter).
+#' 4. Return decision `"YNM"` if the null hypothesis of geometric gaps
+#' is not rejected, and `"NO"` otherwise.
+#'
+#' A confidence interval for {\eqn{\gamma}} is also computed using a
+#' normal approximation:
+#' \deqn{ \text{Var}(\hat{\gamma}) = \frac{\hat{\gamma} (\hat{\gamma} - 1)^2}{n}. }
+#'
+#' @param X Numeric vector of observations.
+#' @param alpha Numeric, significance level (default = 0.05).
+#' @param K Integer, number of categories for chi-squared grouping.
+#'   If `NULL`, defaults to `min(4, length(gaps))`.
+#' @param warmup Integer, number of initial gaps to discard (default = 0).
+#'
+#' @return A list with elements:
+#' \item{obs_counts}{Observed counts per category.}
+#' \item{exp_counts}{Expected counts per category under fitted geometric law.}
+#' \item{stat}{Chi-squared test statistic.}
+#' \item{df}{Degrees of freedom.}
+#' \item{p_value}{P-value of the chi-squared test.}
+#' \item{p_hat}{Estimated geometric parameter.}
+#' \item{gamma_hat}{Estimated Yang parameter \eqn{\gamma}.}
+#' \item{v_gamma_hat}{Estimated variance of \eqn{\hat{\gamma}}.}
+#' \item{CL}{Confidence interval for \eqn{\gamma}.}
+#' \item{decision}Decision: `"YNM"` if not rejected, `"NO"` otherwise.}
+#'
+#' @examples
+#' set.seed(123)
+#' X <- YNM_series_Gumbel(T = 50, gamma = 1.2)
+#' Test_YNM_Geom(X, alpha = 0.05, K = 4, warmup=2)
+#'
+#'$obs_counts
+#'[1] 3 3 1 4
+#'
+#'$exp_counts
+#'
+#'[1] 2.69 2.03 1.53 4.74
+#'
+#'$stat
+#'[1] 0.8008871
+#'
+#' $df
+#' [1] 2
+#'
+#' $p_value
+#' [1] 0.6700228
+#'
+#' $p_hat
+#' [1] 0.2444444
+#'
+#' $gamma_hat
+#' [1] 1.323529
+#'
+#' $v_gamma_hat
+#' [1] 0.01259414
+#'
+#' $CL
+#' [1] 1.138938 1.508121
+#'
+#' $decision
+#' [1] "YNM"
+Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
 
   gaps = rec_gaps(X)
   if (warmup > 0 ){ gaps <- gaps[-seq_len(warmup)]}
 
   # Total number of observations
   n <- length(gaps)
-  if( n<=1 ) {return(list("dec"="NO")) }
+  if( n<=1 ) {return(list("decision"="NO")) }
 
   ## geometric parameter
   p_hat <- 1/mean(gaps)
@@ -316,12 +492,12 @@ Test_Yang_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
   df <- (K - 1) - 1   # bins-1 - params estimated
 
   p_value <- pchisq(chi2, df = df, lower.tail = FALSE)
-  dec = ifelse(p_value>=alpha , "YNM", "NO") #& CL[1]>1
+  decision = ifelse(p_value>=alpha , "YNM", "NO") #& CL[1]>1
   # if(p_value < alpha) {
-  #   dec = "NO"
+  #   decision = "NO"
   # } else if( CL[1] >1) {
-  #   dec= "Yang"
-  # } else {dec = "NO"}
+  #   decision= "Yang"
+  # } else {decision = "NO"}
 
   return(list(obs_counts = obs_counts,
               exp_counts = round(exp_counts,2),
@@ -332,7 +508,7 @@ Test_Yang_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
               "gamma_hat"=gamma ,
               "v_gamma_hat" = v_gamma_hat ,
               "CL" = CL,
-              "dec"=dec))
+              "decision"=decision))
 }
 
 
@@ -344,7 +520,7 @@ dispersion_geom_test <- function(X, alpha=0.05, B = 5000, seed = NULL, return_si
    gaps = rec_gaps (X)
   if (!is.null(seed)) set.seed(seed)
 
-  if (any(gaps < 1)) return(list(dec= "NO"))
+  if (any(gaps < 1)) return(list(decision= "NO"))
 
   n <- length(gaps)
 
@@ -368,6 +544,6 @@ dispersion_geom_test <- function(X, alpha=0.05, B = 5000, seed = NULL, return_si
 
   res <- list(n = n, Gbar = Gbar, s2 = s2, D = D,
               p_chisq= p_chisq,
-              dec = ifelse(p_chisq>alpha, "Geom", "NO"))
+              decision = ifelse(p_chisq>alpha, "Geom", "NO"))
   return(res)
 }

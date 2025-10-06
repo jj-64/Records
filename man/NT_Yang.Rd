@@ -4,7 +4,7 @@
 \alias{NT_Yang}
 \title{Distribution of number of records in YANG-Nevzorov (YN) process}
 \usage{
-NT_Yang(m, T, gamma, s = NA)
+NT_Yang(m, T, gamma, s = NULL)
 }
 \arguments{
 \item{m}{the observed number of record}
@@ -13,10 +13,11 @@ NT_Yang(m, T, gamma, s = NA)
 
 \item{gamma}{The power of the process, \eqn{\gamma >= 1}}
 
-\item{s}{(NA by default) the Stirling matrix of the second kind}
+\item{s}{Optional. Precomputed Stirling matrix from
+\code{\link{Stirling_2nd_Yang}} (default = NA so it is recomputed internally).}
 }
 \value{
-a probability less than one
+Probability value \eqn{P(N_T = m)} less than one
 }
 \description{
 Distribution of the number of records YANG-Nevzorov (YN) process. The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.

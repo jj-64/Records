@@ -18,7 +18,7 @@
 #'   and adjusted R-squared exceeds the threshold, \code{"NO"} otherwise.}
 #'   \item{MSE}{Mean squared error of the fitted model (normalized by \eqn{\sum X^2}).}
 #'   \item{STD}{Estimated standard error of the slope coefficient.}
-#'   \item{dec}{Decision: \code{"LDM"} if the null hypothesis is rejected
+#'   \item{decision}{Decision: \code{"LDM"} if the null hypothesis is rejected
 #' }
 #'
 #' @details
@@ -62,8 +62,8 @@ Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8) {
   RS <- summary(robust_model)$adj.r.squared
 
   # Decision rule
-  #dec <- ifelse(p_value < alpha & RS >= RSq, "LDM", "NO")
-  dec <- ifelse(p_value < alpha, "LDM", "NO")
+  #decision <- ifelse(p_value < alpha & RS >= RSq, "LDM", "NO")
+  decision <- ifelse(p_value < alpha & RS >= RSq, "LDM", "NO")
 
   return(list(
     stat = coefficient,
@@ -71,7 +71,7 @@ Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8) {
     RS = RS,
     MSE = MSE,
     STD = std_error,
-    dec = dec
+    decision = decision
   ))
 }
 
@@ -136,7 +136,7 @@ Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {
 #'   (either z-statistic or quantile interval).}
 #'   \item{theta_hat}{Estimated drift parameter \eqn{\theta}.}
 #'   \item{v_theta_hat}{Estimated variance for drift parameter \eqn{\theta}.}
-#'   \item{dec}{Decision: \code{"LDM"} if accepted, \code{"NO"} otherwise.}
+#'   \item{decision}{Decision: \code{"LDM"} if accepted, \code{"NO"} otherwise.}
 #' }
 #'
 #' @details
@@ -166,10 +166,10 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
 
   # Decision rule
   if (z_theo <= qnorm(1 - alpha / 2) && z_theo >= qnorm(alpha / 2)) {
-    dec <- "NO"
+    decision <- "NO"
   } else {
     z_theo <- Quantile_LDM(T = length(X), theta = theta, scale = scale, alpha = alpha)
-    dec <- ifelse(obs <= z_theo[2] && obs >= max(z_theo[1], 1), "LDM", "NO")
+    decision <- ifelse(obs <= z_theo[2] && obs >= max(z_theo[1], 1), "LDM", "NO")
   }
 
   return(list(
@@ -177,7 +177,7 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
     stat_theo = z_theo,
     theta_hat = theta,
     v_theta_gat = v_theta,
-    dec = dec
+    decision = decision
   ))
 }
 
@@ -208,11 +208,11 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
 #'   \item{Var_Z}{Estimated variance of \code{Z}.}
 #'   \item{stat}{Standardized stage 1 test statistic.}
 #'   \item{p_value}{p_value of the stage 1 test.}
-#'   \item{dec}{Decision of stage 1: \code{"Sameslope"} or \code{"NO"}.}
+#'   \item{decision}{Decision of stage 1: \code{"Sameslope"} or \code{"NO"}.}
 #'   \item{z_A}{Stage 2 standardized slope for first block comparison.}
 #'   \item{z_B}{Stage 2 standardized slope for third block comparison.}
 #'   \item{slope_SD}{Estimated standard deviation of slope differences (stage 2).}
-#'   \item{dec}{Final decision: \code{"LDM"} or \code{"NO"}.}
+#'   \item{decision}{Final decision: \code{"LDM"} or \code{"NO"}.}
 #' }
 #'
 #' @details
@@ -241,7 +241,8 @@ Test_LDM_Sequential <- function(X, alpha = 0.05) {
   # Stage 1
   res1 <- Test_LDM_Sen_stage1(X, alpha = 2 * alpha, pooled = FALSE)  # one-sided
 
-  if (res1$dec == "NO") {
+  if (res1$decision1 == "NO") {
+    names(res1)[which(names(res1) == 'decision1')] = "decision"
     return(res1)
   }
 
@@ -305,7 +306,7 @@ Test_LDM_Sen_stage1 <- function(X, alpha = 0.05, pooled = FALSE) {
   }
 
   # Decision: same slope or reject
-  dec <- ifelse(p_value > alpha / 2, "Sameslope", "NO")
+  decision <- ifelse(p_value > alpha / 2, "Sameslope", "NO")
 
   return(list(
     block_size = m,
@@ -316,7 +317,7 @@ Test_LDM_Sen_stage1 <- function(X, alpha = 0.05, pooled = FALSE) {
     Var_Z = var_z,
     stat = T_p,
     p_value = p_value,
-    dec = dec
+    decision1 = decision
   ))
 }
 
@@ -336,10 +337,10 @@ Test_LDM_Sen_stage2 <- function(stage1, alpha = 0.05) {
   z_B <- s2 / sigma_s
 
   # Decision
-  dec <- ifelse(abs(z_A) <= qnorm(1 - alpha / 2) | abs(z_B) <= qnorm(1 - alpha / 2),
+  decision <- ifelse(abs(z_A) <= qnorm(1 - alpha / 2) | abs(z_B) <= qnorm(1 - alpha / 2),
                 "NO", "LDM")
 
-  return(list(z_A = z_A, z_B = z_B, slope_SD = sigma_s, dec = dec))
+  return(list(z_A = z_A, z_B = z_B, slope_SD = sigma_s, decision = decision))
 }
 
 
@@ -375,11 +376,11 @@ Test_LDM_Sen = function(X, alpha=0.05){
   #CL_low_H0 = qnorm(alpha/2)* sigma_s  #-1.959 for alpha =0.05
   #CL_up_H0 = qnorm(1-alpha/2)* sigma_s
   #"CL_H0" = c(CL_low_H0, CL_up_H0)
-  #dec= ifelse(s >= CL_up_H0 | s<= CL_low_H0, "LDM","NO")
+  #decision= ifelse(s >= CL_up_H0 | s<= CL_low_H0, "LDM","NO")
   z=s/sigma_s
-  dec = ifelse(abs(z) >= qnorm(1-alpha/2), "LDM", "NO")
+  decision = ifelse(abs(z) >= qnorm(1-alpha/2), "LDM", "NO")
 
-   return(list( "stat" = z,"theta_hat"=s,"theta_SD"=sigma_s,"dec"=dec))
+   return(list( "stat" = z,"theta_hat"=s,"theta_SD"=sigma_s,"decision"=decision))
   #abline(a=a, b=s)
   #plot(sort(y2),sort(y1))
   #abline(a=0, b=1)
@@ -468,10 +469,10 @@ Test_LDM_Sen = function(X, alpha=0.05){
 #   p_value = 1-pt(q=abs(T_p), df = n-3)
 #   }
 #
-#   #dec= ifelse((T_p <= qnorm(alpha,0,1) | T_p >= qnorm(1-alpha,0,1)), "NO", "SameSlope")
-#   dec = ifelse (p_value > alpha/2 , "Sameslope", "NO")
-#   #dec= ifelse( z >= qnorm(alpha/2,0,1)*sqrt(var_z) &  z <=  qnorm(1-alpha/2,0,1)*sqrt(var_z), "LDM", "NO")
-#   return(list("block_size"= m,"means"= w$mean_value, "slopes"= w$slopes[-1],"var_x" = var_x,"Z"=z, "Var_Z" = var_z, "stat"=  T_p,"p_value" =  p_value, "dec" = dec))
+#   #decision= ifelse((T_p <= qnorm(alpha,0,1) | T_p >= qnorm(1-alpha,0,1)), "NO", "SameSlope")
+#   decision = ifelse (p_value > alpha/2 , "Sameslope", "NO")
+#   #decision= ifelse( z >= qnorm(alpha/2,0,1)*sqrt(var_z) &  z <=  qnorm(1-alpha/2,0,1)*sqrt(var_z), "LDM", "NO")
+#   return(list("block_size"= m,"means"= w$mean_value, "slopes"= w$slopes[-1],"var_x" = var_x,"Z"=z, "Var_Z" = var_z, "stat"=  T_p,"p_value" =  p_value, "decision" = decision))
 # }
 #
 # Test_LDM_Sen_stage2 = function(stage1, alpha=0.05){
@@ -491,9 +492,9 @@ Test_LDM_Sen = function(X, alpha=0.05){
 #   ## Test
 #   z_A=  s1/sigma_s
 #   z_B=  s2/sigma_s
-#   dec = ifelse(abs(z_A) <= qnorm(1-alpha/2) | abs(z_B) <= qnorm(1-alpha/2),  "NO", "LDM")
+#   decision = ifelse(abs(z_A) <= qnorm(1-alpha/2) | abs(z_B) <= qnorm(1-alpha/2),  "NO", "LDM")
 #
-#   return(list( "z_A" = z_A, "z_B" = z_B, "slope_SD"=sigma_s,"dec"=dec))
+#   return(list( "z_A" = z_A, "z_B" = z_B, "slope_SD"=sigma_s,"decision"=decision))
 # }
 #
 # Test_LDM_Sequential <- function(X, alpha = 0.05) {
@@ -503,7 +504,7 @@ Test_LDM_Sen = function(X, alpha=0.05){
 #   # Step 1: Run Test_LDM_Sen_stage1
 #   res1 <- Test_LDM_Sen_stage1(X, alpha = 2*alpha, pooled = FALSE)  ## one sided test
 #
-#   if (res1$dec == "NO") {
+#   if (res1$decision == "NO") {
 #     # Stop immediately
 #     return(res1)
 #   }
@@ -512,7 +513,7 @@ Test_LDM_Sen = function(X, alpha=0.05){
 #   n= floor(length(X)/2)
 #   # res2_A <- Test_LDM_Sen(X[1:n], alpha = alpha)
 #   # res2_B <- Test_LDM_Sen(X[(n +1):length(X)], alpha = alpha)
-#   # res2 = ifelse(res2_A$dec == "NO" |  res2_B$dec == "NO", "NO", "LDM")
+#   # res2 = ifelse(res2_A$decision == "NO" |  res2_B$decision == "NO", "NO", "LDM")
 #   res2 = Test_LDM_Sen_stage2(res1, alpha=alpha)
 #
 #   return( c(res1,res2 ))

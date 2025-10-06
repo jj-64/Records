@@ -12,7 +12,7 @@ Stirling_2nd_Yang(T, gamma)
 \item{gamma}{The power of the process, \eqn{\gamma >= 1}}
 }
 \value{
-A \eqn{T \times T} lower triangular \eqn{T \times T} matrix of all combinations of Stirling number.
+A \eqn{T \times T} lower triangular matrix of all combinations of Stirling number.
 }
 \description{
 It is used later to compute the distribution of number of records

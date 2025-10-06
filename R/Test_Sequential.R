@@ -20,7 +20,7 @@ DT_CLYD = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return(score=4)}
 
@@ -58,7 +58,7 @@ DT_CLDY = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{    dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{    dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -78,7 +78,7 @@ DT_CYLD = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -111,7 +111,7 @@ DT_CYDL = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(rec_gaps(X))
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -152,7 +152,7 @@ DT_CDYL = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -191,7 +191,7 @@ DT_CDLY = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -217,7 +217,7 @@ DT_LCYD = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -255,7 +255,7 @@ DT_LCDY = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{    dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{    dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -277,7 +277,7 @@ DT_LYCD = function(X,p=0.05){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
     if(length(part$j)==1){dec="NO"
-    }else{dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    }else{dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
   if(dec!="NO"){    return( score=4)}
 
   ##Classical
@@ -310,7 +310,7 @@ DT_LYDC = function(X,p=0.05){
     part= partition(X)
     if(length(part$j)==1){dec="NO"
     }else{
-      dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+      dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -348,7 +348,7 @@ DT_LDYC = function(X,p=0.05){
     part= partition(X)
     if(length(part$j)==1){dec="NO"
     }else{
-      dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+      dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -383,7 +383,7 @@ DT_LDCY = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   }
   if(dec!="NO"){    return( score=4)}
 
@@ -399,7 +399,7 @@ DT_YCLD = function(X,p=0.05){
   ## YANG
   gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
   part= partition(X)
-  if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+  if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   if(dec!="NO"){    return( score=4)}
 
   ##Classical
@@ -426,7 +426,7 @@ DT_YCDL = function(X,p=0.05){
   ## YANG
   gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
   part= partition(X)
-  if(length(part$j)==1){dec="NO"     }else{    dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+  if(length(part$j)==1){dec="NO"     }else{    dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   if(dec!="NO"){    return( score=4)}
 
   ##Classical
@@ -453,7 +453,7 @@ DT_YLCD = function(X,p=0.05){
   ## YANG
   gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
   part= partition(X)
-  if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+  if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   if(dec!="NO"){    return( score=4)}
 
   ## LDM
@@ -480,7 +480,7 @@ DT_YLDC = function(X,p=0.05){
   ## YANG
   gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
   part= partition(X)
-  if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+  if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   if(dec!="NO"){    return( score=4)}
 
   ## LDM
@@ -509,7 +509,7 @@ DT_YDLC = function(X,p=0.05){
   ## YANG
   gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
   part= partition(X)
-  if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+  if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   if(dec!="NO"){    return( score=4)}
 
   ##DTRW
@@ -536,7 +536,7 @@ DT_YDCL = function(X,p=0.05){
   ## YANG
   gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
   part= partition(X)
-  if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
+  if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}
   if(dec!="NO"){    return( score=4)}
 
   ##DTRW
@@ -578,7 +578,7 @@ DT_DCLY = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
 
   if(dec!="NO"){    return( score=4)}
 
@@ -603,7 +603,7 @@ DT_DCYL = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{     dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    if(length(part$j)==1){dec="NO"     }else{     dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
   if(dec!="NO"){    return( score=4)}
 
   ## LDM
@@ -628,7 +628,7 @@ DT_DYCL = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{    dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    if(length(part$j)==1){dec="NO"     }else{    dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
   if(dec!="NO"){    return( score=4)}
 
   ##Classical
@@ -656,7 +656,7 @@ DT_DYLC = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{ dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    if(length(part$j)==1){dec="NO"     }else{ dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
   if(dec!="NO"){    return( score=4)}
 
   ## LDM
@@ -689,7 +689,7 @@ DT_DLYC = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    if(length(part$j)==1){dec="NO"     }else{dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
   if(dec!="NO"){    return( score=4)}
 
   ##Classical
@@ -721,7 +721,7 @@ DT_DLCY = function(X,p=0.05){
   if(dec=="NO"){
     gamma_hat = Estim_gamma_indicator(X=X,min=1,max=5)
     part= partition(X)
-    if(length(part$j)==1){dec="NO"     }else{dec=Test_Yang_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
+    if(length(part$j)==1){dec="NO"     }else{dec=Test_YNM_Pearson(X=X,gamma=gamma_hat,estimated=1,p=p)$dec}}
   if(dec!="NO"){    return( score=4)}
 
   ## No model

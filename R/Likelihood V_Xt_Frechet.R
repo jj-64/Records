@@ -16,7 +16,7 @@
 #' @param params Numeric vector of three values:  estimated gamma parameter \eqn{ >1}; estimated 1/scale parameter \eqn{ >0}; estimated shape parameter \eqn{ >0}.
 #' @return Numeric, variance of gamma estimator.
 #' @examples
-#' Xt = Yang_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
+#' Xt = YNM_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
 #'> Xt
 #'[1]  1.150213  1.967684  2.815744  5.612472  1.894868  1.545855  2.086920
 #'[8]  2.786223  5.900306  3.548544  6.620712  2.774885  6.421587  7.112956
@@ -68,7 +68,7 @@ V_Xt_Frechet_Yang_gamma <- function(x, params) {
 #' @inheritParams V_Xt_Frechet_Yang_gamma
 #' @return Numeric, variance of gamma estimator.
 #' @examples
-#' Xt = Yang_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
+#' Xt = YNM_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
 #'> Xt
 #'[1]  1.150213  1.967684  2.815744  5.612472  1.894868  1.545855  2.086920
 #'[8]  2.786223  5.900306  3.548544  6.620712  2.774885  6.421587  7.112956
@@ -122,7 +122,7 @@ V_Xt_Frechet_Yang_scale = function(x,params){
 #' @inheritParams V_Xt_Frechet_Yang_gamma
 #' @return Numeric, variance of gamma estimator.
 #' @examples
-#' Xt = Yang_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
+#' Xt = YNM_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
 #'> Xt
 #'[1]  1.150213  1.967684  2.815744  5.612472  1.894868  1.545855  2.086920
 #'[8]  2.786223  5.900306  3.548544  6.620712  2.774885  6.421587  7.112956

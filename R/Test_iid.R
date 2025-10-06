@@ -23,7 +23,7 @@
 #' @return A list with:
 #' \item{stat}{The observed test statistic.}
 #' \item{p_value}{The p-value under the null hypothesis.}
-#' \item{dec}{Character string: "Classical" or "NO"}
+#' \item{decision}{Character string: "Classical" or "NO"}
 #' @export
 #'
 #' @examples
@@ -35,12 +35,12 @@ Test_iid_NT <- function(X, alpha = 0.05) {
   obs_stat <- (rec_counts(X) - log(T)) / sqrt(log(T))
   p_value <- 1 - pnorm(obs_stat, 0, 1)
 
-  dec <- ifelse(p_value > alpha, "Classical", "NO")
+  decision <- ifelse(p_value > alpha, "Classical", "NO")
 
   return(list(
     stat = obs_stat,
     p_value = p_value,
-    dec = dec
+    decision = decision
   ))
 }
 
@@ -63,7 +63,7 @@ Test_iid_NT <- function(X, alpha = 0.05) {
 #' @return A list with:
 #' \item{stat}{The Ljung–Box (or Box–Pierce) test statistic.}
 #' \item{p_value}{The p-value of the test.}
-#' \item{dec}{Character string: "Classical" or "NO"}
+#' \item{decision}{Character string: "Classical" or "NO"}
 #' @export
 #'
 #' @examples
@@ -78,6 +78,6 @@ Test_iid_BoxJenkins <- function(X, lags = 10, alpha = 0.05, type = "Ljung-Box") 
   return(list(
     stat = bt$statistic,
     p_value = bt$p.value,
-    dec = decision
+    decision = decision
   ))
 }

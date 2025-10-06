@@ -182,8 +182,9 @@ Estim_gamma_indicator <- function(X, min = 1, max = 5, step = 0.001) {
 #' Estim_gamma_indicator_Variance(T=300, 1.2, approximate = TRUE)
 #' [1] 0.00096
 Estim_gamma_indicator_Variance <- function(T, gamma, approximate = FALSE) {
+
   if (approximate) {
-    # --- Approximate variance formula ---
+    # --- Approximate variance formula --- works for large gamma and T
     v <- 1 / gamma
     Inv = (1-v)/v^3
 
