@@ -23,7 +23,7 @@ A list with components:
 and adjusted R-squared exceeds the threshold, \code{"NO"} otherwise.}
 \item{MSE}{Mean squared error of the fitted model (normalized by \eqn{\sum X^2}).}
 \item{STD}{Estimated standard error of the slope coefficient.}
-\item{dec}{Decision: \code{"LDM"} if the null hypothesis is rejected
+\item{decision}{Decision: \code{"LDM"} if the null hypothesis is rejected
 }
 }
 \description{

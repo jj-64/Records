@@ -23,7 +23,7 @@ The Fisher information is given by:
 \deqn{ I(a) = -\frac{T}{a^2} - \sum_{t=1}^{T} \gamma^t (\log(A y))^2 (A y)^{-a} }
 }
 \examples{
-Xt = Yang_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
+Xt = YNM_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
 > Xt
 [1]  1.150213  1.967684  2.815744  5.612472  1.894868  1.545855  2.086920
 [8]  2.786223  5.900306  3.548544  6.620712  2.774885  6.421587  7.112956

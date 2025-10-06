@@ -19,7 +19,7 @@ Test_iid_BoxJenkins(X, lags = 10, alpha = 0.05, type = "Ljung-Box")
 A list with:
 \item{stat}{The Ljung–Box (or Box–Pierce) test statistic.}
 \item{p_value}{The p-value of the test.}
-\item{dec}{Character string: "Classical" or "NO"}
+\item{decision}{Character string: "Classical" or "NO"}
 }
 \description{
 Tests whether a sequence of observations is i.i.d. using the Ljung–Box test

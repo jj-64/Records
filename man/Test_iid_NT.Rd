@@ -15,7 +15,7 @@ Test_iid_NT(X, alpha = 0.05)
 A list with:
 \item{stat}{The observed test statistic.}
 \item{p_value}{The p-value under the null hypothesis.}
-\item{dec}{Character string: "Classical" or "NO"}
+\item{decision}{Character string: "Classical" or "NO"}
 }
 \description{
 Tests whether a sequence of observations is i.i.d. based on the number of records,
