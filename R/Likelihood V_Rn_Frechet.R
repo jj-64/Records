@@ -1,5 +1,5 @@
-##################Variance estimators - Rn - Frechet - Yang ##########################
-v_Rn_Exp_Yang_gamma <- function(a, b, x) {
+##################Variance estimators - Rn - Frechet - YNM ##########################
+v_Rn_Exp_YNM_gamma <- function(a, b, x) {
   # Terms involving b
   b_term <- x^b * ((b^2 - 3*b + 2) * x^2 + (4*b - 2*b^2) * x + b^2 - b)
 
@@ -16,7 +16,7 @@ v_Rn_Exp_Yang_gamma <- function(a, b, x) {
 }
 
 ## Variance of gamma
-V_Rn_Frechet_Yang_gamma =  function(R,L,T,params){  ## vector of Rn, Ln, values of Time, gamma, A and a of Frechet parameters
+V_Rn_Frechet_YNM_gamma =  function(R,L,T,params){  ## vector of Rn, Ln, values of Time, gamma, A and a of Frechet parameters
   m = length(R) ## NT = m
   g = params[1]
   A = params[2]
@@ -26,17 +26,17 @@ V_Rn_Frechet_Yang_gamma =  function(R,L,T,params){  ## vector of Rn, Ln, values 
 
   term2 = numeric(m)
   for(i in 1:(m-1)){
-    term2[i]=(A*R[i])^(-a) * v_Rn_Exp_Yang_gamma(a=L[i],b=L[i+1],x=g)
+    term2[i]=(A*R[i])^(-a) * v_Rn_Exp_YNM_gamma(a=L[i],b=L[i+1],x=g)
   }
   if(L[m]<T){
-    term2[m] = (A*R[m])^(-a)* v_Rn_Exp_Yang_gamma(a=L[m],b=(T+1),x=g)}
+    term2[m] = (A*R[m])^(-a)* v_Rn_Exp_YNM_gamma(a=L[m],b=(T+1),x=g)}
 
   fisher= term1-sum(term2)
   return(-1/fisher)
 }
 
 ## Variance of 1/scale A
-V_Rn_Frechet_Yang_scale = function(R,L,T,params){
+V_Rn_Frechet_YNM_scale = function(R,L,T,params){
   g = params[1]
   A = params[2]
   a = params[3]
@@ -60,7 +60,7 @@ V_Rn_Frechet_Yang_scale = function(R,L,T,params){
 }
 
 ## Variance of shape a
-V_Rn_Frechet_Yang_shape = function(R,L,T,params){
+V_Rn_Frechet_YNM_shape = function(R,L,T,params){
   m=length(R)
   g = params[1]
   A = params[2]

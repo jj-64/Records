@@ -2,14 +2,14 @@
 % Please edit documentation in R/Test_YNM.R
 \name{Test_YNM_NT}
 \alias{Test_YNM_NT}
-\title{Yang's Record Test (Number of Records Statistic)}
+\title{YNM's Record Test (Number of Records Statistic)}
 \usage{
 Test_YNM_NT(X, gamma = NA, alpha = 0.05)
 }
 \arguments{
 \item{X}{A numeric vector (time series).}
 
-\item{gamma}{Optional. The power parameter of the Yang-Nevzorov Model. If not provided, it will be estimated.}
+\item{gamma}{Optional. The power parameter of the YNM-Nevzorov Model. If not provided, it will be estimated.}
 
 \item{alpha}{Significance level (default = 0.05).}
 }
@@ -18,10 +18,10 @@ A list with:
 \item{stat}{Observed number of records.}
 \item{stat_theo}{Theoretical quantile interval at level \eqn{1-\alpha}.}
 \item{gamma_hat}{Estimated or provided \eqn{\gamma}.}
-\item{decision}{Character string: "NO" (reject null) or "Yang" (fail to reject).}
+\item{decision}{Character string: "NO" (reject null) or "YNM" (fail to reject).}
 }
 \description{
-Implements Yang's test for sequences based on the distribution
+Implements YNM's test for sequences based on the distribution
 of the number of records.
 }
 \details{
@@ -32,7 +32,7 @@ If \eqn{\gamma} is unknown, it is estimated using \code{\link{Estim_gamma_indica
 Its variance is computed via \code{\link{Estim_gamma_indicator_Variance}}.
 
 The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
-\deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{NT_Yang}}
+\deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{NT_YNM}}
 }
 \examples{
 set.seed(123)

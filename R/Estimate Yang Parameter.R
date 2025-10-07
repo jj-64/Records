@@ -63,7 +63,7 @@ gamma^2 * (gamma-1)
 Estim_gamma_NT_unbiased = function(X){ ## compute the second estimator*
 
   HT = function(gamma,T){
-    sum(rec_rate_Yang(gamma,1:T))/T
+    sum(rec_rate_YNM(gamma,1:T))/T
   }
 
   H = function(gamma){
@@ -81,7 +81,7 @@ Estim_gamma_NT_unbiased = function(X){ ## compute the second estimator*
 
     cc=0
     for(k in 1:T) {
-      cc[k] = rec_rate_Yang(gamma,k)^2 + (hT-h)^2
+      cc[k] = rec_rate_YNM(gamma,k)^2 + (hT-h)^2
     }
 
     d=hT/T - (sum(cc))/T^2
@@ -192,7 +192,7 @@ Estim_gamma_indicator_Variance <- function(T, gamma, approximate = FALSE) {
   }
 
   # --- Exact Fisher information ---
-  ent <- ENT_Yang(T=T, gamma = gamma )
+  ent <- ENT_YNM(T=T, gamma = gamma )
 
   # Components of Fisher information
   a <- (1 / (gamma^2 * (gamma - 1)^2)) * ent
@@ -200,7 +200,7 @@ Estim_gamma_indicator_Variance <- function(T, gamma, approximate = FALSE) {
   c <- T * (1 + gamma^T * (T - 1)) / (gamma^2 * (gamma^T - 1)^2)
 
   i <- 2:T
-  d <- (i - 1) * (1 + (i - 2) * gamma^(i - 1)) * rec_rate_Yang(gamma, i) /
+  d <- (i - 1) * (1 + (i - 2) * gamma^(i - 1)) * rec_rate_YNM(gamma, i) /
     (gamma^2 * (gamma^(i - 1) - 1)^2)
 
   I <- a + b - c - sum(d)

@@ -53,21 +53,6 @@ partition <- function(X, min_expected = 1, warmup = 2, K = NULL) {
   ))
 }
 
-#' Partition record gaps adaptively
-#'
-#' Partitions record gaps into bins for Pearson-type tests.
-#' Ensures at least two partitions remain after merging.
-#'
-#' @param X Numeric vector (time series).
-#' @param min_expected Minimum expected count per bin (default = 1).
-#' @param warmup Number of initial gaps to drop (default = 2).
-#' @param K Optional. If given, force exactly K partitions using quantiles.
-#' @return A list with:
-#'   \item{j}{Partition start points}
-#'   \item{nk}{Frequencies in each partition}
-#'   \item{labels}{Readable bin labels}
-#' @export
-
 #' Partition record gaps adaptively (with padding)
 #'
 #' Partitions record gaps into bins for Pearson-type tests.
@@ -82,13 +67,17 @@ partition <- function(X, min_expected = 1, warmup = 2, K = NULL) {
 #'   \item{nk}{Frequencies in each partition}
 #'   \item{labels}{Readable bin labels}
 #' @export
-partition2 <- function(X, min_expected = 1, warmup = 2, K = NULL, estimated = TRUE) {
+partition2 <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = TRUE) {
   gaps <- rec_gaps(X)
 
   min_K = 2+ifelse(estimated, 1, 0)
 
   # Drop warmup
-  if (length(gaps) >= (warmup + 5)) {
+  # if (length(gaps) >= (warmup + 5)) {
+  #   gaps <- gaps[-seq_len(warmup)]
+  # }
+  if (is.null(warmup)){
+    warmup = ceiling(0.3*length(gaps))
     gaps <- gaps[-seq_len(warmup)]
   }
 
@@ -147,7 +136,7 @@ partition2 <- function(X, min_expected = 1, warmup = 2, K = NULL, estimated = TR
 }
 
 
-# Pearson chi-square test for Yang
+# Pearson chi-square test for YNM
 Test_YNM_Pearson <- function(X, Partition = NA, gamma = NULL, K=NULL, estimated = TRUE, alpha = 0.05) {
 
   if (sum(is_rec(X)) <=4) {
@@ -173,7 +162,7 @@ Test_YNM_Pearson <- function(X, Partition = NA, gamma = NULL, K=NULL, estimated 
                                          }
 
   # Partition handling
-  if (is.na(Partition)[1]) Partition <- partition(X, K=K)
+  if (is.na(Partition)[1]) Partition <- partition2(X, K=K)
 
   K <- length(Partition$nk)
   nk <- Partition$nk
@@ -270,7 +259,7 @@ Test_YNM_Smooth <- function(X, alpha = 0.05) {
   crit_val <- qchisq(1 - alpha, df = k)
   p_value <- 1 - pchisq(obs_stat, df = k)
 
-  decision <- ifelse(obs_stat <= crit_val, "Yang", "NO")
+  decision <- ifelse(obs_stat <= crit_val, "YNM", "NO")
 
   return(list(
     stat = obs_stat,
@@ -284,11 +273,11 @@ Test_YNM_Smooth <- function(X, alpha = 0.05) {
 
 ############### based on exact distribution of number of records in all cases ######3
 
-Quantile_Yang=function(T,gamma, alpha= 0.05){
+Quantile_YNM=function(T,gamma, alpha= 0.05){
   Prob = 0
 
   for(i in 1:T){
-    Prob[i]= NT_Yang(m=i, T=T,gamma=gamma)
+    Prob[i]= NT_YNM(m=i, T=T,gamma=gamma)
   }
   CDF = cumsum(Prob)  ## cumulative distribution
 
@@ -298,9 +287,9 @@ Quantile_Yang=function(T,gamma, alpha= 0.05){
 }
 
 
-#' Yang's Record Test (Number of Records Statistic)
+#' YNM's Record Test (Number of Records Statistic)
 #'
-#' Implements Yang's test for sequences based on the distribution
+#' Implements YNM's test for sequences based on the distribution
 #' of the number of records.
 #'
 #' @details
@@ -311,17 +300,17 @@ Quantile_Yang=function(T,gamma, alpha= 0.05){
 #' Its variance is computed via \code{\link{Estim_gamma_indicator_Variance}}.
 #'
 #' The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
-#' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{NT_Yang}}
+#' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{NT_YNM}}
 #'
 #' @param X A numeric vector (time series).
-#' @param gamma Optional. The power parameter of the Yang-Nevzorov Model. If not provided, it will be estimated.
+#' @param gamma Optional. The power parameter of the YNM-Nevzorov Model. If not provided, it will be estimated.
 #' @param alpha Significance level (default = 0.05).
 #'
 #' @return A list with:
 #' \item{stat}{Observed number of records.}
 #' \item{stat_theo}{Theoretical quantile interval at level \eqn{1-\alpha}.}
 #' \item{gamma_hat}{Estimated or provided \eqn{\gamma}.}
-#' \item{decision}{Character string: "NO" (reject null) or "Yang" (fail to reject).}
+#' \item{decision}{Character string: "NO" (reject null) or "YNM" (fail to reject).}
 #'
 #' @export
 #'
@@ -350,14 +339,14 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
     stat_theo <- z_theo
   } else {
     # --- Fallback to exact quantiles ---
-    probs <- vapply(1:T, function(i) NT_Yang(m = i, T = T, gamma = gamma), numeric(1))
+    probs <- vapply(1:T, function(i) NT_YNM(m = i, T = T, gamma = gamma), numeric(1))
     cdf <- cumsum(probs)
 
-    lower <- which.min(abs(cdf - (alpha / 2)))  ##Quantile_Yang(T=T, gamma=gamma, alpha= alpha)[1]
-    upper <- which.min(abs(cdf - (1 - alpha / 2)))  ###Quantile_Yang(T=T, gamma=gamma, alpha= alpha)[2]
+    lower <- which.min(abs(cdf - (alpha / 2)))  ##Quantile_YNM(T=T, gamma=gamma, alpha= alpha)[1]
+    upper <- which.min(abs(cdf - (1 - alpha / 2)))  ###Quantile_YNM(T=T, gamma=gamma, alpha= alpha)[2]
 
     stat_theo <- c(lower, upper)
-    decision <- ifelse(obs >= max(lower, 1) && obs <= upper, "Yang", "NO")
+    decision <- ifelse(obs >= max(lower, 1) && obs <= upper, "YNM", "NO")
   }
 
   return(list(
@@ -374,19 +363,20 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #The usual test assumes Gaps are i.i.d. Geom(p). If gaps are nonstationary (e.g. short early gaps, longer later gaps) the single-sample mean
 #is dominated by early small gaps → p biased high → expected tail mass under the null is underestimated → observed long gaps look unsurprising → test fails to reject.
 #So the issue is not the chi-square per se but the (false) assumption of stationarity/homogeneity of gap distribution across time.
-#' Test for Yang–Nevzorov Geometric Record Gaps
+#' Test for YNM–Nevzorov Geometric Record Gaps
 #'
-#' Performs a goodness-of-fit test for the Yang–Nevzorov model by examining
+#' Performs a goodness-of-fit test for the YNM–Nevzorov model by examining
 #' the distribution of record time gaps in a sequence of observations.
 #' The procedure estimates the geometric parameter, computes a chi-squared
 #' statistic on grouped frequencies, and evaluates whether the observed record
 #' gaps are consistent with a geometric distribution.
 #'
 #' @details
-#' Let \eqn{G_i} denote the observed record gaps. Under the Yang–Nevzorov
+#' Let \eqn{G_i} denote the observed record gaps. Under the YNM–Nevzorov
 #' model, the gaps are approximately geometrically distributed with parameter
 #' \eqn{\hat{p} = 1 / \bar{G}}. The test proceeds as follows:
 #'
+#' 0. Remove warm-up gaps (if NULL, 30% of gaps are removed)
 #' 1. Estimate \eqn{p} and the implied \eqn{\hat{\gamma} = 1 / (1 - \hat{p})}.
 #' 2. Compute expected frequencies for the first \eqn{K-1} categories and
 #' group all larger gaps into the \eqn{K}-th bin.
@@ -405,7 +395,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param K Integer, number of categories for chi-squared grouping.
 #'   If `NULL`, defaults to `min(4, length(gaps))`.
-#' @param warmup Integer, number of initial gaps to discard (default = 0).
+#' @param warmup Integer, number of initial gaps to discard (default = NULL).
 #'
 #' @return A list with elements:
 #' \item{obs_counts}{Observed counts per category.}
@@ -414,7 +404,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' \item{df}{Degrees of freedom.}
 #' \item{p_value}{P-value of the chi-squared test.}
 #' \item{p_hat}{Estimated geometric parameter.}
-#' \item{gamma_hat}{Estimated Yang parameter \eqn{\gamma}.}
+#' \item{gamma_hat}{Estimated YNM parameter \eqn{\gamma}.}
 #' \item{v_gamma_hat}{Estimated variance of \eqn{\hat{\gamma}}.}
 #' \item{CL}{Confidence interval for \eqn{\gamma}.}
 #' \item{decision}Decision: `"YNM"` if not rejected, `"NO"` otherwise.}
@@ -454,10 +444,15 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #'
 #' $decision
 #' [1] "YNM"
-Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
+Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL) {
+
+   if (sum(is_rec(X)) <=4) {
+    return(list(decision = "NO"))}
 
   gaps = rec_gaps(X)
+  if (is.null(warmup) ){ warmup = ceiling(0.3 * length(gaps)) }
   if (warmup > 0 ){ gaps <- gaps[-seq_len(warmup)]}
+
 
   # Total number of observations
   n <- length(gaps)
@@ -474,7 +469,7 @@ Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
   # (n-1) * obs_var/theor_var <= qchisq(1-alpha, df = n-1)
 
   # define bins 1:(k-1) and K = ">=k"
-  if (is.null(K)) {K= min(4,length(gaps)) }
+  if (is.null(K)) {K= max(3, length(gaps) )}  ## min(4, length(ga))}
   if(K<2) {K=3}  ## to avoid df = K-2 <0
   obs_counts <- tabulate(pmin(gaps, K), nbins = K)
 
@@ -492,11 +487,11 @@ Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=0) {
   df <- (K - 1) - 1   # bins-1 - params estimated
 
   p_value <- pchisq(chi2, df = df, lower.tail = FALSE)
-  decision = ifelse(p_value>=alpha , "YNM", "NO") #& CL[1]>1
+  decision = ifelse(p_value>=alpha & 1 <=CL[1], "YNM", "NO") #& CL[1]>1
   # if(p_value < alpha) {
   #   decision = "NO"
   # } else if( CL[1] >1) {
-  #   decision= "Yang"
+  #   decision= "YNM"
   # } else {decision = "NO"}
 
   return(list(obs_counts = obs_counts,

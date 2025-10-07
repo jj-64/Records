@@ -2,7 +2,7 @@
 % Please edit documentation in R/Test_YNM.R
 \name{partition2}
 \alias{partition2}
-\title{Partition record gaps adaptively}
+\title{Partition record gaps adaptively (with padding)}
 \usage{
 partition2(X, min_expected = 1, warmup = 2, K = NULL, estimated = TRUE)
 }
@@ -20,13 +20,8 @@ A list with:
 \item{j}{Partition start points}
 \item{nk}{Frequencies in each partition}
 \item{labels}{Readable bin labels}
-
-A list with:
-\item{j}{Partition start points}
-\item{nk}{Frequencies in each partition}
-\item{labels}{Readable bin labels}
 }
 \description{
 Partitions record gaps into bins for Pearson-type tests.
-Ensures at least two partitions remain after merging.
+Ensures at least 3 partitions by padding with zero-frequency bins if necessary.
 }

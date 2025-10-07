@@ -2,9 +2,9 @@
 % Please edit documentation in R/Test_YNM.R
 \name{Test_YNM_Geom}
 \alias{Test_YNM_Geom}
-\title{Test for Yang–Nevzorov Geometric Record Gaps}
+\title{Test for YNM–Nevzorov Geometric Record Gaps}
 \usage{
-Test_YNM_Geom(X, alpha = 0.05, K = NULL, warmup = 0)
+Test_YNM_Geom(X, alpha = 0.05, K = NULL, warmup = NULL)
 }
 \arguments{
 \item{X}{Numeric vector of observations.}
@@ -14,7 +14,7 @@ Test_YNM_Geom(X, alpha = 0.05, K = NULL, warmup = 0)
 \item{K}{Integer, number of categories for chi-squared grouping.
 If \code{NULL}, defaults to \code{min(4, length(gaps))}.}
 
-\item{warmup}{Integer, number of initial gaps to discard (default = 0).}
+\item{warmup}{Integer, number of initial gaps to discard (default = NULL).}
 }
 \value{
 A list with elements:
@@ -24,23 +24,24 @@ A list with elements:
 \item{df}{Degrees of freedom.}
 \item{p_value}{P-value of the chi-squared test.}
 \item{p_hat}{Estimated geometric parameter.}
-\item{gamma_hat}{Estimated Yang parameter \eqn{\gamma}.}
+\item{gamma_hat}{Estimated YNM parameter \eqn{\gamma}.}
 \item{v_gamma_hat}{Estimated variance of \eqn{\hat{\gamma}}.}
 \item{CL}{Confidence interval for \eqn{\gamma}.}
 \item{decision}Decision: \code{"YNM"} if not rejected, \code{"NO"} otherwise.}
 }
 \description{
-Performs a goodness-of-fit test for the Yang–Nevzorov model by examining
+Performs a goodness-of-fit test for the YNM–Nevzorov model by examining
 the distribution of record time gaps in a sequence of observations.
 The procedure estimates the geometric parameter, computes a chi-squared
 statistic on grouped frequencies, and evaluates whether the observed record
 gaps are consistent with a geometric distribution.
 }
 \details{
-Let \eqn{G_i} denote the observed record gaps. Under the Yang–Nevzorov
+Let \eqn{G_i} denote the observed record gaps. Under the YNM–Nevzorov
 model, the gaps are approximately geometrically distributed with parameter
 \eqn{\hat{p} = 1 / \bar{G}}. The test proceeds as follows:
 \enumerate{
+\item Remove warm-up gaps (if NULL, 30\% of gaps are removed)
 \item Estimate \eqn{p} and the implied \eqn{\hat{\gamma} = 1 / (1 - \hat{p})}.
 \item Compute expected frequencies for the first \eqn{K-1} categories and
 group all larger gaps into the \eqn{K}-th bin.

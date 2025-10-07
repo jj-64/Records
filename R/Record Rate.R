@@ -85,34 +85,34 @@ P_LDM = function(theta, location=0,scale){
   1 - exp(-theta / scale)
 }
 
-#################### Yang-Nevzorov #####################
-#' @title Record Rate for Yang-Nevzorov Model
-#' @description Computes the probability of observing a record at time \eqn{t} in the Yang-Nevzorov setting.
+#################### YNM-Nevzorov #####################
+#' @title Record Rate for YNM-Nevzorov Model
+#' @description Computes the probability of observing a record at time \eqn{t} in the YNM-Nevzorov setting.
 #' @param gamma The memory parameter (\(\gamma > 1\)).
 #' @param t Time index (integer).
 #' @details Probability of a record occurring at time \eqn{t}, given by:
 #' \deqn{ P(R_t) = \frac{\gamma^t}{\gamma} \cdot \frac{1 - \gamma}{1 - \gamma^t} }
 #' @return a probability
 #' @examples
-#' rec_rate_Yang(gamma=1.1, t=10)
+#' rec_rate_YNM(gamma=1.1, t=10)
 #' 0.1479504
-#' rec_rate_Yang(gamma=1.4, t=10)
+#' rec_rate_YNM(gamma=1.4, t=10)
 #' 0.2959456
-rec_rate_Yang = function(gamma, t){
+rec_rate_YNM = function(gamma, t){
   (gamma^t / gamma) * (1 - gamma) / (1 - gamma^t)
 }
 
-#' @title Asymptotic Record Rate for Yang-Nevzorov Model
-#' @description Computes the limiting record rate as \( t \to \infty \) in the Yang-Nevzorov model.
+#' @title Asymptotic Record Rate for YNM-Nevzorov Model
+#' @description Computes the limiting record rate as \( t \to \infty \) in the YNM-Nevzorov model.
 #' @param gamma The memory parameter (\(\gamma > 1\)).
 #' @details Limiting record probability:
 #' \deqn{ P(R_\infty) = 1 - \frac{1}{\gamma} }
 #' @return a probability
 #' @examples
-#' P_Yang(gamma=1.1)
+#' P_YNM(gamma=1.1)
 #'  0.09090909
-#' P_Yang(gamma=1.4)
+#' P_YNM(gamma=1.4)
 #'  0.2857143
-P_Yang = function(gamma){
+P_YNM = function(gamma){
   1 - (1/gamma)
 }

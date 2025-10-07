@@ -474,14 +474,14 @@ NT_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirlin
   return(exp(-theta*T/scale) * s[T,m]/ p)
 }
 
-#################### Yang-Nevzorov #####################
+#################### YNM-Nevzorov #####################
 
 ### Expected number of records in YANG-Nevzorov process
 #' Expected number of records in YANG-Nevzorov process
 #'
-#'The expected number of records in a Yang-Nevzorov process. It is distribution free, i.e. does not depend on the underlying distribution of the process.
+#'The expected number of records in a YNM-Nevzorov process. It is distribution free, i.e. does not depend on the underlying distribution of the process.
 #'@details
-#' A Yang-Nevzorov process can be expressed as
+#' A YNM-Nevzorov process can be expressed as
 #' \deqn{X_t = max\{Y_1, \cdots, Y_{\gamma^t}\}}
 #' where \eqn{t} is the time, \eqn{Y_t} are idenpendent and identically distributed random vector.
 #'
@@ -495,13 +495,13 @@ NT_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirlin
 #' @returns a value for the expected number of records
 #' @export
 #'
-#' @examples ENT_Yang (T=25, gamma=1.1)
+#' @examples ENT_YNM (T=25, gamma=1.1)
 #' [1] 5.000207
-ENT_Yang = function(T,gamma){
+ENT_YNM = function(T,gamma){
   s=0
   for(k in 1:T){
     #s[k] = (gamma^k * (gamma-1)) / (gamma* (gamma^k -1))
-    s[k] = rec_rate_Yang(gamma,k) }
+    s[k] = rec_rate_YNM(gamma,k) }
 
   return(sum(s))
 }
@@ -510,7 +510,7 @@ ENT_Yang = function(T,gamma){
 #'
 #' The variance of number of records in a YANG-Nevzorov process.
 #'@details
-#' A Yang-Nevzorov process can be expressed as
+#' A YNM-Nevzorov process can be expressed as
 #' \deqn{X_t = max\{Y_1, \cdots, Y_{\gamma^t}\}}
 #' where \eqn{t} is the time, \eqn{Y_t} are idenpendent and identically distributed random vector.
 #'
@@ -527,12 +527,12 @@ ENT_Yang = function(T,gamma){
 #' @returns a single value of the variance of number of records
 #' @export
 #'
-#' @examples VNT_Yang(T=25, gamma=1.1)
+#' @examples VNT_YNM(T=25, gamma=1.1)
 #' [1] 3.10049
-VNT_Yang = function(T, gamma){
+VNT_YNM = function(T, gamma){
   s=0; s2=0
   for(k in 1:T){
-    s[k] = rec_rate_Yang(gamma,k)
+    s[k] = rec_rate_YNM(gamma,k)
     s2[k] =s[k]^2
   }
    return(sum(s)-sum(s2))
@@ -540,7 +540,7 @@ VNT_Yang = function(T, gamma){
 
 
 ## Function needed to compute the distribution of number of records
-u_t_Yang=function(t,gamma){
+u_t_YNM=function(t,gamma){
   (1-gamma^t)/ ((1-gamma)*gamma^t) }
 
 
@@ -553,7 +553,7 @@ u_t_Yang=function(t,gamma){
 #' It is used later to compute the distribution of number of records
 #'
 #' Computes a triangular table of weighted Stirling numbers of the second kind
-#' adapted for Yang's model with parameter \eqn{\gamma}.
+#' adapted for YNM's model with parameter \eqn{\gamma}.
 #'
 #'
 #'@details
@@ -577,16 +577,16 @@ u_t_Yang=function(t,gamma){
 #' @returns  A \eqn{T \times T} lower triangular matrix of all combinations of Stirling number.
 #' @export
 #'
-#' @examples Stirling_2nd_Yang(T=5, gamma=1.1)
+#' @examples Stirling_2nd_YNM(T=5, gamma=1.1)
 #'           [,1]      [,2]     [,3]     [,4]   [,5]
 #' [1,]  1.0000000  0.000000  0.00000 0.000000    0
 #' [2,]  0.9090909  1.000000  0.00000 0.000000    0
 #' [3,]  1.5777611  2.644628  1.00000 0.000000    0
 #' [4,]  3.9236583  8.154560  5.13148 1.000000    0
 #' [5,] 12.4374688 29.772515 24.42066 8.301346    1
-Stirling_2nd_Yang = function(T,gamma){  ## compute stirling number of second kind
+Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
   # Precompute u_t for efficiency
-  u <- u_t_Yang(t = 1:T, gamma = gamma)
+  u <- u_t_YNM(t = 1:T, gamma = gamma)
 
   # Initialize triangular matrix
   s <- matrix(0, nrow = T, ncol = T) ##S(T,m)= 0 for m>T upper diagonal
@@ -612,7 +612,7 @@ Stirling_2nd_Yang = function(T,gamma){  ## compute stirling number of second kin
 #'
 #'Distribution of the number of records YANG-Nevzorov (YN) process. The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
 #' @details
-#' A Yang-Nevzorov process can be expressed as
+#' A YNM-Nevzorov process can be expressed as
 #' \deqn{X_t = max\{Y_1, \cdots, Y_{\gamma^t}\}}
 #' where \eqn{t} is the time, \eqn{Y_t} are idenpendent and identically distributed random vector.
 #'
@@ -627,22 +627,22 @@ Stirling_2nd_Yang = function(T,gamma){  ## compute stirling number of second kin
 #' @param T the length of the series
 #' @param gamma The power of the process, \eqn{\gamma >= 1}
 #' @param s Optional. Precomputed Stirling matrix from
-#'   \code{\link{Stirling_2nd_Yang}} (default = NA so it is recomputed internally).
+#'   \code{\link{Stirling_2nd_YNM}} (default = NA so it is recomputed internally).
 #'
 #' @returns Probability value \eqn{P(N_T = m)} less than one
 #' @export
 #'
-#' @examples NT_Yang(m=5,T=25, gamma=1.1)
+#' @examples NT_YNM(m=5,T=25, gamma=1.1)
 #'  0.2223667
-#' NT_Yang(m=5,T=25, gamma=1.1, s = Stirling_2nd_Yang(T=25,gamma=1.1))
+#' NT_YNM(m=5,T=25, gamma=1.1, s = Stirling_2nd_YNM(T=25,gamma=1.1))
 #'  0.2223667
-NT_Yang <- function(m, T, gamma, s = NULL) {
+NT_YNM <- function(m, T, gamma, s = NULL) {
   if (is.null(s)) {
-    s <- Stirling_2nd_Yang(T = T, gamma = gamma)
+    s <- Stirling_2nd_YNM(T = T, gamma = gamma)
   }
 
   # Precompute product of u_t
-  p <- prod(u_t_Yang(t = 1:T, gamma = gamma))
+  p <- prod(u_t_YNM(t = 1:T, gamma = gamma))
 
   return(s[T, m] / ((gamma^T) * p))
 }

@@ -34,7 +34,7 @@ Likelihood_Xt_Frechet_iid <- function(T, x, Aa) {
 #' Uses the **dnorm** function:
 #' \deqn{log L = \sum \log(f_{\text{Normal}}(x; \mu, \sigma))}
 #'Note that the growth parameter \eqn{\gamma} is fixed to 1 in the IID case.
-#' @inheritParams Likelihood_Xt_Frechet_Yang
+#' @inheritParams Likelihood_Xt_Frechet_YNM
 #' @return Numeric value of the log-likelihood.
 #' @export
 Likelihood_Xt_Norm_iid <- function(T, x, gAa) {
@@ -87,11 +87,11 @@ Likelihood_Xt_Norm_DTRW =  function(x,Aa){
 
 }
 
-############## Likelihood Functions for Yang Process ##############
+############## Likelihood Functions for YNM Process ##############
 
-#' Compute Log-Likelihood for Frechet Yang Process
+#' Compute Log-Likelihood for Frechet YNM Process
 #'
-#' Computes the log-likelihood for a series following a Frechet-distributed Yang process, based on full information.
+#' Computes the log-likelihood for a series following a Frechet-distributed YNM process, based on full information.
 #'
 #' @details
 #' The likelihood function is given by:
@@ -109,9 +109,9 @@ Likelihood_Xt_Norm_DTRW =  function(x,Aa){
 #' @export
 #' @examples
 #' Xt = YNM_series_Frechet(T=25, gamma=1.1, shape=1, scale=2)
-#' Likelihood_Xt_Frechet_Yang(T=25, x=Xt, gAa = c(1.1,1/2,1))
+#' Likelihood_Xt_Frechet_YNM(T=25, x=Xt, gAa = c(1.1,1/2,1))
 #'
-Likelihood_Xt_Frechet_Yang <- function(T, x, gAa) {
+Likelihood_Xt_Frechet_YNM <- function(T, x, gAa) {
   s1 <- T * log(gAa[3] * gAa[2]^(-gAa[3]))
   s2 <- -(gAa[3] + 1) * sum(log(x))
   s3 <- (T * (T + 1) / 2) * log(gAa[1])

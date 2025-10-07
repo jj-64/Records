@@ -1,5 +1,5 @@
 
-##################Variance estimators - Xt - Frechet - Yang ##########################
+##################Variance estimators - Xt - Frechet - YNM ##########################
 #' Variance of LogL Gamma Estimator for full Frechet YANG-Nevzorov Process
 #'
 #' Computes the variance of the gamma estimator using the Fisher information matrix.
@@ -27,7 +27,7 @@
 #' upper_bounds <- c(5,20,20)  # Example: Bound gAa[1] by min(R/L)
 #' start_values <- c(1.001, 0.001, 0.001)
 #'
-#' Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_Yang(T=T, x=Xt, gAa)) }
+#' Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_YNM(T=T, x=Xt, gAa)) }
 #'
 #' ## Run optimization using optim with L-BFGS-B method
 #' MLE_C <- optim(par = start_values,           # Starting values for gAa
@@ -37,7 +37,7 @@
 #'               upper = upper_bounds)$par
 #'MLE_C
 #'1.2312049 0.7976267 2.2797543  ## Gamma, A, a
-#'V= V_Xt_Frechet_Yang_gamma(x=Xt, g=MLE_C[1], A= MLE_C[2], a= MLE_C[3])
+#'V= V_Xt_Frechet_YNM_gamma(x=Xt, g=MLE_C[1], A= MLE_C[2], a= MLE_C[3])
 #'V
 #'[1] 0.0002850398
 #' #standard deviation
@@ -46,7 +46,7 @@
 #' #Confidence interval
 #' bounds(value = MLE_C[1], z = 1.96 , variance = V)
 #' [1] 1.198114 1.264296
-V_Xt_Frechet_Yang_gamma <- function(x, params) {
+V_Xt_Frechet_YNM_gamma <- function(x, params) {
   g = params[1]
   A = params[2]
   a = params[3]
@@ -65,7 +65,7 @@ V_Xt_Frechet_Yang_gamma <- function(x, params) {
 #' The Fisher information is given by:
 #' \deqn{ I(A) = \frac{a T}{A^2} - a (a+1) A^{-a-2} \sum_{t=1}^{T} \gamma^t y^{-a} }
 #'
-#' @inheritParams V_Xt_Frechet_Yang_gamma
+#' @inheritParams V_Xt_Frechet_YNM_gamma
 #' @return Numeric, variance of gamma estimator.
 #' @examples
 #' Xt = YNM_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
@@ -79,7 +79,7 @@ V_Xt_Frechet_Yang_gamma <- function(x, params) {
 #' upper_bounds <- c(5,20,20)  # Example: Bound gAa[1] by min(R/L)
 #' start_values <- c(1.001, 0.001, 0.001)
 #'
-#' Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_Yang(T=T, x=Xt, gAa)) }
+#' Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_YNM(T=T, x=Xt, gAa)) }
 #'
 #' ## Run optimization using optim with L-BFGS-B method
 #' MLE_C <- optim(par = start_values,           # Starting values for gAa
@@ -89,7 +89,7 @@ V_Xt_Frechet_Yang_gamma <- function(x, params) {
 #'               upper = upper_bounds)$par
 #'MLE_C
 #'1.2312049 0.7976267 2.2797543  ## Gamma, A, a
-#'V= V_Xt_Frechet_Yang_scale(x=Xt, g=MLE_C[1], A= MLE_C[2], a= MLE_C[3])
+#'V= V_Xt_Frechet_YNM_scale(x=Xt, g=MLE_C[1], A= MLE_C[2], a= MLE_C[3])
 #'V
 #'[1] 0.004896407
 #' #standard deviation
@@ -98,7 +98,7 @@ V_Xt_Frechet_Yang_gamma <- function(x, params) {
 #' #Confidence interval
 #' bounds(value = MLE_C[2], z = 1.96 , variance = V)
 #' [1] 0.6604770 0.9347764
-V_Xt_Frechet_Yang_scale = function(x,params){
+V_Xt_Frechet_YNM_scale = function(x,params){
   g = params[1]
   A = params[2]
   a = params[3]
@@ -119,7 +119,7 @@ V_Xt_Frechet_Yang_scale = function(x,params){
 #' The Fisher information is given by:
 #' \deqn{ I(a) = -\frac{T}{a^2} - \sum_{t=1}^{T} \gamma^t (\log(A y))^2 (A y)^{-a} }
 #'
-#' @inheritParams V_Xt_Frechet_Yang_gamma
+#' @inheritParams V_Xt_Frechet_YNM_gamma
 #' @return Numeric, variance of gamma estimator.
 #' @examples
 #' Xt = YNM_series_Frechet(T=25,gamma=1.25, shape=2, scale=1)
@@ -133,7 +133,7 @@ V_Xt_Frechet_Yang_scale = function(x,params){
 #' upper_bounds <- c(5,20,20)  # Example: Bound gAa[1] by min(R/L)
 #' start_values <- c(1.001, 0.001, 0.001)
 #'
-#' Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_Yang(T=T, x=Xt, gAa)) }
+#' Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_YNM(T=T, x=Xt, gAa)) }
 #'
 #' ## Run optimization using optim with L-BFGS-B method
 #' MLE_C <- optim(par = start_values,           # Starting values for gAa
@@ -143,7 +143,7 @@ V_Xt_Frechet_Yang_scale = function(x,params){
 #'               upper = upper_bounds)$par
 #'MLE_C
 #'1.2312049 0.7976267 2.2797543  ## Gamma, A, a
-#'V= V_Xt_Frechet_Yang_shape(x=Xt, g=MLE_C[1], A= MLE_C[2], a= MLE_C[3])
+#'V= V_Xt_Frechet_YNM_shape(x=Xt, g=MLE_C[1], A= MLE_C[2], a= MLE_C[3])
 #'V
 #'[1] 0.02437784
 #' #standard deviation
@@ -152,7 +152,7 @@ V_Xt_Frechet_Yang_scale = function(x,params){
 #' #Confidence interval
 #' bounds(value = MLE_C[3], z = 1.96 , variance = V)
 #' [1] 1.973732 2.585777
-V_Xt_Frechet_Yang_shape = function(x,params){
+V_Xt_Frechet_YNM_shape = function(x,params){
   g = params[1]
   A = params[2]
   a = params[3]

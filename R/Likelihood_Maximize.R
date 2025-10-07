@@ -55,7 +55,7 @@ Max_Likelihood_Rn = function(X,Likelihood_function,T,
 }
 #### Example
 
-# Max_Likelihood_Xt(X=y, Likelihood_function = Likelihood_Xt_Frechet_Yang)
+# Max_Likelihood_Xt(X=y, Likelihood_function = Likelihood_Xt_Frechet_YNM)
 # Max_Likelihood_Xt(X=y, Likelihood_function = Likelihood_Xt_Frechet_LDM,
 #                                             lower_bounds=c(0.001, 0.001, 0.001),
 #                                             upper_bounds = c(5,20,20),  # Example: Bound params[1] by min(R/L)

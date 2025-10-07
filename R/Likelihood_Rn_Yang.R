@@ -1,20 +1,20 @@
 ############## Exponential #################
-#' Log-Likelihood for Record Process with Exponential Distribution under Yang Model
+#' Log-Likelihood for Record Process with Exponential Distribution under YNM Model
 #'
 #' Computes the log-likelihood of a record process where record values follow
-#' an Exponential distribution, and record arrival probabilities follow the Yang-Nevzorov model.
+#' an Exponential distribution, and record arrival probabilities follow the YNM-Nevzorov model.
 #'
 #' @param R A numeric vector of record values.
 #' @param L A numeric vector of time indices at which the records occur.
 #' @param T An integer indicating the total number of time points.
-#' @param params A numeric vector of parameters: \eqn{\gamma} (Yang parameter), and 1/rate of the exponential distribution.
+#' @param params A numeric vector of parameters: \eqn{\gamma} (YNM parameter), and 1/rate of the exponential distribution.
 #'
 #' @return A numeric value representing the log-likelihood.
 #' @export
 #'
 #' @examples
-#' Likelihood_Rn_Exp_Yang(R = c(1.2, 2.5, 3.8), L = c(2, 4, 6), T = 10, params = c(0.8, 2))
-Likelihood_Rn_Exp_Yang <- function(R,L,T, params) {  ## vector of R, L, value of T, vector of (gamma, 1/rate)
+#' Likelihood_Rn_Exp_YNM(R = c(1.2, 2.5, 3.8), L = c(2, 4, 6), T = 10, params = c(0.8, 2))
+Likelihood_Rn_Exp_YNM <- function(R,L,T, params) {  ## vector of R, L, value of T, vector of (gamma, 1/rate)
   m=length(R)
 
   # Calculate Sum1
@@ -56,19 +56,19 @@ Likelihood_Rn_Exp_Yang <- function(R,L,T, params) {  ## vector of R, L, value of
   return(vrais)
 }
 
-#' Likelihood for Record Process with Exponential Distribution under Yang Model
+#' Likelihood for Record Process with Exponential Distribution under YNM Model
 #'
 #' Computes the likelihood (not log) of a record process assuming
-#' Exponential record values and Yang-type record frequency.
+#' Exponential record values and YNM-type record frequency.
 #'
-#' @inheritParams Likelihood_Rn_Exp_Yang
+#' @inheritParams Likelihood_Rn_Exp_YNM
 #'
 #' @return A numeric value representing the likelihood.
 #' @export
 #'
 #' @examples
-#' L_Rn_Exp_Yang(R = c(1.2, 2.5, 3.8), L = c(2, 4, 6), T = 10, params = c(0.8, 2))
-L_Rn_Exp_Yang = function(R,L,T, params){
+#' L_Rn_Exp_YNM(R = c(1.2, 2.5, 3.8), L = c(2, 4, 6), T = 10, params = c(0.8, 2))
+L_Rn_Exp_YNM = function(R,L,T, params){
 
   m = length(R)
 
@@ -94,22 +94,22 @@ L_Rn_Exp_Yang = function(R,L,T, params){
 }
 
 ############### Frechet #####################
-#' Log-Likelihood for Record Process with Fréchet Distribution under Yang Model
+#' Log-Likelihood for Record Process with Fréchet Distribution under YNM Model
 #'
 #' Calculates the log-likelihood assuming the record values follow a Fréchet distribution
-#' with Yang-Nevzorov model record probabilities.
+#' with YNM-Nevzorov model record probabilities.
 #'
 #' @param R A numeric vector of record values.
 #' @param L A numeric vector of time indices of the records.
 #' @param T Integer, total observation time or maximum index.
-#' @param params A numeric vector: \eqn{\gamma} (Yang parameter), scale, and shape of the Fréchet distribution.
+#' @param params A numeric vector: \eqn{\gamma} (YNM parameter), scale, and shape of the Fréchet distribution.
 #'
 #' @return The log-likelihood as a numeric value, or \code{-Inf} if parameters are invalid.
 #' @export
 #'
 #' @examples
-#' Likelihood_Rn_Frechet_Yang(R = c(3.5, 2.1, 1.8), L = c(2, 4, 6), T = 10, params = c(0.9, 1, 2))
-Likelihood_Rn_Frechet_Yang = function(R,L,T,params){
+#' Likelihood_Rn_Frechet_YNM(R = c(3.5, 2.1, 1.8), L = c(2, 4, 6), T = 10, params = c(0.9, 1, 2))
+Likelihood_Rn_Frechet_YNM = function(R,L,T,params){
   m = length(R) #m= rec_counts(y)  ## number of records
 
   # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or params[3] <= 0, we return -Inf)
@@ -140,22 +140,22 @@ Likelihood_Rn_Frechet_Yang = function(R,L,T,params){
 
 #################### Gumbel ###############
 
-#' Log-Likelihood for Record Process with Gumbel Distribution under Yang Model
+#' Log-Likelihood for Record Process with Gumbel Distribution under YNM Model
 #'
 #' Computes the log-likelihood for records modeled using the Gumbel distribution
-#' with the Yang-Nevzorov mechanism for record arrival.
+#' with the YNM-Nevzorov mechanism for record arrival.
 #'
 #' @param R A numeric vector of record values.
 #' @param L A numeric vector of time indices of the records.
 #' @param T Integer indicating the total number of observations.
-#' @param params A numeric vector: \eqn{\gamma} (Yang parameter), location \eqn{\mu}, and scale \eqn{\beta} of the Gumbel distribution.
+#' @param params A numeric vector: \eqn{\gamma} (YNM parameter), location \eqn{\mu}, and scale \eqn{\beta} of the Gumbel distribution.
 #'
 #' @return Log-likelihood value as a numeric scalar.
 #' @export
 #'
 #' @examples
-#' Likelihood_Rn_Gumbel_Yang(R = c(2.4, 3.0, 4.1), L = c(1, 3, 7), T = 10, params = c(0.8, 0, 1))
-Likelihood_Rn_Gumbel_Yang <- function(R,L,T, params) {  ## vector of R, L, value of T, vector of gamma, location mu and scale beta
+#' Likelihood_Rn_Gumbel_YNM(R = c(2.4, 3.0, 4.1), L = c(1, 3, 7), T = 10, params = c(0.8, 0, 1))
+Likelihood_Rn_Gumbel_YNM <- function(R,L,T, params) {  ## vector of R, L, value of T, vector of gamma, location mu and scale beta
   m=length(R)
 
   # Calculate Sum1
@@ -197,19 +197,19 @@ Likelihood_Rn_Gumbel_Yang <- function(R,L,T, params) {  ## vector of R, L, value
   return(vrais)
 }
 
-#' Likelihood for Record Process with Gumbel Distribution under Yang Model
+#' Likelihood for Record Process with Gumbel Distribution under YNM Model
 #'
 #' Computes the likelihood (non-log) assuming Gumbel-distributed record values
-#' and record occurrence governed by the Yang process.
+#' and record occurrence governed by the YNM process.
 #'
-#' @inheritParams Likelihood_Rn_Gumbel_Yang
+#' @inheritParams Likelihood_Rn_Gumbel_YNM
 #'
 #' @return Numeric value representing the likelihood.
 #' @export
 #'
 #' @examples
-#' L_Rn_Gumbel_Yang(R = c(2.4, 3.0, 4.1), L = c(1, 3, 7), T = 10, params = c(0.8, 0, 1))
-L_Rn_Gumbel_Yang = function(R,L,T, params){
+#' L_Rn_Gumbel_YNM(R = c(2.4, 3.0, 4.1), L = c(1, 3, 7), T = 10, params = c(0.8, 0, 1))
+L_Rn_Gumbel_YNM = function(R,L,T, params){
 
   m = length(R)
 
@@ -235,10 +235,10 @@ L_Rn_Gumbel_Yang = function(R,L,T, params){
 }
 
 ############## Weibull ##################
-#' Log-Likelihood for Record Process with Weibull Distribution under Yang Model
+#' Log-Likelihood for Record Process with Weibull Distribution under YNM Model
 #'
 #' Calculates the log-likelihood for a process of records with Weibull-distributed values
-#' and record times based on the Yang-Nevzorov model.
+#' and record times based on the YNM-Nevzorov model.
 #'
 #' @param R A numeric vector of record values.
 #' @param L A numeric vector of time indices of the records.
@@ -249,8 +249,8 @@ L_Rn_Gumbel_Yang = function(R,L,T, params){
 #' @export
 #'
 #' @examples
-#' Likelihood_Rn_Weibull_Yang(R = c(1.5, 2.6, 3.7), L = c(2, 5, 8), T = 10, params = c(0.9, 1.5, 2))
-Likelihood_Rn_Weibull_Yang <- function(R,L,T, params) {  ## vector of R, L, value of T, vector of (gamma, 1/rate)
+#' Likelihood_Rn_Weibull_YNM(R = c(1.5, 2.6, 3.7), L = c(2, 5, 8), T = 10, params = c(0.9, 1.5, 2))
+Likelihood_Rn_Weibull_YNM <- function(R,L,T, params) {  ## vector of R, L, value of T, vector of (gamma, 1/rate)
   m=length(R)
 
   # Calculate Sum1

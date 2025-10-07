@@ -26,7 +26,7 @@ A list with the following elements:
 Performs a composite hypothesis test to assess whether a given time series
 follows a Discrete-Time Random Walk (DTRW) process. The test combines three
 component tests — stationarity, independence, and symmetry — using
-multiple-comparison correction methods (Bonferroni, Holm, Sidák, or chi-square).
+multiple-comparison correction methods (Bonferroni, Holm-Bonferoni, Holm-Sidák, or chi-square).
 }
 \details{
 The function applies the following tests:
@@ -49,7 +49,7 @@ The overall decision is based on combining p-values using one of the following m
 \itemize{
 \item \code{"Bonf"} — Bonferroni correction (default)
 \item \code{"Holm"} — Holm–Bonferroni sequential correction
-\item \code{"Sidak"} — Sidák correction
+\item \code{"Sidak"} — Holm-Sidák correction
 \item \code{"Chisq"} — Fisher’s chi-squared combination test
 }
 
