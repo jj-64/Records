@@ -2,30 +2,57 @@
 % Please edit documentation in R/Record Rate.R
 \name{rec_rate_LDM}
 \alias{rec_rate_LDM}
-\title{Record Rate for Linear Drift Model (LDM)}
+\title{Record Rate in the Linear Drift Model (LDM)}
 \usage{
-rec_rate_LDM(theta, t, location = 0, scale)
+rec_rate_LDM(theta, t = Inf, location = 0, scale = 1)
 }
 \arguments{
-\item{theta}{The drift parameter (\eqn{\theta > 0}).}
+\item{theta}{Drift parameter (\eqn{\theta > 0}).}
 
-\item{t}{Time index (integer).}
+\item{t}{Time index (integer). If \code{t = Inf} or \code{NULL},
+the asymptotic record rate \eqn{P(R_\infty)} is returned.}
 
-\item{scale}{Scale parameter of the \eqn{Gumbel} distribution.}
+\item{location}{Optional location parameter (not used in the probability formula, included for consistency).}
+
+\item{scale}{Scale parameter of the Gumbel distribution (default = 1).}
 }
 \value{
-a probability value
+A numeric value representing the record rate probability.
 }
 \description{
-Computes the probability of observing a record at time \eqn{t} in an LDM setting under \eqn{Gumbel} underlying distribution.
+Computes the record rate/probability of observing record \eqn{P(R_t)} at time \eqn{t}
+(or its asymptotic limit as \eqn{t \to \infty}) under a Linear Drift Model (LDM)
+with an underlying Gumbel distribution.
 }
 \details{
-Probability of a record occurring at time \eqn{t}, given by:
-\deqn{ P(t) = \frac{1 - e^{-\theta/\text{scale}}}{1 - e^{-\theta t/\text{scale}}} }
+For finite time \eqn{t}, the record rate is given by:
+\deqn{
+P(R_t) = \frac{1 - e^{-\theta / \text{scale}}}{1 - e^{-\theta t / \text{scale}}}
+}
+
+As \eqn{t \to \infty}, the record rate converges to:
+\deqn{
+P(R_\infty) = 1 - e^{-\theta / \text{scale}}
+}
+
+This model corresponds to linearly drifting observations where each new value
+is drawn from a Gumbel distribution shifted by a constant drift \eqn{\theta}.
 }
 \examples{
-rec_rate_LDM(theta=0.5, t=50, scale=1)
-0.3934693
-rec_rate_LDM(theta=0.5, t=10, scale=1)
-0.3961385
+# Finite-time record rate
+rec_rate_LDM(theta = 0.5, t = 10, scale = 1)
+
+# Asymptotic record rate (t -> infinity)
+rec_rate_LDM(theta = 0.5, t = Inf, scale = 1)
+
+# Default behavior returns asymptotic rate
+rec_rate_LDM(theta = 0.3, scale = 1)
+
+# Compare convergence
+t_seq <- 1:100
+rates <- sapply(t_seq, function(tt) rec_rate_LDM(0.5, tt, scale = 1))
+plot(t_seq, rates, type = "l", col = "blue", lwd = 2,
+     ylab = "Record Rate", xlab = "t")
+abline(h = rec_rate_LDM(0.5, Inf, scale = 1), col = "red", lty = 2)
+
 }
