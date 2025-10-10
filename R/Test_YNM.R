@@ -384,8 +384,8 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #'    \deqn{ \chi^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}, }
 #'    with \eqn{df = (K - 1) - 1} degrees of freedom (adjusted for the
 #'    estimated parameter).
-#' 4. Return decision `"YNM"` if the null hypothesis of geometric gaps
-#' is not rejected, and `"NO"` otherwise.
+#' 4. Return decision "YNM" if the null hypothesis of geometric gaps
+#' is not rejected, and "NO" otherwise.
 #'
 #' A confidence interval for {\eqn{\gamma}} is also computed using a
 #' normal approximation:
@@ -510,35 +510,35 @@ Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL) {
 ##########################################################
 
 # dispersion test for geometric gaps: asymptotic chi-square + MC p-value
-dispersion_geom_test <- function(X, alpha=0.05, B = 5000, seed = NULL, return_sim = FALSE) {
-
-   gaps = rec_gaps (X)
-  if (!is.null(seed)) set.seed(seed)
-
-  if (any(gaps < 1)) return(list(decision= "NO"))
-
-  n <- length(gaps)
-
-  if (n < 5) warning("Small n: chi-square approx will be poor; prefer Monte Carlo.")
-
-  Gbar <- mean(gaps)
-  s2 <- var(gaps) # sample variance uses denominator (n-1)
-
-  # Prevent degenerate case Gbar <= 1 (won't happen unless all gaps=1)
-  if (Gbar <= 1) {
-    # variance under estimated p is zero or negative; handle separately
-    return(list(error = "Mean of gaps <= 1 (all gaps=1?), cannot compute dispersion test.",
-                Gbar = Gbar, s2 = s2))
-  }
-
-  # test statistic
-  D <- (n - 1) * s2 / (Gbar * (Gbar - 1))
-
-  # asymptotic p-value using chi-square_{n-1}
-  p_chisq <- pchisq(D, df = n - 1, lower.tail = FALSE)
-
-  res <- list(n = n, Gbar = Gbar, s2 = s2, D = D,
-              p_chisq= p_chisq,
-              decision = ifelse(p_chisq>alpha, "Geom", "NO"))
-  return(res)
-}
+# dispersion_geom_test <- function(X, alpha=0.05, B = 5000, seed = NULL, return_sim = FALSE) {
+#
+#    gaps = rec_gaps (X)
+#   if (!is.null(seed)) set.seed(seed)
+#
+#   if (any(gaps < 1)) return(list(decision= "NO"))
+#
+#   n <- length(gaps)
+#
+#   if (n < 5) warning("Small n: chi-square approx will be poor; prefer Monte Carlo.")
+#
+#   Gbar <- mean(gaps)
+#   s2 <- var(gaps) # sample variance uses denominator (n-1)
+#
+#   # Prevent degenerate case Gbar <= 1 (won't happen unless all gaps=1)
+#   if (Gbar <= 1) {
+#     # variance under estimated p is zero or negative; handle separately
+#     return(list(error = "Mean of gaps <= 1 (all gaps=1?), cannot compute dispersion test.",
+#                 Gbar = Gbar, s2 = s2))
+#   }
+#
+#   # test statistic
+#   D <- (n - 1) * s2 / (Gbar * (Gbar - 1))
+#
+#   # asymptotic p-value using chi-square_{n-1}
+#   p_chisq <- pchisq(D, df = n - 1, lower.tail = FALSE)
+#
+#   res <- list(n = n, Gbar = Gbar, s2 = s2, D = D,
+#               p_chisq= p_chisq,
+#               decision = ifelse(p_chisq>alpha, "Geom", "NO"))
+#   return(res)
+# }

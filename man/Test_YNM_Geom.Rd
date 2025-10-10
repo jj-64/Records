@@ -49,8 +49,8 @@ group all larger gaps into the \eqn{K}-th bin.
 \deqn{ \chi^2 = \sum_{k=1}^K \frac{(O_k - E_k)^2}{E_k}, }
 with \eqn{df = (K - 1) - 1} degrees of freedom (adjusted for the
 estimated parameter).
-\item Return decision \code{"YNM"} if the null hypothesis of geometric gaps
-is not rejected, and \code{"NO"} otherwise.
+\item Return decision "YNM" if the null hypothesis of geometric gaps
+is not rejected, and "NO" otherwise.
 }
 
 A confidence interval for {\eqn{\gamma}} is also computed using a

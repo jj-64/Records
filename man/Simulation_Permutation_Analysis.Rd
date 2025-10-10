@@ -24,11 +24,13 @@ Simulation_Permutation_Analysis(
 
 \item{generator}{String. The name of series generator}
 
-\item{series_args}{List. Arguments of the generator of the series, the argument "T" is not included}
+\item{series_args}{List. Arguments of the generator of the series, the
+argument "T" is not included}
 
 \item{n_arg}{Character. default is "T" as some generator functions take "n"}
 
-\item{H0}{Character. The true generating process: "DTRW", "LDM", "iid", or "YNM"}
+\item{H0}{Character. The true generating process: "DTRW", "LDM",
+"Classical", or "YNM"}
 
 \item{alpha}{Numeric. Significance level for all tests (default = 0.05)}
 
@@ -54,10 +56,13 @@ and records which test (if any) is accepted by each permutation.
 }
 \examples{
 \dontrun{
-sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50, generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1), H0 = "DTRW")
-}
+sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
+generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
+H0 = "DTRW")
 
-### 75\% of the permutations return "DTRW" and 25\% return "YNM"
+
+### 75\% of the permutations trees return "DTRW" and 25\% return "YNM".
+### On average, one simulation will return the following:
 #  summary_total
 #  Decision Freq
 #  1     DTRW 0.75
@@ -119,4 +124,5 @@ sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50, generator = DTRW_s
 #     22        YDLC          0.5
 #     23        YLCD          1.0
 #     24        YLDC          1.0
+}
 }
