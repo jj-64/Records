@@ -4,7 +4,7 @@
 \alias{partition2}
 \title{Partition record gaps adaptively (with padding)}
 \usage{
-partition2(X, min_expected = 1, warmup = 2, K = NULL, estimated = TRUE)
+partition2(X, min_expected = 1, warmup = NULL, K = NULL, estimated = TRUE)
 }
 \arguments{
 \item{X}{Numeric vector (time series).}
