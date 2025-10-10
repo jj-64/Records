@@ -123,7 +123,7 @@ V_Rn_Frechet_LDM_theta =  function(R,L,T, params) { ## y vector and theta, A and
 
 ## Variance of 1/scale A
 
-V_Rn_Frechet_LDM_A = function(R,L,T,params){
+V_Rn_Frechet_LDM_scale = function(R,L,T,params){
   theta = params[1]
   A = params[2]
   a = params[3]
@@ -160,7 +160,7 @@ V_Rn_Frechet_LDM_A = function(R,L,T,params){
 }
 
 ## Variance of shape a
-V_Rn_Frechet_LDM_a = function(R,L,T,params){
+V_Rn_Frechet_LDM_shape = function(R,L,T,params){
   m=length(R)
   theta = params[1]
   A = params[2]
@@ -218,7 +218,7 @@ V_Rn_Frechet_LDM_a = function(R,L,T,params){
 #' @param R Vector of record values.
 #' @param L Vector of record times.
 #' @param T Total observation time.
-#' @param params Numeric vector of two values: Scale parameter (1/scale > 0) and Shape parameter (\alpha > 0).
+#' @param params Numeric vector of two values: Scale parameter (\eqn{1/A} > 0) and Shape parameter (\eqn{\alpha} > 0).
 #' @return The variance estimate of \eqn{ A }.
 #' @examples
 #' Xt = VGAM::rfrechet(n=25,location=0, scale=1, shape=2)
@@ -282,7 +282,7 @@ V_Rn_Frechet_iid_scale = function(R,L,T,params){
 #' @param R Numeric vector of record values.
 #' @param L Numeric vector of record times.
 #' @param T Numeric value representing total observation time.
-#' @param params Numeric vector of two values: Scale parameter (1/scale > 0) and Shape parameter (\alpha > 0).
+#' @param params Numeric vector of two values: Scale parameter (\eqn{1/A} > 0) and Shape parameter (\eqn{\alpha} > 0).
 #' @return The variance estimate of \eqn{ \alpha }.
 V_Rn_Frechet_iid_shape = function(R, L, T, params) {
   A = params[1]

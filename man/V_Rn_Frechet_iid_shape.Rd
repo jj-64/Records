@@ -13,7 +13,7 @@ V_Rn_Frechet_iid_shape(R, L, T, params)
 
 \item{T}{Numeric value representing total observation time.}
 
-\item{params}{Numeric vector of two values: Scale parameter (1/scale > 0) and Shape parameter (\alpha > 0).}
+\item{params}{Numeric vector of two values: Scale parameter (\eqn{1/A} > 0) and Shape parameter (\eqn{\alpha} > 0).}
 }
 \value{
 The variance estimate of \eqn{ \alpha }.
