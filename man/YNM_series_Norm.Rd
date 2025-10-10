@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Norm}
 \alias{YNM_series_Norm}
-\title{Generate a Yang Series with Normal Noise}
+\title{Generate a YNM Series with Normal Noise}
 \usage{
 YNM_series_Norm(T, gamma, loc = 0, sd = 1)
 }
@@ -16,10 +16,10 @@ YNM_series_Norm(T, gamma, loc = 0, sd = 1)
 \item{sd}{Positive numeric. The standard deviation of the normal distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generate a Yang Series with Normal Noise
+Generate a YNM Series with Normal Noise
 }
 \details{
 The series is generated as:

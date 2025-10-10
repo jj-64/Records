@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Pareto}
 \alias{YNM_series_Pareto}
-\title{Generate a Yang Series with Pareto Noise}
+\title{Generate a YNM Series with Pareto Noise}
 \usage{
 YNM_series_Pareto(T, gamma, scale = 0.5, shape = 4)
 }
@@ -16,10 +16,10 @@ YNM_series_Pareto(T, gamma, scale = 0.5, shape = 4)
 \item{shape}{Positive numeric. The shape parameter of the Weibull distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generate a Yang Series with Pareto Noise
+Generate a YNM Series with Pareto Noise
 }
 \details{
 \deqn{X_i = \text{scale} \cdot (1 - U^{1/\gamma^i})^{-1/\text{shape}}}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Gumbel}
 \alias{YNM_series_Gumbel}
-\title{Generate a Yang Series with Gumbel Noise}
+\title{Generate a YNM Series with Gumbel Noise}
 \usage{
 YNM_series_Gumbel(T, gamma, loc = 0, scale = 1)
 }
@@ -16,10 +16,10 @@ YNM_series_Gumbel(T, gamma, loc = 0, scale = 1)
 \item{scale}{Positive numeric. The scale parameter of the Gumbel distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generate a Yang Series with Gumbel Noise
+Generate a YNM Series with Gumbel Noise
 }
 \details{
 \deqn{X_i = \text{loc} - \text{scale} \cdot \log(-\log(U^{1/\gamma^i}))}

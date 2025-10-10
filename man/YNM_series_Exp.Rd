@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Exp}
 \alias{YNM_series_Exp}
-\title{Generate a Yang Series with Exponential Noise}
+\title{Generate a YNM Series with Exponential Noise}
 \usage{
 YNM_series_Exp(T, gamma, rate = 1)
 }
@@ -14,10 +14,10 @@ YNM_series_Exp(T, gamma, rate = 1)
 \item{rate}{Positive numeric. The rate parameter of the Exponential distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generate a Yang Series with Exponential Noise
+Generate a YNM Series with Exponential Noise
 }
 \details{
 \deqn{X_i = -\frac{\log(1 - U^{1/\gamma^i})}{\text{rate}}}

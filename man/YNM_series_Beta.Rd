@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Beta}
 \alias{YNM_series_Beta}
-\title{Generate a Yang Series with Beta Noise}
+\title{Generate a YNM Series with Beta Noise}
 \usage{
 YNM_series_Beta(T, gamma, shape1 = 1, shape2 = 1)
 }
@@ -16,10 +16,10 @@ YNM_series_Beta(T, gamma, shape1 = 1, shape2 = 1)
 \item{shape2}{Positive numeric. The second shape parameter of the Beta distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generates a Yang series where the noise follows a Beta distribution.
+Generates a YNM series where the noise follows a Beta distribution.
 }
 \details{
 The series is generated as:

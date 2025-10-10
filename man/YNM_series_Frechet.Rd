@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Frechet}
 \alias{YNM_series_Frechet}
-\title{Generate a Yang Series with Frechet Noise}
+\title{Generate a YNM Series with Frechet Noise}
 \usage{
 YNM_series_Frechet(T, gamma, shape, scale)
 }
@@ -16,10 +16,10 @@ YNM_series_Frechet(T, gamma, shape, scale)
 \item{scale}{Positive numeric. The scale parameter of the Frechet distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generate a Yang Series with Frechet Noise
+Generate a YNM Series with Frechet Noise
 }
 \details{
 \deqn{X_i = \text{scale} \cdot \left(-\frac{1}{\gamma^i} \log(U) \right)^{-1/\text{shape}}}

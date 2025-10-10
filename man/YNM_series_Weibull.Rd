@@ -2,7 +2,7 @@
 % Please edit documentation in R/Generate Yang_series.R
 \name{YNM_series_Weibull}
 \alias{YNM_series_Weibull}
-\title{Generate a Yang Series with Weibull Noise}
+\title{Generate a YNM Series with Weibull Noise}
 \usage{
 YNM_series_Weibull(T, gamma, scale = 1, shape = 1)
 }
@@ -16,10 +16,10 @@ YNM_series_Weibull(T, gamma, scale = 1, shape = 1)
 \item{shape}{Positive numeric. The shape parameter of the Weibull distribution.}
 }
 \value{
-A numeric vector representing the Yang series.
+A numeric vector representing the YNM series.
 }
 \description{
-Generate a Yang Series with Weibull Noise
+Generate a YNM Series with Weibull Noise
 }
 \details{
 \deqn{X_i = (-\text{scale}^\text{shape} \cdot \log(1 - U^{1/\gamma^i}))^{1/\text{shape}}}
