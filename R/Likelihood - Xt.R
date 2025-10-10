@@ -305,6 +305,6 @@ Likelihood_Xt_Frechet_LDM_OptSolve <- function(x) {
   return(c(theta=result$par[1], A=A, a=result$par[3], logL=-result$objective))
 }
 
-library(nleqslv)
+#library(nleqslv)
 
 

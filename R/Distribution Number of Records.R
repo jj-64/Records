@@ -1,4 +1,4 @@
-library(combinat)
+#library(combinat)
 #################### iid #####################
 #'Exact Expected number of records in Classical Model
 #'
