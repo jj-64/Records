@@ -4,7 +4,10 @@
 #' @param t Time index (integer).
 #' @return Probability of a record occurring at time \eqn{t}, given by:
 #' \deqn{ P(R_t) = \frac{1}{t} }
-PT_iid = function(t){
+#' #' @examples
+#' rec_rate_iid(10)  # Finite-time record probability at t = 10
+#' 0.1
+rec_rate_iid = function(t){
   1/t
 }
 
@@ -27,7 +30,7 @@ PT_iid = function(t){
 #' @examples
 #' PT_DTRW(10)  # Finite-time record probability at t = 10
 #' 0.1761971
-PT_DTRW = function(t){
+rec_rate_DTRW = function(t){
   Survival(t)
 }
 
@@ -47,11 +50,11 @@ PT_DTRW = function(t){
 #' @seealso \code{\link{PT_DTRW}} for the exact finite-time expression.
 #'
 #' @examples
-#' P_DTRW(1000)  # Asymptotic record probability at large t
+#' rec_rate_DTRW_approximate(1000)  # Asymptotic record probability at large t
 #' 0.01784124
-#' P_DTRW(10)
+#' rec_rate_DTRW_approximate(10)
 #' 0.1784124
-P_DTRW = function(t){
+rec_rate_DTRW_approximate = function(t){
   1/sqrt(pi*t)
 }
 #################### LDM #####################
@@ -79,9 +82,9 @@ rec_rate_LDM = function(theta, t, location=0, scale){
 #' @details Limiting record probability:
 #' \deqn{ P(t -> \infty) = 1 - e^{-\theta/\text{scale}} }
 #' @return probability
-#' @examples P_LDM(theta=0.5, scale=1)
+#' @examples rec_rate_YNM_approximate(theta=0.5, scale=1)
 #' 0.3934693
-P_LDM = function(theta, location=0,scale){
+rec_rate_LDM_approximate = function(theta, location=0,scale){
   1 - exp(-theta / scale)
 }
 
@@ -109,10 +112,10 @@ rec_rate_YNM = function(gamma, t){
 #' \deqn{ P(R_\infty) = 1 - \frac{1}{\gamma} }
 #' @return a probability
 #' @examples
-#' P_YNM(gamma=1.1)
-#'  0.09090909
-#' P_YNM(gamma=1.4)
-#'  0.2857143
-P_YNM = function(gamma){
+#' rec_rate_YNM_approximate(gamma=1.1)
+#' [1] 0.09090909
+#' rec_rate_YNM_approximate(gamma=1.4)
+#' [1] 0.2857143
+rec_rate_YNM_approximate = function(gamma){
   1 - (1/gamma)
 }
