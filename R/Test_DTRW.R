@@ -32,8 +32,8 @@
 #'   \item \code{"Chisq"} — Fisher’s chi-squared combination test
 #' }
 #'
-#' The decision rule is `"DTRW"` if all component tests fail to reject their nulls
-#' under the chosen adjustment method; otherwise `"NO"`.
+#' The decision rule is "DTRW" if all component tests fail to reject their nulls
+#' under the chosen adjustment method; otherwise "NO".
 #'
 #' @param X Numeric vector of observations representing the process path.
 #' @param alpha Numeric, significance level (default = 0.05).
@@ -45,7 +45,7 @@
 #' \item{p_valueStationary}{P-value from ADF stationarity test.}
 #' \item{p_valueIndep}{P-value from Ljung–Box independence test.}
 #' \item{p_valueSymm}{P-value from Wilcoxon symmetry test.}
-#' \item{decision}{Overall decision: `"DTRW"` if consistent with random walk assumptions, `"NO"` otherwise.}
+#' \item{decision}{Overall decision: "DTRW" if consistent with random walk assumptions, "NO" otherwise.}
 #'
 #' @references
 #' Ljung, G. M. and Box, G. E. P. (1978). “On a Measure of Lack of Fit in Time Series Models.”
@@ -234,7 +234,7 @@ Quantile_DTRW <- function(alpha = 0.05, T) {
 #' \item{stat}{Observed test statistic (number of records or standardized z-score).}
 #' \item{stat_theo}{Theoretical quantile bounds (if \code{approximate = FALSE}).}
 #' \item{p_value}{Approximate p-value (if \code{approximate = TRUE}).}
-#' \item{decision}{Character, `"DTRW"` if consistent with DTRW hypothesis, otherwise `"NO"`.}
+#' \item{decision}{Character, "DTRW" if consistent with DTRW hypothesis, otherwise "NO".}
 #'
 #' @seealso \code{\link{Quantile_DTRW}}, \code{\link{rec_counts}},
 #'   \code{\link{ENT_DTRW_approx}}, \code{\link{VNT_DTRW_approx}}

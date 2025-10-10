@@ -12,7 +12,7 @@ Test_YNM_Geom(X, alpha = 0.05, K = NULL, warmup = NULL)
 \item{alpha}{Numeric, significance level (default = 0.05).}
 
 \item{K}{Integer, number of categories for chi-squared grouping.
-If \code{NULL}, defaults to \code{min(4, length(gaps))}.}
+If NULL, defaults to \eqn{min(4, length(gaps))}.}
 
 \item{warmup}{Integer, number of initial gaps to discard (default = NULL).}
 }
@@ -27,7 +27,7 @@ A list with elements:
 \item{gamma_hat}{Estimated YNM parameter \eqn{\gamma}.}
 \item{v_gamma_hat}{Estimated variance of \eqn{\hat{\gamma}}.}
 \item{CL}{Confidence interval for \eqn{\gamma}.}
-\item{decision}Decision: \code{"YNM"} if not rejected, \code{"NO"} otherwise.}
+\item{decision}{Decision: "YNM" if not rejected, "NO" otherwise.}
 }
 \description{
 Performs a goodness-of-fit test for the YNM–Nevzorov model by examining
@@ -37,7 +37,7 @@ statistic on grouped frequencies, and evaluates whether the observed record
 gaps are consistent with a geometric distribution.
 }
 \details{
-Let \eqn{G_i} denote the observed record gaps. Under the YNM–Nevzorov
+Let \eqn{G_i} denote the observed record gaps. Under the YNM-Nevzorov
 model, the gaps are approximately geometrically distributed with parameter
 \eqn{\hat{p} = 1 / \bar{G}}. The test proceeds as follows:
 \enumerate{
@@ -62,34 +62,34 @@ set.seed(123)
 X <- YNM_series_Gumbel(T = 50, gamma = 1.2)
 Test_YNM_Geom(X, alpha = 0.05, K = 4, warmup=2)
 
-$obs_counts
-[1] 3 3 1 4
+# $obs_counts
+# [1] 3 3 1 4
 
-$exp_counts
+# $exp_counts
 
-[1] 2.69 2.03 1.53 4.74
+# [1] 2.69 2.03 1.53 4.74
 
-$stat
-[1] 0.8008871
+# $stat
+# [1] 0.8008871
 
-$df
-[1] 2
+# $df
+# [1] 2
 
-$p_value
-[1] 0.6700228
+# $p_value
+# [1] 0.6700228
 
-$p_hat
-[1] 0.2444444
+# $p_hat
+# [1] 0.2444444
 
-$gamma_hat
-[1] 1.323529
+# $gamma_hat
+# [1] 1.323529
 
-$v_gamma_hat
-[1] 0.01259414
+# $v_gamma_hat
+# [1] 0.01259414
 
-$CL
-[1] 1.138938 1.508121
+# $CL
+# [1] 1.138938 1.508121
 
-$decision
-[1] "YNM"
+# $decision
+# [1] "YNM"
 }

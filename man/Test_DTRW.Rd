@@ -20,7 +20,7 @@ A list with the following elements:
 \item{p_valueStationary}{P-value from ADF stationarity test.}
 \item{p_valueIndep}{P-value from Ljung–Box independence test.}
 \item{p_valueSymm}{P-value from Wilcoxon symmetry test.}
-\item{decision}{Overall decision: \code{"DTRW"} if consistent with random walk assumptions, \code{"NO"} otherwise.}
+\item{decision}{Overall decision: "DTRW" if consistent with random walk assumptions, "NO" otherwise.}
 }
 \description{
 Performs a composite hypothesis test to assess whether a given time series
@@ -53,8 +53,8 @@ The overall decision is based on combining p-values using one of the following m
 \item \code{"Chisq"} — Fisher’s chi-squared combination test
 }
 
-The decision rule is \code{"DTRW"} if all component tests fail to reject their nulls
-under the chosen adjustment method; otherwise \code{"NO"}.
+The decision rule is "DTRW" if all component tests fail to reject their nulls
+under the chosen adjustment method; otherwise "NO".
 }
 \examples{
 set.seed(123)

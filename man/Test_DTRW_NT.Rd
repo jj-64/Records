@@ -22,7 +22,7 @@ A list containing:
 \item{stat}{Observed test statistic (number of records or standardized z-score).}
 \item{stat_theo}{Theoretical quantile bounds (if \code{approximate = FALSE}).}
 \item{p_value}{Approximate p-value (if \code{approximate = TRUE}).}
-\item{decision}{Character, \code{"DTRW"} if consistent with DTRW hypothesis, otherwise \code{"NO"}.}
+\item{decision}{Character, "DTRW" if consistent with DTRW hypothesis, otherwise "NO".}
 }
 \description{
 Performs a hypothesis test to determine whether a given time series

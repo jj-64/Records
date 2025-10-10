@@ -363,6 +363,8 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #The usual test assumes Gaps are i.i.d. Geom(p). If gaps are nonstationary (e.g. short early gaps, longer later gaps) the single-sample mean
 #is dominated by early small gaps → p biased high → expected tail mass under the null is underestimated → observed long gaps look unsurprising → test fails to reject.
 #So the issue is not the chi-square per se but the (false) assumption of stationarity/homogeneity of gap distribution across time.
+
+
 #' Test for YNM–Nevzorov Geometric Record Gaps
 #'
 #' Performs a goodness-of-fit test for the YNM–Nevzorov model by examining
@@ -372,7 +374,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' gaps are consistent with a geometric distribution.
 #'
 #' @details
-#' Let \eqn{G_i} denote the observed record gaps. Under the YNM–Nevzorov
+#' Let \eqn{G_i} denote the observed record gaps. Under the YNM-Nevzorov
 #' model, the gaps are approximately geometrically distributed with parameter
 #' \eqn{\hat{p} = 1 / \bar{G}}. The test proceeds as follows:
 #'
@@ -394,7 +396,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' @param X Numeric vector of observations.
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param K Integer, number of categories for chi-squared grouping.
-#'   If `NULL`, defaults to `min(4, length(gaps))`.
+#'   If NULL, defaults to \eqn{min(4, length(gaps))}.
 #' @param warmup Integer, number of initial gaps to discard (default = NULL).
 #'
 #' @return A list with elements:
@@ -407,43 +409,43 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' \item{gamma_hat}{Estimated YNM parameter \eqn{\gamma}.}
 #' \item{v_gamma_hat}{Estimated variance of \eqn{\hat{\gamma}}.}
 #' \item{CL}{Confidence interval for \eqn{\gamma}.}
-#' \item{decision}Decision: `"YNM"` if not rejected, `"NO"` otherwise.}
+#' \item{decision}{Decision: "YNM" if not rejected, "NO" otherwise.}
 #'
 #' @examples
 #' set.seed(123)
 #' X <- YNM_series_Gumbel(T = 50, gamma = 1.2)
 #' Test_YNM_Geom(X, alpha = 0.05, K = 4, warmup=2)
 #'
-#'$obs_counts
-#'[1] 3 3 1 4
+#'# $obs_counts
+#'# [1] 3 3 1 4
 #'
-#'$exp_counts
+#'# $exp_counts
 #'
-#'[1] 2.69 2.03 1.53 4.74
+#'# [1] 2.69 2.03 1.53 4.74
 #'
-#'$stat
-#'[1] 0.8008871
+#'# $stat
+#'# [1] 0.8008871
 #'
-#' $df
-#' [1] 2
+#'# $df
+#'# [1] 2
 #'
-#' $p_value
-#' [1] 0.6700228
+#'# $p_value
+#'# [1] 0.6700228
 #'
-#' $p_hat
-#' [1] 0.2444444
+#'# $p_hat
+#'# [1] 0.2444444
 #'
-#' $gamma_hat
-#' [1] 1.323529
+#'# $gamma_hat
+#'# [1] 1.323529
 #'
-#' $v_gamma_hat
-#' [1] 0.01259414
+#'# $v_gamma_hat
+#'# [1] 0.01259414
 #'
-#' $CL
-#' [1] 1.138938 1.508121
+#'# $CL
+#'# [1] 1.138938 1.508121
 #'
-#' $decision
-#' [1] "YNM"
+#'# $decision
+#'# [1] "YNM"
 Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL) {
 
    if (sum(is_rec(X)) <=4) {
@@ -452,7 +454,6 @@ Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL) {
   gaps = rec_gaps(X)
   if (is.null(warmup) ){ warmup = ceiling(0.3 * length(gaps)) }
   if (warmup > 0 ){ gaps <- gaps[-seq_len(warmup)]}
-
 
   # Total number of observations
   n <- length(gaps)
