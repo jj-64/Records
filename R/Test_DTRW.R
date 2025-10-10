@@ -111,6 +111,23 @@ Test_DTRW = function(X,alpha=0.05, method="Bonf"){
 }
 
 
+Test_DTRW_Indep = function(X,alpha=0.05){
+
+  ## Test2:  Perform Ljung-Box test on increments: H0:independently distributed (no autocorrelation)
+  ljung_box_test <- Box.test(diff(X), type = "Ljung-Box")
+  p_value2 = ljung_box_test$p.value  ## we want H0: fail to reject so p_value>p
+
+  ##Test3: Wilcoxon signed-rank test for symmetry H0: symmetric
+  wilcoxon_test = wilcox.test(diff(X), mu =0, alternative = "two.sided", exact = FALSE) #median(increments) # DTRW without drift
+  p_value3 = wilcoxon_test$p.value
+
+  dec = ifelse(p_value2 < alpha/2 | p_value3< alpha/2 , "NO", "DTRW")
+  return(list(
+    aleternative = "correlated",
+    p_value = p_value2,
+    decision = dec
+  ))
+}
 ############## based on exact distribution of number of records ##############
 #' Compute Quantile Bounds for Record Counts under a DTRW Process
 #'

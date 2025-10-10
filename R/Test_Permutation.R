@@ -110,6 +110,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
   ## ---------- Optional: summary of how many times each model accepted ----------
   summary <- as.data.frame(table(results$Decision))
   summary <- summary[order(summary$Freq, decreasing = TRUE), ]
+ colnames(summary) = c("decision", "Freq")
 
 
   if (print) {
@@ -209,9 +210,10 @@ colnames(result)=c("None","Classical","DTRW","LDM","YN")
 #' sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
 #' generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
 #' H0 = "DTRW")
-#' }
 #'
-#' ### 75% of the permutations return "DTRW" and 25% return "YNM"
+#'
+#' ### 75% of the permutations trees return "DTRW" and 25% return "YNM".
+#' ### On average, one simulation will return the following:
 #' #  summary_total
 #' #  Decision Freq
 #' #  1     DTRW 0.75
@@ -273,7 +275,7 @@ colnames(result)=c("None","Classical","DTRW","LDM","YN")
 #' #     22        YDLC          0.5
 #' #     23        YLCD          1.0
 #' #     24        YLDC          1.0
-
+#' }
 Simulation_Permutation_Analysis <- function(
     n_sim = 1000,
     T = 50,
@@ -315,6 +317,7 @@ Simulation_Permutation_Analysis <- function(
 
     # store results for this simulation
     all_results$Decision[all_results$sim_id == i] <- (perm_result$decision)$Decision
+    summary_per_sim =  perm_result$summary
     setTxtProgressBar(pb, i)
   }
   close(pb)
