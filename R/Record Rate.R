@@ -115,7 +115,7 @@ rec_rate_DTRW <- function(t, approximate = FALSE) {
 #'
 #' @export
 rec_rate_LDM <- function(theta, t = Inf, location = 0, scale = 1) {
-  if (is.infinite(t) || is.null(t)) {
+  if (is.infinite(t[1]) || is.null(t)) {
     # Asymptotic case
     return(1 - exp(-theta / scale))
   } else {
