@@ -25,7 +25,6 @@
 #' The test fits a robust regression model of the form:
 #' \deqn{ X_t = \theta (t - \bar{t}) + \varepsilon_t }
 #' where time \eqn{t} and observations \eqn{X_t} are centralized.
-#'
 #' The decision rule is:
 #' \enumerate{
 #'   \item Reject \eqn{H_0: \theta = 0} if the p_value is below \code{alpha}.
@@ -37,6 +36,7 @@
 #' t <- 1:50
 #' X <- 0.3 * t + rnorm(50, sd = 5)  # Linear drift with noise
 #' Test_LDM_Regression(X, alpha = 0.05, RSq = 0.7)
+#' @export
 Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8) {
   t <- seq_along(X)
 
@@ -98,7 +98,7 @@ Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8) {
 #' desired quantile levels.
 #'
 #' @seealso \code{\link{Test_LDM_NT}} for hypothesis testing of the number of records.
-#'
+#' @export
 #' @examples
 #' Quantile_LDM(T = 20, theta = 0.5, alpha = 0.05)
 Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {
@@ -150,7 +150,7 @@ Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {
 #' }
 #'
 #' @seealso \code{\link{Quantile_LDM}} for quantile computation.
-#'
+#' @export
 #' @examples
 #' set.seed(123)
 #' X <- rnorm(50, mean = 0.2 * (1:50))  # Linear drift
