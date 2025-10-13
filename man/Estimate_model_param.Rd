@@ -9,9 +9,7 @@ Estimate_model_param(
   method = c("NT", "NT_unbiased", "MLE_indicator"),
   model = "LDM",
   variance = TRUE,
-  scale = 1,
-  min = 1e-04,
-  max = 5
+  ...
 )
 }
 \arguments{
@@ -33,4 +31,10 @@ Numeric estimate of theta and variance (if TRUE)
 \description{
 Estimates the drift parameter theta in the Linear Drift Model (LDM)
 using different methods: "NT", "NT_unbiased", or "MLE".
+}
+\examples{
+X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
+3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729)
+
+Estimate_model_param(X, method="NT", model = "LDM", scale=1)
 }
