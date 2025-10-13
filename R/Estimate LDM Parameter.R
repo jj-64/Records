@@ -100,7 +100,10 @@ Estimate_LDM_NT <- function(X, variance = TRUE, scale=1) {
 #' @export
 #' @examples
 #' \dontrun{
-#' res <- Estimate_LDM_NT_unbiased(x_series, variance = TRUE, scale = 1)
+#' Yt <- rnorm(25)
+#' Xt <- Yt + 0.2 * (1:25)
+#' rec_counts(Xt)  # Number of records
+#' res <- Estimate_LDM_NT_unbiased(Xt, variance = TRUE, scale = 1)
 #' res$theta; res$variance
 #' }
 #' Estimate_LDM_NT_unbiased(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
@@ -223,10 +226,11 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 ######################## MLE ########################################
 
 
-#' Maximum Likelihood Estimation (and Variance) of θ Based on record indicator Series (with optional variance)
+#' Maximum Likelihood Estimation of θ Based on record indicator Series (with optional variance)
 #'
 #' Computes the Maximum Likelihood Estimate (MLE) of the parameter θ
 #' for the Linear Drift Model (LDM), based on the record indicator series \eqn{\delta_t}.
+#'
 #' Optionally computes its analytical variance.
 #'
 #' @param X Numeric vector — the observed time series.
@@ -242,8 +246,8 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #' \log L(\theta) = N \log(1 - z) + (T - N) \log z - \log(1 - z^T)
 #' - \sum_{t=2}^{T} \delta_t \log(1 - z^{t-1})
 #' }
-#' where \(z = e^{-\theta}\), \(N\) is the number of records, \(T\) the series length,
-#' and \(\delta_t\) are the record indicator values.
+#' where \eqn{z = e^{-\theta}}, \eqn{N} is the number of records, \eqn{T} the series length,
+#' and \eqn{\delta_t} are the record indicator values.
 #'
 #'
 #'
@@ -253,7 +257,22 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #' \item{variance}{Analytical variance (or NA if variance = FALSE).}
 #'
 #' @export
-Estimate_LDM_MLE <- function(X, variance = TRUE, scale = 1, min = 0.0001, max = 5, step = 0.01) {
+#' @examples
+#' Yt <- rnorm(25)
+#' Xt <- Yt + 0.2 * (1:25)
+#' rec_counts(Xt)  # Number of records
+#' res <- Estimate_LDM_MLE_indicator(Xt, variance = TRUE, scale = 1)
+#' res$theta; res$variance
+#'
+#' Estimate_LDM_MLE_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
+#' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
+#'
+#' $theta
+#' [1] 0.3301
+#'
+#' $variance
+#' [1] 0.02139224
+Estimate_LDM_MLE_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001, max = 5, step = 0.01) {
   if (!is.numeric(X) || length(X) < 4)
     stop("X must be a numeric vector with length > 4.")
   if (scale <= 0)
