@@ -11,32 +11,37 @@
 #' @param min,max Search bounds for MLE method.
 #' @return Numeric estimate of theta and variance (if TRUE)
 #' @export
-Estimate_model_param <- function(X, method = c("NT", "NT_unbiased", "MLE_indicator"), model="LDM", variance = TRUE,
-                                 scale = 1, min = 0.0001, max = 5) {
+#' @examples
+#' X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
+#' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729)
+#'
+#' Estimate_model_param(X, method="NT", model = "LDM", scale=1)
+Estimate_model_param <- function(X, method = c("NT", "NT_unbiased", "MLE_indicator"), model="LDM", variance = TRUE, ...) {
   method <- match.arg(method)
   model <- match.arg(model)
+  args <- list(...)
 
   if (model == "LDM"){
     if (method == "NT") {
-      est <- Estimate_LDM_NT(X, variance = variance, scale=scale)
+      est <- Estimate_LDM_NT(X, variance = variance, scale=args$scale)
 
     } else if (method == "NT_unbiased") {
-      est = Estimate_LDM_NT_unbiased(X, variance = variance, scale=scale)
+      est = Estimate_LDM_NT_unbiased(X, variance = variance, scale=args$scale)
 
     } else if (method == "MLE_indicator") {
-      d <- is_rec(X)
-      NT <- rec_counts(X)
-      T <- length(X)
-      LogT_LDM <- function(z, T, delta, N) {
-        v <- function(t, z) log(1 - z^(t - 1))
-        x <- sapply(2:T, v, z = z)
-        N * log(1 - z) + (T - N) * log(z) - log(1 - z^T) - sum(delta * x)
-      }
-      z1 <- seq(min, max, by = 0.01)
-      z <- exp(-z1)
-      likel <- sapply(z, LogT_LDM, T = T, delta = d, N = NT)
-      theta <- -log(z[which.max(likel)])
-    }}
-  return(theta)
+      est = Estimate_LDM_MLE_indicator(X, variance = variance, scale=args$scale, min = args$min, max=args$max, step=args$step)
+    }
+  } else if(model == "YNM"){
+    if (method == "NT") {
+      est <- Estimate_YNM_NT(X, variance = variance)
+
+    } else if (method == "NT_unbiased") {
+      est = Estimate_LDM_NT_unbiased(X, variance = variance)
+
+    } else if (method == "MLE_indicator") {
+      est = Estimate_YNM_MLE_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)
+    }
+  }
+  return(est)
 }
 

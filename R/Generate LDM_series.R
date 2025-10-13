@@ -21,7 +21,7 @@
 #'     \item{gumbel}{`loc`, `scale`}
 #'     \item{weibull}{`shape`, `scale`}
 #'     \item{frechet}{`shape`, `scale`}
-#'     \item{norm}{`loc`, `sd`}
+#'     \item{norm}{`mean`, `sd`}
 #'     \item{exp}{`rate`}
 #'     \item{pareto}{`scale`, `shape`}
 #'     \item{unifom}{`min`, `max`}
@@ -40,7 +40,6 @@
 #'
 #' #Normal
 #'LDM_series(100, theta = 0.1, dist = "norm", mean = 0, sd = 1)
-
 LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), ...) {
   dist <- match.arg(dist)   # enforce valid choice
   args <- list(...)
@@ -129,7 +128,6 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' @param shape1 Positive numeric. The first shape parameter of the Beta distribution.
 #' @param shape2 Positive numeric. The second shape parameter of the Beta distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 #' @examples
 #' LDM_series_Beta(100, theta = 0.5, shape1 = 2, shape2 = 5)
 LDM_series_Beta <- function(T, theta, shape1 = 1, shape2 = 1) {
@@ -138,7 +136,6 @@ LDM_series_Beta <- function(T, theta, shape1 = 1, shape2 = 1) {
   x <- theta * (1:T) + y
   return(x)
 }
-
 
 
 #' Generate an LDM Series with Gumbel Noise
@@ -150,7 +147,6 @@ LDM_series_Beta <- function(T, theta, shape1 = 1, shape2 = 1) {
 #' @param loc Numeric. The location parameter of the Gumbel distribution.
 #' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Gumbel <- function(T, theta, loc = 0, scale = 1) {
   if (scale <= 0) stop("Enter a positive value for scale")
   y <- VGAM::rgumbel(T, loc, scale)
@@ -167,7 +163,6 @@ LDM_series_Gumbel <- function(T, theta, loc = 0, scale = 1) {
 #' @param scale Positive numeric. The scale parameter of the Weibull distribution.
 #' @param shape Positive numeric. The shape parameter of the Weibull distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Weibull <- function(T, theta, shape = 1,scale = 1) {
   if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
   y <- rweibull(T, shape=shape, scale=scale)
@@ -184,7 +179,6 @@ LDM_series_Weibull <- function(T, theta, shape = 1,scale = 1) {
 #' @param scale Positive numeric. The scale parameter of the Frechet distribution.
 #' @param shape Positive numeric. The shape parameter of the Frechet distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Frechet <- function(T, theta, scale = 1, shape = 2) {
   if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
   y <- VGAM::rfrechet(T, loc = 0, scale, shape)
@@ -200,7 +194,6 @@ LDM_series_Frechet <- function(T, theta, scale = 1, shape = 2) {
 #' @inheritParams LDM_series_Beta
 #' @param rate Positive numeric. The rate parameter of the Exponential distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Exp <- function(T, theta, rate = 1) {
   if (rate <= 0) stop("Enter a positive value for scale:1/ rate")
   y <- rexp(T, rate=rate)
@@ -218,7 +211,6 @@ LDM_series_Exp <- function(T, theta, rate = 1) {
 #' @inheritParams LDM_series_Beta
 #' @inheritParams LDM_series_Weibull
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Pareto <- function(T, theta, scale = 0.5, shape = 4) {
   if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
   y <- rpareto(T * 1.5, scale, shape)
@@ -236,7 +228,6 @@ LDM_series_Pareto <- function(T, theta, scale = 0.5, shape = 4) {
 #' @param loc Numeric. The mean (location) of the normal distribution.
 #' @param sd Positive numeric. The standard deviation of the normal distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Norm <- function(T, theta, loc = 0, sd = 1) {
   if (sd <= 0) stop("Enter a positive value for standard deviation")
   y <- rnorm(T, loc, sd)
@@ -253,7 +244,6 @@ LDM_series_Norm <- function(T, theta, loc = 0, sd = 1) {
 #' @param min Numeric. The lower bound of the uniform distribution.
 #' @param max Numeric. The upper bound of the uniform distribution.
 #' @return A numeric vector representing the LDM series.
-#' @export
 LDM_series_Unif <- function(T, theta, min = -1, max = 1) {
   y <- runif(T, min, max)
   x <- theta * (1:T) + y

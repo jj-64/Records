@@ -205,10 +205,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
     lambda_theta <- NA_real_
     if (!is.null(Estimated$variance) && is.numeric(Estimated$variance)) {
       lambda_theta <- Estimated$variance
-    } else if (exists("Estim_theta_NT_Variance", mode = "function")) {
-      # fallback: compute variance using the simple NT variance function (user-provided)
-      lambda_theta <- Estim_theta_NT_Variance(theta = theta_unbiased, scale = scale)
-    } else {
+    }  else {
       warning("Could not locate variance for the base NT estimator. Returning NA for final variance.")
       lambda_theta <- NA_real_
     }
@@ -234,7 +231,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #' Optionally computes its analytical variance.
 #'
 #' @param X Numeric vector — the observed time series.
-#' @param variance Logical. If TRUE, compute variance of θ̂. Default = TRUE.
+#' @param variance Logical. If TRUE, compute variance of θ. Default = TRUE.
 #' @param scale Numeric. Scale parameter (default = 1).
 #' @param min Lower bound for θ search space. Default = 0.0001.
 #' @param max Upper bound for θ search space. Default = 5.

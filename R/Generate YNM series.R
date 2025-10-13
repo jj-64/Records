@@ -16,7 +16,7 @@
 #'     \item{frechet}{`shape`, `scale`}
 #'     \item{exp}{`rate`}
 #'     \item{pareto}{`scale`, `shape`}
-#'     \item{norm}{`loc`, `sd`}
+#'     \item{norm}{`mean`, `sd`}
 #'   }
 #'
 #' @return A numeric vector of length T, the simulated YNM process.
@@ -79,7 +79,7 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet"
       },
 
       norm = {
-        loc <- args$loc %||% 0
+        loc <- args$mean %||% 0
         sd  <- args$sd  %||% 1
         if (sd <= 0) stop("Enter positive value for sd")
         qnorm(u^(1/m), mean = loc, sd = sd)
@@ -235,11 +235,11 @@ YNM_series_Pareto <- function(T, gamma, scale = 0.5, shape = 4) {
 #' \deqn{X_i = \max(Y_i), \quad Y_i \sim \mathcal{N}(\text{loc}, \text{sd}), \quad \text{length}(Y_i) = \gamma^i}
 #'
 #' @inheritParams YNM_series_Beta
-#' @param loc Numeric. The mean (location) of the normal distribution.
+#' @param mean Numeric. The mean (location) of the normal distribution.
 #' @param sd Positive numeric. The standard deviation of the normal distribution.
 #' @return A numeric vector representing the YNM series.
 #' @export
-YNM_series_Norm <- function(T, gamma, loc = 0, sd = 1) {
+YNM_series_Norm <- function(T, gamma, mean = 0, sd = 1) {
 if (sd <= 0) stop("Enter a positive value for standard deviation")
 
 # Pre-allocate
@@ -248,7 +248,7 @@ y <- numeric(T)
 for (i in 1:T) {
   m <- gamma^i
   u <- runif(1)                # uniform random variable
-  y[i] <- qnorm(u^(1/m), mean = loc, sd = sd)
+  y[i] <- qnorm(u^(1/m), mean = mean, sd = sd)
 }
 y= y[is.finite(y)]
 

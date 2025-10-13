@@ -16,7 +16,7 @@ Estimate_LDM_MLE_indicator(
 \arguments{
 \item{X}{Numeric vector — the observed time series.}
 
-\item{variance}{Logical. If TRUE, compute variance of θ̂. Default = TRUE.}
+\item{variance}{Logical. If TRUE, compute variance of θ. Default = TRUE.}
 
 \item{scale}{Numeric. Scale parameter (default = 1).}
 
@@ -44,13 +44,15 @@ The log-likelihood is:
 - \sum_{t=2}^{T} \delta_t \log(1 - z^{t-1})
 }
 where \eqn{z = e^{-\theta}}, \eqn{N} is the number of records, \eqn{T} the series length,
-and \(\delta_t\) are the record indicator values.
+and \eqn{\delta_t} are the record indicator values.
 }
 \examples{
-\dontrun{
-res <- Estimate_LDM_MLE_indicator(x_series, variance = TRUE, scale = 1)
+Yt <- rnorm(25)
+Xt <- Yt + 0.2 * (1:25)
+rec_counts(Xt)  # Number of records
+res <- Estimate_LDM_MLE_indicator(Xt, variance = TRUE, scale = 1)
 res$theta; res$variance
-}
+
 Estimate_LDM_MLE_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 

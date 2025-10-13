@@ -152,10 +152,10 @@ rec_rate_LDM <- function(theta, t = Inf, location = 0, scale = 1) {
 #'
 #' @export
 rec_rate_YNM <- function(gamma, t = Inf) {
-  if (is.infinite(t) || is.null(t)) {
+  if (is.infinite(t[1]) || is.null(t)) {
     return(1 - 1/gamma)
   } else {
-    return((gamma^t / gamma) * (1 - gamma) / (1 - gamma^t))
+    return((gamma^t - gamma^(t-1)) / (gamma^t -1 ) )
   }
 }
 

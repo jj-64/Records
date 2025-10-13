@@ -57,7 +57,10 @@ where \eqn{P(\theta) = 1-e^{-\theta}}, \eqn{P_t(\theta) = \frac{1-e^{-\theta}}{1
 }
 \examples{
 \dontrun{
-res <- Estimate_LDM_NT_unbiased(x_series, variance = TRUE, scale = 1)
+Yt <- rnorm(25)
+Xt <- Yt + 0.2 * (1:25)
+rec_counts(Xt)  # Number of records
+res <- Estimate_LDM_NT_unbiased(Xt, variance = TRUE, scale = 1)
 res$theta; res$variance
 }
 Estimate_LDM_NT_unbiased(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
