@@ -10,7 +10,7 @@
 #'  "norm", "cauchy, "uniform"
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
-#'     \item{norm}{`loc`, `sd`}
+#'     \item{norm}{`mean`, `sd`}
 #'     \item{cauchy}{`loc`, `scale`}
 #'     \item{uniform}{`min`, `max`}
 #'   }
@@ -34,7 +34,7 @@ DTRW_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
       dist,
 
       norm = {
-        loc <- args$loc %||% 0
+        loc <- args$mean %||% 0
         sd  <- args$sd  %||% 1
         if (sd <= 0) stop("Enter positive value for sd")
         rnorm(T, loc, sd)
@@ -101,26 +101,26 @@ DTRW_series_Cauchy <- function(T, loc = 0, scale = 1) {
 #'
 #' @details
 #' The series is generated recursively as:
-#' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \mathcal{N}(\text{loc}, \text{sd})}
+#' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \mathcal{N}(\text{mean}, \text{sd})}
 #' where:
 #' - \eqn{T} is the length of the series.
 #' - \eqn{e_t} are i.i.d. random variables from a Normal distribution.
-#' - \eqn{\text{loc}} is the mean of the Normal distribution.
+#' - \eqn{\text{mean}} is the mean of the Normal distribution.
 #' - \eqn{\text{sd}} is the standard deviation of the Normal distribution.
 #'
 #' @param T Integer. The length of the series.
-#' @param loc Numeric. The mean (location) parameter of the normal distribution.
+#' @param mean Numeric. The mean (location) parameter of the normal distribution.
 #' @param sd Positive numeric. The standard deviation of the normal distribution.
 #' @return A numeric vector representing the DTRW series.
 #' @export
 #' @examples
-#' DTRW_series_Norm(100, loc = 0, sd = 1)
-DTRW_series_Norm <- function(T, loc, sd) {
+#' DTRW_series_Norm(100, mean = 0, sd = 1)
+DTRW_series_Norm <- function(T, mean, sd) {
   if (sd <= 0) stop("Enter a positive value for standard deviation")
-  # e <- rnorm(T, mean = loc, sd = sd) ## Generate increments
+  # e <- rnorm(T, mean = mean, sd = sd) ## Generate increments
   # x <- numeric(T)
 
-  x <- cumsum(rnorm(T, mean = loc, sd = sd))
+  x <- cumsum(rnorm(T, mean = mean, sd = sd))
   #x <- x - x[1] # Normalize the series so it starts at 0
   return(x)
 }

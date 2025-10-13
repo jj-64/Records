@@ -7,7 +7,7 @@
 Estimate_model_param(
   X,
   method = c("NT", "NT_unbiased", "MLE_indicator"),
-  model = "LDM",
+  model = c("LDM", "YNM"),
   variance = TRUE,
   ...
 )
@@ -37,4 +37,24 @@ X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.5
 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729)
 
 Estimate_model_param(X, method="NT", model = "LDM", scale=1)
+#  $theta
+# [1] 0.4462871
+
+#  $variance
+# [1] 0.5625
+
+Estimate_model_param(X, method="NT", model = "YNM")
+
+# $gamma[1]
+# 1.5625
+
+# $variance
+# [1] 1.373291
+
+Estimate_model_param(X, method="NT_unbiased", model = "YNM")
+# $gamma
+# [1] 1.388625
+
+# $variance
+# [1] 0.7497066
 }

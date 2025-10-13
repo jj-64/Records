@@ -12,6 +12,7 @@
 #' @param L Vector of record times.
 #' @param T Total observation time.
 #' @return The log-likelihood value.
+#' @export
 #' @examples
 #' Xt = DTRW_series_Norm(T=25,loc=0, sd=1)
 #' Xt
@@ -64,6 +65,7 @@ Likelihood_Ln_DTRW = function(L, T) {
 #' @param T Total observation time.
 #' @param params Vector of parameters: variance (\eqn{\sigma^2}) of the step distribution.
 #' @return The log-likelihood value.
+#' @export
 #' @examples
 #' Xt = DTRW_series_Norm(T=25,loc=0, sd=1)
 #' Xt

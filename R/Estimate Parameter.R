@@ -16,7 +16,27 @@
 #' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729)
 #'
 #' Estimate_model_param(X, method="NT", model = "LDM", scale=1)
-Estimate_model_param <- function(X, method = c("NT", "NT_unbiased", "MLE_indicator"), model="LDM", variance = TRUE, ...) {
+#' #  $theta
+#' # [1] 0.4462871
+#'
+#' #  $variance
+#' # [1] 0.5625
+#'
+#' Estimate_model_param(X, method="NT", model = "YNM")
+#'
+#' # $gamma[1]
+#' # 1.5625
+#'
+#' # $variance
+#' # [1] 1.373291
+#'
+#' Estimate_model_param(X, method="NT_unbiased", model = "YNM")
+#' # $gamma
+#' # [1] 1.388625
+#'
+#' # $variance
+#' # [1] 0.7497066
+Estimate_model_param <- function(X, method = c("NT", "NT_unbiased", "MLE_indicator"), model=c("LDM","YNM"), variance = TRUE, ...) {
   method <- match.arg(method)
   model <- match.arg(model)
   args <- list(...)
@@ -36,7 +56,7 @@ Estimate_model_param <- function(X, method = c("NT", "NT_unbiased", "MLE_indicat
       est <- Estimate_YNM_NT(X, variance = variance)
 
     } else if (method == "NT_unbiased") {
-      est = Estimate_LDM_NT_unbiased(X, variance = variance)
+      est = Estimate_YNM_NT_unbiased(X, variance = variance)
 
     } else if (method == "MLE_indicator") {
       est = Estimate_YNM_MLE_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)
