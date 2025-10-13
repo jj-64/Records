@@ -35,7 +35,6 @@ if the slope (drift parameter) is significantly different from zero.
 The test fits a robust regression model of the form:
 \deqn{ X_t = \theta (t - \bar{t}) + \varepsilon_t }
 where time \eqn{t} and observations \eqn{X_t} are centralized.
-
 The decision rule is:
 \enumerate{
 \item Reject \eqn{H_0: \theta = 0} if the p_value is below \code{alpha}.
