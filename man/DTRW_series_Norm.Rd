@@ -4,12 +4,12 @@
 \alias{DTRW_series_Norm}
 \title{Generate a Discrete-Time Random Walk (DTRW) Series with Normal Noise}
 \usage{
-DTRW_series_Norm(T, loc, sd)
+DTRW_series_Norm(T, mean, sd)
 }
 \arguments{
 \item{T}{Integer. The length of the series.}
 
-\item{loc}{Numeric. The mean (location) parameter of the normal distribution.}
+\item{mean}{Numeric. The mean (location) parameter of the normal distribution.}
 
 \item{sd}{Positive numeric. The standard deviation of the normal distribution.}
 }
@@ -21,15 +21,15 @@ Generates a DTRW series where the increments follow a Normal distribution.
 }
 \details{
 The series is generated recursively as:
-\deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \mathcal{N}(\text{loc}, \text{sd})}
+\deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \mathcal{N}(\text{mean}, \text{sd})}
 where:
 \itemize{
 \item \eqn{T} is the length of the series.
 \item \eqn{e_t} are i.i.d. random variables from a Normal distribution.
-\item \eqn{\text{loc}} is the mean of the Normal distribution.
+\item \eqn{\text{mean}} is the mean of the Normal distribution.
 \item \eqn{\text{sd}} is the standard deviation of the Normal distribution.
 }
 }
 \examples{
-DTRW_series_Norm(100, loc = 0, sd = 1)
+DTRW_series_Norm(100, mean = 0, sd = 1)
 }
