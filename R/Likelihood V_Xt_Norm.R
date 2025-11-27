@@ -1,6 +1,6 @@
 ## Variance of the variance estimator sigma2
-V_Xt_Norm_DTRW_a = function(x,params){
-  a= params
+V_Xt_Norm_DTRW_scale = function(x,params){
+  a= params[2]
   T=length(x)
   XX=diff(x)
 

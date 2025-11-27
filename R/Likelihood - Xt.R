@@ -10,19 +10,19 @@
 #'
 #' @param T Integer. Length of the series.
 #' @param x Numeric vector. Observed data.
-#' @param Aa Numeric vector of parameters \eqn{( A, a )}:
+#' @param params Numeric vector of parameters \eqn{( A, a )}:
 #'  \itemize{
 #'   \item \eqn{A}: 1/Scale parameter (1/scale).
 #'   \item \eqn{a}: Shape parameter.
 #'  }
 #' @return Numeric value of the log-likelihood.
 #' @export
-Likelihood_Xt_Frechet_iid <- function(T, x, Aa) {
-  sum(log(VGAM::dfrechet(x = x, 0, scale = 1 / Aa[1], shape = Aa[2])))
+Likelihood_Xt_Frechet_iid <- function(T, x, params) {
+  sum(log(VGAM::dfrechet(x = x, 0, scale = 1 / params[1], shape = params[2])))
 
-  # s1=T*log(gAa[1]*gAa[2])
-  # s2 = -(gAa[2]+1)*sum(log(gAa[1]*x))
-  # s3 = -sum((gAa[1]*x)^(-gAa[2]))
+  # s1=T*log(params[1]*params[2])
+  # s2 = -(params[2]+1)*sum(log(params[1]*x))
+  # s3 = -sum((params[1]*x)^(-params[2]))
   # s1+s2+s3
 }
 
@@ -37,12 +37,12 @@ Likelihood_Xt_Frechet_iid <- function(T, x, Aa) {
 #' @inheritParams Likelihood_Xt_Frechet_YNM
 #' @return Numeric value of the log-likelihood.
 #' @export
-Likelihood_Xt_Norm_iid <- function(T, x, gAa) {
-  sum(log(dnorm(x = x, mean = gAa[1], sd = gAa[2])))
+Likelihood_Xt_Norm_iid <- function(T, x, params) {
+  sum(log(dnorm(x = x, mean = params[1], sd = params[2])))
 
-  # s1=T*log(gAa[1]*gAa[2])
-  # s2 = -(gAa[2]+1)*sum(log(gAa[1]*x))
-  # s3 = -sum((gAa[1]*x)^(-gAa[2]))
+  # s1=T*log(params[1]*params[2])
+  # s2 = -(params[2]+1)*sum(log(params[1]*x))
+  # s3 = -sum((params[1]*x)^(-params[2]))
   # s1+s2+s3
 }
 
@@ -52,7 +52,7 @@ Likelihood_Xt_Norm_iid <- function(T, x, gAa) {
 #'
 #'Compute Log-Likelihood for DTRW Model with Gaussian Noise
 #' @param x Numeric vector. Observed data.
-#' @param Aa Numeric vector of parameters \eqn{( A, a )}:
+#' @param params Numeric vector of parameters \eqn{( A, a )}:
 #'  \itemize{
 #'   \item \eqn{A}: Mean of normal distribution assumed 0 for no drift models.
 #'   \item \eqn{a}: variance of normal distribution
@@ -67,21 +67,21 @@ Likelihood_Xt_Norm_iid <- function(T, x, gAa) {
 #'[8] -0.2289111  0.1204328  1.0547639 -0.4275506  0.2533994  2.3335009  3.4109412
 #'[15]  3.1307010  5.0952581  5.8665243  8.9529542  7.2892812  4.8499811  0.7474847
 #'[22] -0.7717111 -2.3678676 -5.8535865 -4.9697589
-#' Likelihood_Xt_Norm_DTRW(x=Xt, Aa=c(0,3))
+#' Likelihood_Xt_Norm_DTRW(x=Xt, params=c(0,3))
 #' -61.32352
-#' Likelihood_Xt_Norm_DTRW(x=Xt, Aa=c(0,1))
+#' Likelihood_Xt_Norm_DTRW(x=Xt, params=c(0,1))
 #' -89.51009
-Likelihood_Xt_Norm_DTRW =  function(x,Aa){
+Likelihood_Xt_Norm_DTRW =  function(x,params){
 
 
   if (length(x) < 2) {
     stop("The time series must have at least two observations.")
   }
-  logL=sum(log(dnorm(x=diff(x),mean=Aa[1],sd = sqrt(Aa[2]))))
+  logL=sum(log(dnorm(x=diff(x),mean=params[1],sd = sqrt(params[2]))))
   #T <- length(x) - 1  # Number of steps in the random walk
   #increments <- diff(x)  # Compute X_t - X_{t-1}
 
-  #logL <- - (T / 2) * log(2 * pi * Aa[2]) - sum((increments-Aa[1])^2) / (2 * Aa[2])
+  #logL <- - (T / 2) * log(2 * pi * params[2]) - sum((increments-params[1])^2) / (2 * params[2])
 
   return(logL)
 
@@ -99,7 +99,7 @@ Likelihood_Xt_Norm_DTRW =  function(x,Aa){
 #'
 #' @param T Integer. Length of the series.
 #' @param x Numeric vector. Observed data.
-#' @param gAa Numeric vector of parameters \eqn{( \gamma, A, a )}:
+#' @param params Numeric vector of parameters \eqn{( \gamma, A, a )}:
 #'  \itemize{
 #'   \item \eqn{\gamma}: Growth parameter.
 #'   \item \eqn{A}: 1/Scale parameter (1/scale).
@@ -109,13 +109,13 @@ Likelihood_Xt_Norm_DTRW =  function(x,Aa){
 #' @export
 #' @examples
 #' Xt = YNM_series_Frechet(T=25, gamma=1.1, shape=1, scale=2)
-#' Likelihood_Xt_Frechet_YNM(T=25, x=Xt, gAa = c(1.1,1/2,1))
+#' Likelihood_Xt_Frechet_YNM(T=25, x=Xt, params = c(1.1,1/2,1))
 #'
-Likelihood_Xt_Frechet_YNM <- function(T, x, gAa) {
-  s1 <- T * log(gAa[3] * gAa[2]^(-gAa[3]))
-  s2 <- -(gAa[3] + 1) * sum(log(x))
-  s3 <- (T * (T + 1) / 2) * log(gAa[1])
-  s4 <- -sum(gAa[1]^(1:T) * (gAa[2] * x)^(-gAa[3]))
+Likelihood_Xt_Frechet_YNM <- function(T, x, params) {
+  s1 <- T * log(params[3] * params[2]^(-params[3]))
+  s2 <- -(params[3] + 1) * sum(log(x))
+  s3 <- (T * (T + 1) / 2) * log(params[1])
+  s4 <- -sum(params[1]^(1:T) * (params[2] * x)^(-params[3]))
   return(s1 + s2 + s3 + s4)
 }
 
@@ -135,7 +135,7 @@ Likelihood_Xt_Frechet_YNM <- function(T, x, gAa) {
 #'
 #' @param T Integer. Length of the series.
 #' @param x Numeric vector. Observed data.
-#' @param gAa Numeric vector of parameters \eqn{( \theta, A, a )}:
+#' @param params Numeric vector of parameters \eqn{( \theta, A, a )}:
 #'  \itemize{
 #'   \item \eqn{\theta}: slope parameter.
 #'   \item \eqn{A}: 1/Scale parameter (1/scale).
@@ -145,17 +145,17 @@ Likelihood_Xt_Frechet_YNM <- function(T, x, gAa) {
 #' @export
 #' @examples
 #' Xt = LDM_series_Frechet(T=25, theta=0.2, shape=1, scale=2)
-#' Likelihood_Xt_Frechet_LDM(T=25, x=Xt, gAa = c(0.2,1/2, 1) )
-Likelihood_Xt_Frechet_LDM <- function(T, x, gAa) {
-  X <- x - gAa[1] * (1:T)
+#' Likelihood_Xt_Frechet_LDM(T=25, x=Xt, params = c(0.2,1/2, 1) )
+Likelihood_Xt_Frechet_LDM <- function(T, x, params) {
+  X <- x - params[1] * (1:T)
 
   if (any(X <= 0)) return(-1000)
 
-  A <- (sum(X^-gAa[3]) / T)^(1/gAa[3])
+  A <- (sum(X^-params[3]) / T)^(1/params[3])
 
-  s1 <- T * log(gAa[3] * A^(-gAa[3]))
-  s2 <- -(gAa[3] + 1) * sum(log(X))
-  s3 <- -sum((A * X)^(-gAa[3]))
+  s1 <- T * log(params[3] * A^(-params[3]))
+  s2 <- -(params[3] + 1) * sum(log(X))
+  s3 <- -sum((A * X)^(-params[3]))
 
   return(s1 + s2 + s3)
 }
@@ -289,8 +289,8 @@ Likelihood_Xt_Frechet_LDM_DerivativeSolve <- function(x, initial_guess) {  #Solv
 #'0.4909235   0.9644116   2.5826999 -20.9373215
 Likelihood_Xt_Frechet_LDM_OptSolve <- function(x) {
   T=length(x)
-  objective_wrapper <- function(gAa) {
-    -Likelihood_Xt_Frechet_LDM(T, x, gAa)
+  objective_wrapper <- function(params) {
+    -Likelihood_Xt_Frechet_LDM(T, x, params)
   }
 
   result <- nlminb(

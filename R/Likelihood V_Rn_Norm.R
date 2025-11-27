@@ -1,7 +1,7 @@
 ############################# Variance estimators - Rn - Norm - DTRW ############################
 ## Variance of mean A
 
-V_Rn_Norm_DTRW_A = function(R,L,T,params){  ## A=mean, a= sigma, sd
+V_Rn_Norm_DTRW_shape = function(R,L,T,params){  ## A=mean, a= sigma, sd
   A = params[1]
   a= params[2]
   m=length(R)
@@ -28,7 +28,7 @@ V_Rn_Norm_DTRW_A = function(R,L,T,params){  ## A=mean, a= sigma, sd
 }
 
 ## Variance of variance alpha or a  ## revisit
-V_Rn_Norm_DTRW_a = function(R,L,T,params){
+V_Rn_Norm_DTRW_scale2 = function(R,L,T,params){
   A = params[1]
   a= params[2]
 
@@ -64,8 +64,8 @@ V_Rn_Norm_DTRW_a = function(R,L,T,params){
 }
 
 ## Variance of the variance estimator sigma2
-V_Rn_Norm_DTRW_a0 = function(R,L,T,params){
-  a= params
+V_Rn_Norm_DTRW_scale = function(R,L,T,params){
+  a= params[2]
   m=length(R)
   #RR=diff(R)
   #t = diff(L)
