@@ -1,4 +1,4 @@
-############## Perform LDM test ##############
+#####------------------  LDM_Regression Hubert ------------------  ####
 #' Hypothesis Test for Linear Drift Model using Robust Regression
 #'
 #' Tests whether the observed sequence \code{X} follows the Linear Drift Model (LDM)
@@ -9,7 +9,11 @@
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param RSq Numeric, minimum adjusted R-squared required to accept the LDM
 #'   hypothesis (default = 0.8).
-#'
+#' @param info String. "All" if data provided is the whole series \eqn{X_t} or
+#' "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+#' record_times must be provided.
+#' @param record_times Numeric vector of the occurence times of records. (Default is NA).
+#' Forced in case "info" = "Records"
 #' @return A list with components:
 #' \describe{
 #'   \item{stat}{Estimated slope coefficient (drift parameter).}
@@ -37,8 +41,16 @@
 #' X <- 0.3 * t + rnorm(50, sd = 5)  # Linear drift with noise
 #' Test_LDM_Regression(X, alpha = 0.05, RSq = 0.7)
 #' @export
-Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8) {
-  t <- seq_along(X)
+Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8, info = c("All"), record_times=NA) {
+
+  ##Force to provide record times in case only records are used
+  if (info == "Records" & length(record_times) != length(X) ){
+    stop("Number of records is not the same as record times (Or not provided)")
+  } else  if (info == "Records" & is.numeric(record_times[1])){
+    t= record_times
+  }
+
+  if (info == "All") {t <- seq_along(X)}
 
   # Centralize data
   t <- t - mean(t)
@@ -75,7 +87,7 @@ Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8) {
   ))
 }
 
-################################# Test based on observed number of records ##########################################################
+#########------------------  Test based on observed number of records ------------------ ################
 
 #' Quantile Function for LDM Distribution of Record Numbers in case of Gumbel underlying distribution
 #'
@@ -160,8 +172,9 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
   scale <- 1
 
   # Estimate theta and variance
-  theta <- Estim_theta_indicator(min = 0.0001, max = 5, X = X)
-  v_theta <- Estim_theta_indicator_Variance(T = length(X), theta = theta, scale = scale)
+  estimated = Estimate_LDM_MLE_indicator(X=X, variance = TRUE, scale=1, min = 0.0001, max = 5, step = 0.01)
+  theta <- estimated$theta
+  v_theta <- estimated$variance
   z_theo <- theta / sqrt(v_theta)
 
   # Decision rule
@@ -175,13 +188,13 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
   return(list(
     stat = obs,
     stat_theo = z_theo,
-    theta_hat = theta,
-    v_theta_gat = v_theta,
+    theta = theta,
+    variance = v_theta,
     decision = decision
   ))
 }
 
-############################ Two-stage based on Şen Slope  #############################
+########----------------- Two-stage based on Şen Slope  ---------------- ##########
 
 #' Sequential Test for the Linear Drift Model (LDM)
 #'
@@ -193,11 +206,11 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
 #' refines the decision by testing slope significance across partitions.
 #'
 #' @param X Numeric vector of observations.
+#' @param time Numeric vector of the record times. (default = NA means we are using all observed X series)
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param pooled Logical, if \code{TRUE}, pooled variance across blocks is used
 #'   in stage 1 for the noise variance estimation. Otherwise, variance is estimated directly
 #'   from residuals (default = \code{FALSE}).
-#'
 #' @return A list with results from both stages:
 #' \describe{
 #'   \item{block_size}{Size of each partitioned block.}
@@ -237,9 +250,11 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
 #'
 #'
 #' @export
-Test_LDM_Sequential <- function(X, alpha = 0.05) {
+Test_LDM_Sequential <- function(X, time = NA,alpha = 0.05) {
+  if(length(X)<4) {return(decision = "NO")}
+
   # Stage 1
-  res1 <- Test_LDM_Sen_stage1(X, alpha = 2 * alpha, pooled = FALSE)  # one-sided
+  res1 <- Test_LDM_Sen_stage1(X, time=time, alpha = 2 * alpha, pooled = FALSE)  # one-sided
 
   if (res1$decision1 == "NO") {
     names(res1)[which(names(res1) == 'decision1')] = "decision"
@@ -254,21 +269,30 @@ Test_LDM_Sequential <- function(X, alpha = 0.05) {
 
 #' @rdname Test_LDM_Sequential
 #' @export
-Test_LDM_Sen_stage1 <- function(X, alpha = 0.05, pooled = FALSE) {
-  n <- length(X)
+Test_LDM_Sen_stage1 <- function(X, time=NA, alpha = 0.05, pooled = FALSE) {
+
+  if(is.na(time[1])) {time = 1:length(X)}
+  if (length(X) != length(time)) stop("X and time must have the same length")
+
+  #n <- length(X)
   n_blocks <- 3
-  m <- floor(n / n_blocks)
+
+  # Sort by time
+  ord <- order(time)
+  X <- X[ord]
+  time <- time[ord]
 
   block_means <- numeric(n_blocks)
   blocks <- vector("list", n_blocks)
 
-  # Partition data into blocks
+  # Partition data into equal blocks
+  m <- floor(length(X) / n_blocks)
   for (i in 1:n_blocks) {
     start <- (i - 1) * m + 1
-    end <- i * m
+    end <- ifelse( i< n_blocks, i * m, length(X) )
     blocks[[i]] <- X[start:end]
-    block_means[i] <- mean(blocks[[i]])
-  }
+    block_means[i] <- mean(blocks[[i]])}
+
 
   # Slopes between consecutive block means
   slopes <- numeric(n_blocks)
@@ -280,11 +304,12 @@ Test_LDM_Sen_stage1 <- function(X, alpha = 0.05, pooled = FALSE) {
   x_hat <- list(
     blocks[[1]] - slopes[2] * seq_len(m),
     blocks[[2]] - slopes[2] * ((m + 1):(2 * m)),
-    blocks[[3]] - slopes[3] * (((2 * m) + 1):(3 * m))
+    blocks[[3]] - slopes[3] * (((2 * m) + 1):(length(X)))
   )
 
-  # Stage 1 test statistic
-  z <- (2 * block_means[2] - block_means[1] - block_means[3]) / m
+  # Stage 1 statistic (equality of slopes)
+
+  z <- (2 * block_means[2] - block_means[1] - block_means[3])
 
   # Variance of Z
   if (pooled) {
@@ -295,11 +320,11 @@ Test_LDM_Sen_stage1 <- function(X, alpha = 0.05, pooled = FALSE) {
   }
 
   # Standardized test statistic
-  var_z <- (6 * var_x) / m^3
+  var_z <- (6 * var_x) / m^2
   T_p <- z / sqrt(var_z)
 
   # p_value
-  p_value <- if (n >= 30) {
+  p_value <- if (max(time) >= 30) {
     1 - pnorm(abs(T_p))
   } else {
     1 - pt(q = abs(T_p), df = n - 3)
@@ -310,6 +335,7 @@ Test_LDM_Sen_stage1 <- function(X, alpha = 0.05, pooled = FALSE) {
 
   return(list(
     block_size = m,
+    #block_times = block_times,
     means = block_means,
     slopes = slopes[-1],
     var_x = var_x,
@@ -344,7 +370,7 @@ Test_LDM_Sen_stage2 <- function(stage1, alpha = 0.05) {
 }
 
 
-############ BAsed on Sen-Slope
+##### ------------------  Based on Sen-Slope ------------------ #############
 
 Test_LDM_Sen = function(X, alpha=0.05){
 

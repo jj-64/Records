@@ -55,20 +55,19 @@
 #' \emph{Scandinavian Journal of Statistics}, 6(2), 65–70.
 #'
 #' Fisher, R. A. (1932). \emph{Statistical Methods for Research Workers.}
-#'
+#' @export
 #' @examples
 #' set.seed(123)
 #' X <- cumsum(rnorm(100))  # Simulated random walk
-#' Test_DTRW(X, alpha = 0.05, method = "Bonf")
+#' Test_DTRW_Indep(X, alpha = 0.05, method = "Bonf")
 #'
-#' @export
-Test_DTRW = function(X,alpha=0.05, method="Bonf"){
+Test_DTRW_Indep = function(X,alpha=0.05, method="Bonf"){
 
   X=X-X[1]
   increments <- diff(X)
   ## Test1: Perform ADF test H1: stationary
-    adf_test <- tseries::adf.test(X)
-    p_value1 = adf_test$p.value ## we want H0: series is not stationary, so fail to reject H0, so p_value>alpha
+    #adf_test <- tseries::adf.test(X)
+    #p_value1 = adf_test$p.value ## we want H0: series is not stationary, so fail to reject H0, so p_value>alpha
 
   ## Test2:  Perform Ljung-Box test on increments: H0:independently distributed (no autocorrelation)
     ljung_box_test <- Box.test(increments, type = "Ljung-Box")
@@ -81,17 +80,17 @@ Test_DTRW = function(X,alpha=0.05, method="Bonf"){
 
   ## Decision logic
     if (method == "Bonf") {
-      dec <- ifelse(p_value1 > alpha / 3 & p_value2 > alpha / 3 & p_value3 > alpha / 3, "DTRW", "NO")
+      dec <- ifelse(p_value2 > alpha / 2 & p_value3 > alpha / 2, "DTRW", "NO")
 
     } else if (method == "Holm") {
-      pp <- sort(c(p_value1, p_value2, p_value3))
-      Holm <- pp > c(1 - (1 - alpha)^(1/3), 1 - (1 - alpha)^(1/2), alpha)
-      dec <- ifelse(sum(Holm) == 3, "DTRW", "NO") ## Holm-Bonf is true true true
+      pp <- sort(c(p_value2, p_value3))
+      Holm <- pp > c(1 - (1 - alpha)^(1/2), 1 - (1 - alpha)^(1/2), alpha)
+      dec <- ifelse(sum(Holm) == 2, "DTRW", "NO") ## Holm-Bonf is true true true
 
     } else if (method == "Sidak") {
-      pp <- c(p_value1, p_value2, p_value3)
-      Sidak <- pp > (1 - (1 - alpha)^(1/3))
-      dec <- ifelse(sum(Sidak) == 3, "DTRW", "NO") ## Holm-Sidak is true true true
+      pp <- c( p_value2, p_value3)
+      Sidak <- pp > (1 - (1 - alpha)^(1/2))
+      dec <- ifelse(sum(Sidak) == 2, "DTRW", "NO") ## Holm-Sidak is true true true
 
     } else if (method == "Chisq") {
       stat <- -2 * (log(p_value1) + log(p_value2) + log(p_value3))
@@ -103,15 +102,16 @@ Test_DTRW = function(X,alpha=0.05, method="Bonf"){
 
     return(list(
       method = method,
-      p_valueStationary = p_value1,
+      aleternativeIndep = "correlated",
       p_valueIndep = p_value2,
+      aleternativeSymm = "NotSymmetric",
       p_valueSymm = p_value3,
       decision = dec
     ))
 }
 
 
-Test_DTRW_Indep = function(X,alpha=0.05){
+Test_DTRW_Indep2 = function(X,alpha=0.05){
 
   ## Test2:  Perform Ljung-Box test on increments: H0:independently distributed (no autocorrelation)
   ljung_box_test <- Box.test(diff(X), type = "Ljung-Box")

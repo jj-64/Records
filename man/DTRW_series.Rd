@@ -14,7 +14,7 @@ DTRW_series(T, dist = c("norm", "cauchy", "uniform"), ...)
 
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{
-\item{norm}{\code{loc}, \code{sd}}
+\item{norm}{\code{mean}, \code{sd}}
 \item{cauchy}{\code{loc}, \code{scale}}
 \item{uniform}{\code{min}, \code{max}}
 }}

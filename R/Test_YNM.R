@@ -1,5 +1,5 @@
 
-partition <- function(X, min_expected = 1, warmup = 2, K = NULL) {
+partition_OLD <- function(X, min_expected = 1, warmup = 2, K = NULL) {
   gaps <- rec_gaps(X)
 
   # drop early gaps if warmup > 0
@@ -62,12 +62,13 @@ partition <- function(X, min_expected = 1, warmup = 2, K = NULL) {
 #' @param min_expected Minimum expected count per bin (default = 1).
 #' @param warmup Number of initial gaps to drop (default = 2).
 #' @param K Optional. If given, force exactly K partitions using quantiles.
+#' @param estimated. Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
 #' @return A list with:
 #'   \item{j}{Partition start points}
 #'   \item{nk}{Frequencies in each partition}
 #'   \item{labels}{Readable bin labels}
 #' @export
-partition2 <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = TRUE) {
+partition <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = TRUE) {
   gaps <- rec_gaps(X)
 
   min_K = 2+ifelse(estimated, 1, 0)
@@ -162,7 +163,7 @@ Test_YNM_Pearson <- function(X, Partition = NA, gamma = NULL, K=NULL, estimated 
                                          }
 
   # Partition handling
-  if (is.na(Partition)[1]) Partition <- partition2(X, K=K)
+  if (is.na(Partition)[1]) Partition <- partition(X, K=K)
 
   K <- length(Partition$nk)
   nk <- Partition$nk
@@ -271,7 +272,7 @@ Test_YNM_Smooth <- function(X, alpha = 0.05) {
 
 
 
-############### based on exact distribution of number of records in all cases ######3
+#######---------------  Test_YNM_NT -------#########
 
 Quantile_YNM=function(T,gamma, alpha= 0.05){
   Prob = 0
@@ -323,14 +324,39 @@ Quantile_YNM=function(T,gamma, alpha= 0.05){
 Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
   T <- length(X)
   obs <- rec_counts(X)
+  v_gamma = NA_real_
 
   # --- Estimate gamma if not provided ---
   if (is.na(gamma)) {
-    gamma <- Estim_gamma_indicator(X = X, min = 1, max = 5)
+    estimated =  Estimate_YNM_MLE_Indicator(X, variance = TRUE, approximate=FALSE, min = 1.01, max=5, step=0.01)
+    gamma <- estimated$gamma
+    v_gamma = estimated$variance
   }
 
-  # --- Variance and test statistic ---
-  v_gamma <- Estim_gamma_indicator_Variance(T = T, gamma = gamma, approximate = FALSE)
+  # --- Variance  ---
+  if(is.na(v_gamma)){
+      if (approximate) {
+        # Approximate variance (large-sample)
+        v <- 1 / gamma_hat
+        var_hat <- (1 - v) / (T * v^3)
+      } else {
+        # Exact Fisher Information (requires ENT_YNM and rec_rate_YNM)
+        ent <- ENT_YNM(T = T, gamma = gamma_hat)
+        a <- (1 / (gamma_hat^2 * (gamma_hat - 1)^2)) * ent
+        b <- (1 / gamma_hat^2) * (T - ent)
+        c <- T * (1 + gamma_hat^T * (T - 1)) / (gamma_hat^2 * (gamma_hat^T - 1)^2)
+
+        i <- 2:T
+        d <- (i - 1) * (1 + (i - 2) * gamma_hat^(i - 1)) *
+          rec_rate_YNM(gamma_hat, i) /
+          (gamma_hat^2 * (gamma_hat^(i - 1) - 1)^2)
+
+        I <- a + b - c - sum(d)
+        v_gamma <- 1 / I
+      }
+  }
+
+  # --- test statistic ---
   z_theo <- (gamma-1) / sqrt(v_gamma)
 
   # --- First check using normal approximation: Ho: Gamma =1 ---
@@ -358,7 +384,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 }
 
 
-############################################################
+#######---------------  Test_YNM_Geom -------------- #########
 
 #The usual test assumes Gaps are i.i.d. Geom(p). If gaps are nonstationary (e.g. short early gaps, longer later gaps) the single-sample mean
 #is dominated by early small gaps → p biased high → expected tail mass under the null is underestimated → observed long gaps look unsurprising → test fails to reject.
@@ -398,7 +424,11 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' @param K Integer, number of categories for chi-squared grouping.
 #'   If NULL, defaults to \eqn{min(4, length(gaps))}.
 #' @param warmup Integer, number of initial gaps to discard (default = NULL).
-#'
+#' @param info String. "All" if data provided is the whole series \eqn{X_t} or
+#' "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+#' record_times must be provided.
+#' @param record_times Numeric vector of the occurence times of records. (Default is NA).
+#' Forced in case "info" = "Records"
 #' @return A list with elements:
 #' \item{obs_counts}{Observed counts per category.}
 #' \item{exp_counts}{Expected counts per category under fitted geometric law.}
@@ -410,7 +440,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' \item{v_gamma_hat}{Estimated variance of \eqn{\hat{\gamma}}.}
 #' \item{CL}{Confidence interval for \eqn{\gamma}.}
 #' \item{decision}{Decision: "YNM" if not rejected, "NO" otherwise.}
-#'
+#' @export
 #' @examples
 #' set.seed(123)
 #' X <- YNM_series_Gumbel(T = 50, gamma = 1.2)
@@ -446,13 +476,25 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #'
 #'# $decision
 #'# [1] "YNM"
-Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL) {
+Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL, info = c("All", "Records"), record_times=NA) {
 
-   if (sum(is_rec(X)) <=4) {
+    ##Force to provide record times in case only records are used
+  if (info == "Records" & length(record_times) != length(X) ){
+    stop("Number of records is not the same as record times (Or not provided)")
+  } else  if (info == "Records" & is.numeric(record_times[1])){
+    gaps = diff(record_times)
+  }
+
+
+  if (sum(is_rec(X)) <=4) {
     return(list(decision = "NO"))}
 
-  gaps = rec_gaps(X)
-  if (is.null(warmup) ){ warmup = ceiling(0.3 * length(gaps)) }
+  ## if vector Xt is provided
+  if(info == "All") gaps = rec_gaps(X)
+
+  ## Warmup
+  if (is.null(warmup) ){ warmup = ceiling(1/3* length(gaps)) }
+  #if (warmup <2 ){ warmup =2}
   if (warmup > 0 ){ gaps <- gaps[-seq_len(warmup)]}
 
   # Total number of observations
@@ -508,7 +550,7 @@ Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL) {
 }
 
 
-##########################################################
+############### IGNORE###########################################
 
 # dispersion test for geometric gaps: asymptotic chi-square + MC p-value
 # dispersion_geom_test <- function(X, alpha=0.05, B = 5000, seed = NULL, return_sim = FALSE) {
