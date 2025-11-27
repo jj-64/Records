@@ -1,4 +1,5 @@
-################### Moments: Estimate gamma parameter ###############
+
+#########------------- Biased based on Moments -------------- ##########
 #' Estimation of Gamma Parameter Based on Number of Records (with optional Variance)
 #'
 #' Estimates the \eqn{\gamma} parameter of the Yang-Nevzorov Model (YNM)
@@ -68,8 +69,7 @@ Estimate_YNM_NT <- function(X, variance = TRUE) {
   ))
 }
 
-###################### Unbiased based on Moments ##################
-
+#########------------- Unbiased based on Moments ------------- ##########
 #' Unbiased Estimation of Gamma Parameter based on number of records (with optional variance)
 #'
 #' Computes **bias-corrected** estimator of the (\eqn{\gamma}) parameter using a bias correction, correcting
@@ -242,7 +242,7 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
 }
 
 
-####################### MLE delta ##############################
+#########------------- MLE indicator ------------------------- ##########
 #' Maximum Likelihood Estimation of Gamma Based on Indicator Series
 #'
 #' Estimates the gamma (\eqn{\gamma}) parameter using the maximum likelihood
