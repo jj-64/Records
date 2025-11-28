@@ -4,14 +4,14 @@
 \alias{Likelihood_Xt_Frechet_LDM}
 \title{Compute Log-Likelihood for Frechet LDM Model}
 \usage{
-Likelihood_Xt_Frechet_LDM(T, x, gAa)
+Likelihood_Xt_Frechet_LDM(T, x, params)
 }
 \arguments{
 \item{T}{Integer. Length of the series.}
 
 \item{x}{Numeric vector. Observed data.}
 
-\item{gAa}{Numeric vector of parameters \eqn{( \theta, A, a )}:
+\item{params}{Numeric vector of parameters \eqn{( \theta, A, a )}:
 \itemize{
 \item \eqn{\theta}: slope parameter.
 \item \eqn{A}: 1/Scale parameter (1/scale).
@@ -34,5 +34,5 @@ The likelihood function is:
 }
 \examples{
 Xt = LDM_series_Frechet(T=25, theta=0.2, shape=1, scale=2)
-Likelihood_Xt_Frechet_LDM(T=25, x=Xt, gAa = c(0.2,1/2, 1) )
+Likelihood_Xt_Frechet_LDM(T=25, x=Xt, params = c(0.2,1/2, 1) )
 }

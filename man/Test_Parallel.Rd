@@ -7,6 +7,7 @@
 Test_Parallel(
   X,
   info = c("All", "Records"),
+  record_times = NA,
   alpha = 0.05,
   lag = 10,
   warmup = 2,

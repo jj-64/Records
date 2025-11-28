@@ -4,14 +4,14 @@
 \alias{Likelihood_Xt_Norm_iid}
 \title{Compute Log-Likelihood for IID Normal Model}
 \usage{
-Likelihood_Xt_Norm_iid(T, x, gAa)
+Likelihood_Xt_Norm_iid(T, x, params)
 }
 \arguments{
 \item{T}{Integer. Length of the series.}
 
 \item{x}{Numeric vector. Observed data.}
 
-\item{gAa}{Numeric vector of parameters \eqn{( \gamma, A, a )}:
+\item{params}{Numeric vector of parameters \eqn{( \gamma, A, a )}:
 \itemize{
 \item \eqn{\gamma}: Growth parameter.
 \item \eqn{A}: 1/Scale parameter (1/scale).

@@ -6,14 +6,16 @@
 \alias{Test_LDM_Sen_stage2}
 \title{Sequential Test for the Linear Drift Model (LDM)}
 \usage{
-Test_LDM_Sequential(X, alpha = 0.05)
+Test_LDM_Sequential(X, time = NA, alpha = 0.05)
 
-Test_LDM_Sen_stage1(X, alpha = 0.05, pooled = FALSE)
+Test_LDM_Sen_stage1(X, time = NA, alpha = 0.05, pooled = FALSE)
 
 Test_LDM_Sen_stage2(stage1, alpha = 0.05)
 }
 \arguments{
 \item{X}{Numeric vector of observations.}
+
+\item{time}{Numeric vector of the record times. (default = NA means we are using all observed X series)}
 
 \item{alpha}{Numeric, significance level (default = 0.05).}
 

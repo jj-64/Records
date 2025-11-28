@@ -4,7 +4,14 @@
 \alias{Test_YNM_Geom}
 \title{Test for YNM–Nevzorov Geometric Record Gaps}
 \usage{
-Test_YNM_Geom(X, alpha = 0.05, K = NULL, warmup = NULL)
+Test_YNM_Geom(
+  X,
+  alpha = 0.05,
+  K = NULL,
+  warmup = NULL,
+  info = c("All", "Records"),
+  record_times = NA
+)
 }
 \arguments{
 \item{X}{Numeric vector of observations.}
@@ -15,6 +22,13 @@ Test_YNM_Geom(X, alpha = 0.05, K = NULL, warmup = NULL)
 If NULL, defaults to \eqn{min(4, length(gaps))}.}
 
 \item{warmup}{Integer, number of initial gaps to discard (default = NULL).}
+
+\item{info}{String. "All" if data provided is the whole series \eqn{X_t} or
+"Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+record_times must be provided.}
+
+\item{record_times}{Numeric vector of the occurence times of records. (Default is NA).
+Forced in case "info" = "Records"}
 }
 \value{
 A list with elements:

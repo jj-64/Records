@@ -14,7 +14,7 @@
 #' @export
 #'
 #' @examples bounds(5, z=qnorm(1-0.05/2), variance = 2)
-#' 2.228192 7.771808
+#' # 2.228192  7.771808
 bounds = function(value,z,variance){
   upper = value+ z*sqrt(variance)
   lower = value- z*sqrt(variance)

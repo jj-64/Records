@@ -14,7 +14,10 @@ Simulation_Permutation_Analysis(
   alpha = 0.05,
   lag = 10,
   warmup = 2,
-  print = FALSE
+  print = FALSE,
+  info = "All",
+  approximate = FALSE,
+  one.sided = FALSE
 )
 }
 \arguments{
@@ -39,6 +42,17 @@ argument "T" is not included}
 \item{warmup}{Integer. Warm-up parameter for YNM test (default = 2)}
 
 \item{print}{logical default is FALSE, summary is not printed}
+
+\item{info}{String. "All" if data provided is the whole series \eqn{X_t} or
+"Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+record_times must be provided.
+Forced in case "info" = "Records"}
+
+\item{approximate}{Logical, if \code{TRUE} use the asymptotic normal approximation for DTRW \eqn{N_T}-test
+(default = \code{FALSE} for the exact quantile test).}
+
+\item{one.sided}{Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
+(default = \code{FALSE} for two-sided).}
 }
 \value{
 A list containing:
@@ -53,76 +67,4 @@ A list containing:
 Runs multiple simulations of time series generated under a specified null model (e.g. DTRW, LDM, iid, YNM),
 applies all 24 possible permutations of four record-based tests (DTRW, LDM, Classical, YNM),
 and records which test (if any) is accepted by each permutation.
-}
-\examples{
-\dontrun{
-sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
-generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
-H0 = "DTRW")
-
-
-### 75\% of the permutations trees return "DTRW" and 25\% return "YNM".
-### On average, one simulation will return the following:
-#  summary_total
-#  Decision Freq
-#  1     DTRW 0.75
-#  2      YNM 0.25
-
-
- ### Contingency Table of what each permutation returns
-#  perm_dec_table
-#  Permutation DTRW YNM
-#  1         CDLY  1.0 0.0
-#  2         CDYL  1.0 0.0
-#  3         CLDY  1.0 0.0
-#  4         CLYD  0.5 0.5
-#  5         CYDL  0.5 0.5
-#  6         CYLD  1.0 0.0
-#  7         DCLY  1.0 0.0
-#  8         DCYL  1.0 0.0
-#  9         DLCY  1.0 0.0
-#  10        DLYC  1.0 0.0
-#  11        DYCL  0.5 0.5
-#  12        DYLC  0.5 0.5
-#  13        LCDY  0.5 0.5
-#  14        LCYD  0.5 0.5
-#  15        LDCY  0.5 0.5
-#  16        LDYC  1.0 0.0
-#  17        LYCD  1.0 0.0
-#  18        LYDC  0.5 0.5
-#  19        YCDL  0.5 0.5
-#  20        YCLD  0.5 0.5
-#  21        YDCL  0.5 0.5
-#  22        YDLC  0.5 0.5
-#  23        YLCD  1.0 0.0
-#  24        YLDC  1.0 0.0
-
-
- ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW" across all simulations
-#     Permutation Success_Rate
-#     1         CDLY          1.0
-#     2         CDYL          1.0
-#     3         CLDY          1.0
-#     4         CLYD          0.5
-#     5         CYDL          0.5
-#     6         CYLD          1.0
-#     7         DCLY          1.0
-#     8         DCYL          1.0
-#     9         DLCY          1.0
-#     10        DLYC          1.0
-#     11        DYCL          0.5
-#     12        DYLC          0.5
-#     13        LCDY          0.5
-#     14        LCYD          0.5
-#     15        LDCY          0.5
-#     16        LDYC          1.0
-#     17        LYCD          1.0
-#     18        LYDC          0.5
-#     19        YCDL          0.5
-#     20        YCLD          0.5
-#     21        YDCL          0.5
-#     22        YDLC          0.5
-#     23        YLCD          1.0
-#     24        YLDC          1.0
-}
 }

@@ -4,14 +4,14 @@
 \alias{Likelihood_Xt_Frechet_iid}
 \title{Compute Log-Likelihood for IID Frechet Model}
 \usage{
-Likelihood_Xt_Frechet_iid(T, x, Aa)
+Likelihood_Xt_Frechet_iid(T, x, params)
 }
 \arguments{
 \item{T}{Integer. Length of the series.}
 
 \item{x}{Numeric vector. Observed data.}
 
-\item{Aa}{Numeric vector of parameters \eqn{( A, a )}:
+\item{params}{Numeric vector of parameters \eqn{( A, a )}:
 \itemize{
 \item \eqn{A}: 1/Scale parameter (1/scale).
 \item \eqn{a}: Shape parameter.

@@ -4,14 +4,14 @@
 \alias{Likelihood_Xt_Frechet_YNM}
 \title{Compute Log-Likelihood for Frechet YNM Process}
 \usage{
-Likelihood_Xt_Frechet_YNM(T, x, gAa)
+Likelihood_Xt_Frechet_YNM(T, x, params)
 }
 \arguments{
 \item{T}{Integer. Length of the series.}
 
 \item{x}{Numeric vector. Observed data.}
 
-\item{gAa}{Numeric vector of parameters \eqn{( \gamma, A, a )}:
+\item{params}{Numeric vector of parameters \eqn{( \gamma, A, a )}:
 \itemize{
 \item \eqn{\gamma}: Growth parameter.
 \item \eqn{A}: 1/Scale parameter (1/scale).
@@ -30,6 +30,6 @@ The likelihood function is given by:
 }
 \examples{
 Xt = YNM_series_Frechet(T=25, gamma=1.1, shape=1, scale=2)
-Likelihood_Xt_Frechet_YNM(T=25, x=Xt, gAa = c(1.1,1/2,1))
+Likelihood_Xt_Frechet_YNM(T=25, x=Xt, params = c(1.1,1/2,1))
 
 }

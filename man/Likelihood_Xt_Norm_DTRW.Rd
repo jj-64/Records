@@ -4,12 +4,12 @@
 \alias{Likelihood_Xt_Norm_DTRW}
 \title{Log-Likelihood expression}
 \usage{
-Likelihood_Xt_Norm_DTRW(x, Aa)
+Likelihood_Xt_Norm_DTRW(x, params)
 }
 \arguments{
 \item{x}{Numeric vector. Observed data.}
 
-\item{Aa}{Numeric vector of parameters \eqn{( A, a )}:
+\item{params}{Numeric vector of parameters \eqn{( A, a )}:
 \itemize{
 \item \eqn{A}: Mean of normal distribution assumed 0 for no drift models.
 \item \eqn{a}: variance of normal distribution
@@ -28,8 +28,8 @@ Xt=DTRW_series_Norm(T=25,loc=0, sd=3)
 [8] -0.2289111  0.1204328  1.0547639 -0.4275506  0.2533994  2.3335009  3.4109412
 [15]  3.1307010  5.0952581  5.8665243  8.9529542  7.2892812  4.8499811  0.7474847
 [22] -0.7717111 -2.3678676 -5.8535865 -4.9697589
-Likelihood_Xt_Norm_DTRW(x=Xt, Aa=c(0,3))
+Likelihood_Xt_Norm_DTRW(x=Xt, params=c(0,3))
 -61.32352
-Likelihood_Xt_Norm_DTRW(x=Xt, Aa=c(0,1))
+Likelihood_Xt_Norm_DTRW(x=Xt, params=c(0,1))
 -89.51009
 }
