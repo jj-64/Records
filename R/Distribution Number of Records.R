@@ -1,34 +1,29 @@
 #library(combinat)
-#################### iid #####################
+### iid -------------------
 #'Exact Expected number of records in Classical Model
 #'
-#' The average expected number of records in an i.i.d process. It is distribution-free, i.e. independent from the process underlying distribution. It only depends from the length of the series.
-#' @param T the length of the series
+#' The average expected number of records in an i.i.d process. It is distribution-free,
+#' i.e. independent from the process underlying distribution. It only depends from the length of the series.
+#' @param T numeric, the length of the series
+#' @param approx logical, if approximated value. default = FALSE
 #'
 #' @returns a single value of the expected number of records
 #' @export
 #' @details It is \eqn{E(N_T) = \sum_{1}^{T}\frac{1}{t}} where \eqn{T} is the length of the series
-#' @examples ENT_iid(T=25)
-#'  3.815958
-ENT_iid = function(T){
-  sum( 1/(1:T) )
+#' If approximated, as the sum of \eqn{1/t} can be approximated by \eqn{log(T) + \omega} where \eqn{\omega = 0.577215} is euler mascheroni constant
+#'
+#' @examples
+#' ENT_iid(T=25)
+#' # 3.815958
+#' ENT_iid(T=25, approx = TRUE)
+#' # 3.796091
+ENT_iid = function(T, approx = FALSE){
+  if (approx){
+    return(log(T) + 0.57721566490153)
+  } else {
+  return(sum( 1/(1:T) )) }
 }
-##########################################################
-#euler=as.numeric(print(-digamma(1), digits=22 ))
-#' Approximated Expected number of records in Classical Model
-#'
-#' The average approximated expected number of records in an i.i.d process. It is distribution-free, i.e. independent from the process underlying distribution. It only depends from the length of the series.
-#' @details As the sum of \eqn{1/t} can be approximated by \eqn{log(T) + \omega} where \eqn{\omega = 0.577215} is euler mascheroni constant
-#' @param T the length of the series
-#'
-#' @returns a single value of the expected number of records
-#' @export
-#'
-#' @examples ENT_iid_approx(T=25)
-#'  3.796091
-ENT_iid_approx = function(T){
- log(T) + 0.57721566490153
-}
+
 #####################################################################
 #Variance of number of records
 #' Variance of number of records in Classical Model
@@ -41,10 +36,10 @@ ENT_iid_approx = function(T){
 #' @export
 #'
 #' @examples VNT_iid(T=25)
-#' [1] 2.210235
+#' # [1] 2.210235
 #' ENT_iid(T=25)
-#' [1] 3.815958
-#' For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
+#' # [1] 3.815958
+#' # For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
 #' NT_iid(m=1,T=25)
 VNT_iid = function(T){
   sum( 1/(1:T) ) -  sum( 1/(1:T)^2 )
@@ -61,9 +56,13 @@ VNT_iid = function(T){
 #'
 #' @returns a single value
 #'
-#' @examples Stirling_first_kind(n=4, k=3)  [1] 6
-#' Stirling_first_kind(n=4, k=0)  [1] 0
-#' Stirling_first_kind(n=4, k=5)  [1] 0
+#' @examples Stirling_first_kind(n=4, k=3)
+#' # [1] 6
+#' Stirling_first_kind(n=4, k=0)
+#' # [1] 0
+#' Stirling_first_kind(n=4, k=5)
+#' # [1] 0
+#' @export
 Stirling_first_kind <- function(n, k) {
     if (n == 0 && k == 0) return(1)
     if (n == 0 || k == 0) return(0)
@@ -107,130 +106,105 @@ NT_iid = function(m,T,s=NA){
   s / factorial(T)
 }
 
-#################### DTRW #####################
+#### DTRW ----------------------
 #' Exact Expected number of records in DTRW Model
 #'
-#' The average exact expected number of records in a DTRW process. It is distribution-free, i.e. independent from the process underlying distribution. It only depends from the length of the series.
+#' The average exact expected number of records in a DTRW process. It is distribution-free, i.e. independent from the process underlying distribution.
+#' It only depends from the length of the series.
 #' @details It is computed as \eqn{E(N_T) = (2T +1) \times 2^{-2T} \times C_{T}^{2T}} where \eqn{T} is the length of the process
-#' @param T the length of the series
+#' If approximated, it is computed as \eqn{E(N_T) = \sqrt(4T/\pi)} where \eqn{T} is the length of the process
+#'
+#' @param T numeric, the length of the series
+#' @param approx logical, if approximated value. default = FALSE
 #'
 #' @returns a single value of the expected number of records
 #' @export
 #'
-#' @examples ENT_DTRW(T=25)
-#' [1] 5.726034
-#' ENT_DTRW_approx(T=25)
-#' [1] 5.641896
-ENT_DTRW=function(T){
-  m=(2*T+1)*choose(2*T,T)*2^(-2*T)
-  return(m)}
-
-## Expected number of Records DTRW
-#' Approximated Expected number of records in DTRW Model
-#'
-#' The average approximated expected number of records in a DTRW process. It is distribution-free, i.e. independent from the process underlying distribution. It only depends from the length of the series.
-#' @details It is computed as \eqn{E(N_T) = \sqrt(4T/\pi)} where \eqn{T} is the length of the process
-#' @param T the length of the series
-#'
-#' @returns a single value of the expected number of records
-#' @export
-#'
-#' @examples ENT_DTRW_approx(T=25)
-#'  [1] 5.641896
-ENT_DTRW_approx=function(T){
-  sqrt(4*T/pi)
+#' @examples
+#' ENT_DTRW(T=25)
+#' # [1] 5.726034
+#' ENT_DTRW(T=25, approx = TRUE)
+#' # [1] 5.641896
+ENT_DTRW <- function(T, approx = FALSE) {
+  if(approx) {
+    return(sqrt(4*T/pi))
+    } else {
+  return((2*T+1)*choose(2*T,T)*2^(-2*T)) }
 }
-
 
 ## Variance of expected number of Records DTRW
 #' Variance of number of records in DTRW Model
 #'
 #'The approximated variance of number of records in DTRW model.
-#'@details It is computed as
-#'\eqn{V(N_T)_approx = 2T \times (1-\frac{2}{\pi})}
-#'where T is the length of series
-#' @returns a value of the variance of number of records
-#' @export
+#' @param T numeric, the length of the series
+#' @param approx logical, if approximated value. default = FALSE
 #'
-#' @examples VNT_DTRW_approx(T=25)
-#' [1] 18.16901
-#' ENT_DTRW_approx(T=25)
-#' [1] 5.641896
-#' VNT_DTRW(T=25)
-#' [1] 13.4865
-#' ENT_DTRW(T=25)
-#' [1] 5.726034
-#' For a series of length 25 and following a DTRW model, we expect to observe around 5.62 records with an approximated variance of 18.169
-VNT_DTRW_approx=function(T){
-  2*(1-2/pi)*T
-}
-
-#' Variance of number of records in DTRW Model
-#'
-#'The exact variance of number of records in DTRW model.
-#'@details It is computed as
+#'@details Exact variance is computed as
 #'\eqn{V(N_T)= 2T+2-E(N_T)-E(N_T)^2}
 #'where \eqn{T} is the length of series and \eqn{E(N_T)} is the expected number of records in DTRW process
+#'
+#' Approximated variance is computed as
+#'\eqn{V(N_T)_approx = 2T \times (1-\frac{2}{\pi})}
+#'
 #' @returns a value of the variance of number of records
 #' @export
 #'
-#' @examples VNT_DTRW_approx(T=25)
-#' [1] 18.16901
-#' ENT_DTRW_approx(T=25)
-#' [1] 5.641896
-#' VNT_DTRW(T=25)
-#' [1] 13.4865
-#' ENT_DTRW(T=25)
-#' [1] 5.726034
-#' For a series of length 25 and following a DTRW model, we expect to observe around 5.72 records with an approximated variance of 13.48
-VNT_DTRW=function(T){
-  m = ENT_DTRW(T)
-  v=2*T+2-m-m^2
-  return(v)
+#' @examples
+#' VNT_DTRW(T=25, approx = TRUE)
+#' # [1] 18.16901
+#' ENT_DTRW(T=25, approx = TRUE)
+#' # [1] 5.641896
+#' VNT_DTRW(T=25, approx = FALSE)
+#' # [1] 13.4865
+#' ENT_DTRW(T=25, approx = FALSE)
+#' # [1] 5.726034
+#' # For a series of length 25 and following a DTRW model, we expect to observe around 5.62 records with an approximated variance of 18.169
+VNT_DTRW = function(T, approx = FALSE){
+  if (approx){
+  return(2*(1-2/pi)*T)
+  } else {
+    m = ENT_DTRW(T, approx= FALSE)
+    v=2*T+2-m-m^2
+    return(v)
+  }
 }
+
 
 #' Approximated Distribution of number of records in DTRW Model
 #'
-#'Approximate distribution of the number of records in DTRW model. The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
-#' @details
-#' The probability of observing \eqn{m} records in a process of length \eqn{T} is given by:
+#'Exact and approximate distribution of the number of records in DTRW model.
+#' The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
+#' #' @details
+#' The Exact probability of observing \eqn{m} records in a process of length \eqn{T} is given by:
+#' \deqn{ P(N_T = m) = 2^{-2T+m-1} \times C_{T}^{2T-m+1} }
+#' where  \eqn{T} is the length of the process
+#'
+#' The approximated probability of observing \eqn{m} records in a process of length \eqn{T} is given by:
 #' \deqn{ P(N_T = m) = \frac{e^{\frac{-m^2}{4T}}}{\sqrt(\pi T)} }
 #' where  \eqn{T} is the length of the process
 #'
 #' @param m the number of records we are computing its probabolity (integer)
 #' @param T length of the series (integer)
+#' @param approx logical, if approximated value. Default = FALSE
 #'
 #' @returns a probability less than one
 #' @export
 #'
-#' @examples NT_DTRW_approx(m=1,T=25)
-#' [1]  0.1117152
-#' NT_DTRW_approx(m=1,T=25)
-#' [1] 0.1122752
-NT_DTRW_approx=function(m,T){
-  exp(-m^2/(4*T))/sqrt(pi*T)
-}
-
-#' Distribution of number of records in DTRW Model
-#'
-#'Exact distribution of the number of records in DTRW model. The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
-#' @details
-#' The probability of observing \eqn{m} records in a process of length \eqn{T} is given by:
-#' \deqn{ P(N_T = m) = 2^{-2T+m-1} \times C_{T}^{2T-m+1} }
-#' where  \eqn{T} is the length of the process
-#'
-#' @param m the number of records we are computing its probabolity (integer)
-#' @param T length of the series (integer)
-#'
-#' @returns a probability less than one
-#' @export
-#'
-#' @examples NT_DTRW(m=1,T=25)
-#' [1] 0.1122752
+#' @examples
+#' NT_DTRW(m=1,T=25, approx = TRUE)
+#' # [1]  0.1117152
+#' NT_DTRW(m=1,T=25, approx = TRUE)
+#' # [1] 0.1122752
+#' NT_DTRW(m=1,T=25)
+#' # [1] 0.1122752
 #' NT_DTRW(m=5,T=25)
-#' [1] 0.09867345
-NT_DTRW = function(m,T){
-  choose(2*T-m+1,T)*2^(-2*T+m-1)
+#' # [1] 0.09867345
+NT_DTRW=function(m,T, approx = FALSE){
+  if ( approx){
+  return (exp(-m^2/(4*T))/sqrt(pi*T))
+  } else {
+    choose(2*T-m+1,T)*2^(-2*T+m-1)
+  }
 }
 
 
@@ -242,8 +216,9 @@ NT_DTRW = function(m,T){
 #' @returns a probability
 #' @export
 #'
-#' @examples Survival(10)
-#' [1] 0.1761971
+#' @examples
+#' Survival(10)
+#' # [1] 0.1761971
 Survival=function(n){2^(-2*n) * choose(2*n,n)}
 
 #' First Pass probability
@@ -254,10 +229,12 @@ Survival=function(n){2^(-2*n) * choose(2*n,n)}
 #' @returns a probability
 #' @export
 #'
-#' @examples FirstPass(10)
-#' [1] 0.009273529
+#' @examples
+#' FirstPass(10)
+#' # [1] 0.009273529
 FirstPass=function(n){Survival(n-1)-Survival(n)}
-#################### LDM #####################
+
+###### LDM --------------
 
 ### Expected number of records LDM
 #'  Expected number of records in Linear Drift Model (LDM)
@@ -292,12 +269,13 @@ FirstPass=function(n){Survival(n-1)-Survival(n)}
 #' @returns a single value of the expected number of records
 #' @export
 #'
-#' @examples ENT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
-#'[1] 10.93343
+#' @examples
+#' ENT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
+#' # [1] 10.93343
 #' ENT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=2)
-#'[1] 7.320699
-#'ENT_LDM(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
-#'[1] 13.18
+#' # [1] 7.320699
+#' ENT_LDM(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
+#' # [1] 13.18
 ENT_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), n_sim = 1000, ...) {
   dist <- match.arg(dist)   # enforce valid choice
   args <- list(...)
@@ -346,11 +324,11 @@ ENT_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "
 #'
 #' @examples
 #' VNT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
-#' [1] 5.761166
+#' # [1] 5.761166
 #' VNT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
-#' [1] 4.509757
+#' # [1] 4.509757
 #' VNT_LDM(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
-#' [1] 4.492424
+#' # [1] 4.492424
 VNT_LDM <- function(T,
                     theta,
                     dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"),

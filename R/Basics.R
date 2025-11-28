@@ -11,7 +11,7 @@
 #'
 #' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' is_rec(X=Xt)
-#' [1] 1 1 1 0 0 0 1 0 0 0
+#' # [1] 1 1 1 0 0 0 1 0 0 0
 is_rec = function(X){
   d=1
   if (length(X) >1 ){
@@ -33,7 +33,7 @@ is_rec = function(X){
 #'
 #' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_counts(X=Xt)
-#' 4
+#' # 4
 rec_counts = function(X){
   sum(is_rec(X))
 }
@@ -49,7 +49,7 @@ rec_counts = function(X){
 #'
 #' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_values(X=Xt)
-#' [1] -0.5 -0.4  0.2  0.8
+#' # [1] -0.5 -0.4  0.2  0.8
 rec_values = function(X){  ## previously Rn
   X[which(is_rec(X)==1)]
 }
@@ -64,7 +64,7 @@ rec_values = function(X){  ## previously Rn
 #'
 #' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_times(X=Xt)
-#' [1] 1 2 3 7
+#' # [1] 1 2 3 7
 rec_times = function(X){  ## previously Ln
   which(is_rec(X)==1)
 }
@@ -80,7 +80,7 @@ rec_times = function(X){  ## previously Ln
 #'
 #' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_gaps(X=Xt)
-#' [1] 1 1 4
+#' # [1] 1 1 4
 rec_gaps =  function(X){   ## previously rec_gaps
   #Ln_pos = Rn_time(X)
   # Ln_delta_pos=0

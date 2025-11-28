@@ -21,5 +21,5 @@ Compute the confidence interval bounds
 }
 \examples{
 bounds(5, z=qnorm(1-0.05/2), variance = 2)
-2.228192 7.771808
+# 2.228192  7.771808
 }
