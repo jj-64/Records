@@ -18,9 +18,10 @@ generate_series <- function(generator, ## function:the function generating the s
 
 ## ---- Helper function: Generate many series and keep labels
 #n_per_model: number of series generated for each model to have a balanced database
-generate_series_multiple_T <- function(
+generate_series_multiple <- function(
     n_per_model = 50,
-    T_vals = c(100, 200, 500) ) {
+    T_vals = c(100, 200, 500) ,
+    normalized = TRUE) {
   all_series <- list()
   labels <- c()
   series_id <- c()
@@ -29,53 +30,65 @@ generate_series_multiple_T <- function(
   for (T_val in T_vals) {
 
     ## ---- DTRW
-    for (i in 1:n_per_model) {
+    i = 1
+    while(i <= n_per_model) {
       s <- generate_series(
         DTRW_series,
         series_args = list(dist = "norm", mean = 0, sd = 1),
         T_val = T_val
       )
-      all_series[[length(all_series) + 1]] <- s
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
       labels <- c(labels, "DTRW")
       series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      i = i + 1
     }
 
     ## ---- LDM
-    for (i in 1:n_per_model) {
+    i = 1
+    while(i <= n_per_model) {
       s <- generate_series(
         LDM_series,
         series_args = list(theta = runif(1,0.1,0.3),
                            dist = "frechet", shape=1, scale=2),
         T_val = T_val
       )
-      all_series[[length(all_series) + 1]] <- s
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
       labels <- c(labels, "LDM")
       series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      i = i + 1
     }
 
     ## ---- YNM
-    for (i in 1:n_per_model) {
+    i=1
+    while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
         series_args = list(gamma = runif(1,1.1,1.5),
                            dist = "frechet", shape=5, scale=5),
         T_val = T_val
       )
-      all_series[[length(all_series) + 1]] <- s
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
       labels <- c(labels, "YNM")
       series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      i=i+1
     }
 
     ## ---- iid (Classical)
-    for (i in 1:n_per_model) {
+    i=1
+    while(i <= n_per_model) {
       s <- rnorm(T_val)
-      all_series[[length(all_series) + 1]] <- s
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
       labels <- c(labels, "Classical")
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      i=i+1
     }
   }
 
@@ -95,7 +108,7 @@ extract_custom_features <- function(series) {
   s <- as.numeric(series)
   n <- length(s)
   if (n < 10) stop("Series too short for stable features")
-
+  if (length(rec_gaps(s)) <2) warning("No records found")
   # Basic stats
   ave = mean(s)
   cv <- sd(s)/mean(s)
@@ -127,19 +140,19 @@ extract_custom_features <- function(series) {
 
 
   # inter-record intervals (for highs and lows, forward and backward)
-  rec_high_gap <- if (length(rec_high_idx) >= 2) rec_gaps(series) else NA
+  rec_high_gap <- if (length(rec_high_idx) >= 2) rec_gaps(series) else 0
   #rec_low_gap <-  if (length(rec_low_idx) >= 2) rec_gaps(-series) else NA
-  rec_high_gap_back <- if (length(rec_high_idx_back) >= 2) rec_gaps(rev(series)) else NA
+  rec_high_gap_back <- if (length(rec_high_idx_back) >= 2) rec_gaps(rev(series)) else 0
   #rec_low_gap_back <-  if (length(rec_low_idx_back) >= 2) rec_gaps(-rev(series)) else NA
 
-  rec_high_gap_median <- if (!all(is.na(rec_high_gap))) median(rec_high_gap, na.rm = TRUE) else NA
+  rec_high_gap_median <- if (!all(is.na(rec_high_gap))) median(rec_high_gap, na.rm = TRUE) else 0
   #rec_low_gap_median <-  if (!all(is.na(rec_low_gap))) median(rec_low_gap, na.rm = TRUE) else NA
-  rec_high_gap_back_median <- if (!all(is.na(rec_high_gap_back))) median(rec_high_gap_back, na.rm = TRUE) else NA
+  rec_high_gap_back_median <- if (!all(is.na(rec_high_gap_back))) median(rec_high_gap_back, na.rm = TRUE) else 0
   #rec_low_gap_back_median <-  if (!all(is.na(rec_low_gap_back))) median(rec_low_gap_back, na.rm = TRUE) else NA
 
-  rec_high_gap_sd <- if (!all(is.na(rec_high_gap))) sd(rec_high_gap, na.rm = TRUE) else NA
+  rec_high_gap_sd <- if (!all(is.na(rec_high_gap))) sd(rec_high_gap, na.rm = TRUE) else 0
   #rec_low_gap_sd <-  if (!all(is.na(rec_low_gap))) sd(rec_low_gap, na.rm = TRUE) else NA
-  rec_high_gap_back_sd <- if (!all(is.na(rec_high_gap_back))) sd(rec_high_gap_back, na.rm = TRUE) else NA
+  #rec_high_gap_back_sd <- if (!all(is.na(rec_high_gap_back))) sd(rec_high_gap_back, na.rm = TRUE) else 0
   #rec_low_gap_back_sd <-  if (!all(is.na(rec_low_gap_back))) sd(rec_low_gap_back, na.rm = TRUE) else NA
 
   # Entropy of record indicator
@@ -226,7 +239,7 @@ extract_custom_features <- function(series) {
 
     rec_high_gap_sd = rec_high_gap_sd,
     #rec_low_gap_sd = rec_low_gap_sd,
-    rec_high_gap_back_sd = rec_high_gap_back_sd,
+    #rec_high_gap_back_sd = rec_high_gap_back_sd,
     #rec_low_gap_back_sd = rec_high_gap_back_sd,
     entropy_c = entropy,
 
@@ -276,20 +289,12 @@ extract_tsfeatures <- function(x) {
   return(as.list(tsf[1, ]))
 }
 
-## extract TSEntropies
-extract_ts_entropies <- function(x) {
-  list(
-    perm_entropy = TSEntropies::ApEn(x),
-    samp_entropy = TSEntropies::SampEn(x)
-  )
-}
 
 ## extract all features
 extract_all_features <- function(x) {
   c(
     extract_custom_features(x),
-    extract_tsfeatures(x),
-    extract_ts_entropies(x)
+    extract_tsfeatures(x)
   )
 }
 
@@ -299,9 +304,8 @@ extract_all_features <- function(x) {
 create_feature_dataset <- function(n_per_model = 50,
                                    T_vals = c(100, 200, 500)) {
 
-  message("Generating multiple series...")
-
-  data <- generate_series_multiple_T(n_per_model, T_vals)
+  message("Generating series...")
+  data <- generate_series_multiple(n_per_model, T_vals, normalized = TRUE)
 
   n <- length(data$series)
   feature_list <- vector("list", n)
@@ -325,5 +329,157 @@ create_feature_dataset <- function(n_per_model = 50,
   }
 
   features_df <- dplyr::bind_rows(feature_list)
+  message("Done.")
   return(features_df)
+}
+
+# ----- 6. Train different classification methods --------------------------------
+
+# We'll create a single function that takes a data frame (predictors + label) and trains:
+# - multinomial logistic (glmnet, multinom)
+# - random forest
+# - xgboost
+# - svmRadial (from caret/kernlab)
+# - knn
+# - naiveBayes
+# - simple neural net (nnet)
+#
+# We'll use caret train with a consistent resampling scheme (repeated CV) and return models and results.
+
+train_and_compare <- function(df, label_col = "label", id_col = "series_id",
+                              seed = 42, do_parallel = FALSE) {
+  set.seed(seed)
+
+  ## Prepare
+  df <- df %>% as.data.frame()
+  df = na.omit(df)
+  rownames(df) <- df[[id_col]]
+  y <- as.factor(df[[label_col]])
+  X_df <- df %>% dplyr::select(-one_of(label_col, id_col))
+
+  ## partition into train/test (we'll use 80/20 stratified)
+  train_index <- createDataPartition(y, p = 0.8, list = FALSE)
+  train_data <- X_df[train_index, ]
+  train_label <- y[train_index]
+  test_data <- X_df[-train_index, ]
+  test_label <- y[-train_index]
+
+  # caret control
+  trctrl <- trainControl(method = "repeatedcv",
+                         number = 5,
+                         repeats = 2,
+                         classProbs = TRUE,
+                         summaryFunction = multiClassSummary,
+                         savePredictions = "final",
+                         verboseIter = FALSE)
+
+  models_list <- list()
+  results <- list()
+
+  # 1) multinom (multinomial logistic using nnet::multinom)
+  cat("Training multinom...\n")
+  m_multinom <- train(x = train_data, y = train_label,
+                      method = "multinom",
+                      trControl = trctrl,
+                      trace = FALSE)
+  models_list$multinom <- m_multinom
+
+  # 2) glmnet (multinomial)
+  cat("Training glmnet (multinomial)...\n")
+  tunegrid_glmnet <- expand.grid(alpha = c(0, 0.5, 1), lambda = 10^seq(-3, 1, length = 10))
+  m_glmnet <- train(x = train_data, y = train_label,
+                    method = "glmnet",
+                    tuneGrid = tunegrid_glmnet,
+                    trControl = trctrl,
+                    family = "multinomial")
+  models_list$glmnet <- m_glmnet
+
+  # 3) random forest
+  #set.seed(seed)
+  cat("Training randomForest...\n")
+  m_rf <- train(x = train_data, y = train_label,
+                method = "rf",
+                trControl = trctrl,
+                importance = TRUE,
+                tuneLength = 5)
+  models_list$rf <- m_rf
+
+  # 4) xgboost (multiclass)
+  # caret's xgbTree supports multiclass with label encoded as numeric starting at 0
+  #set.seed(seed)
+  cat("Training xgboost (caret xgbTree)...\n")
+  # m_xgb <- train(x = train_data, y = train_label,
+  #                method = "xgbTree",
+  #                trControl = trctrl,
+  #                tuneLength = 4)
+  # models_list$xgb <- m_xgb
+
+  # 5) SVM radial
+  #set.seed(seed)
+  cat("Training SVM radial...\n")
+  m_svm <- train(x = train_data, y = train_label,
+                 method = "svmRadial",
+                 trControl = trctrl,
+                 tuneLength = 4)
+  models_list$svm <- m_svm
+
+  # 6) kNN
+  #set.seed(seed)
+  cat("Training kNN...\n")
+  m_knn <- train(x = train_data, y = train_label,
+                 method = "knn",
+                 trControl = trctrl,
+                 tuneLength = 5)
+  models_list$knn <- m_knn
+
+  # 7) naive Bayes
+  #set.seed(seed)
+  cat("Training naiveBayes...\n")
+  m_nb <- train(x = train_data, y = train_label,
+                method = "naive_bayes",
+                trControl = trctrl,
+                tuneLength = 3)
+  models_list$nb <- m_nb
+
+  # 8) neural net (nnet)
+  #set.seed(seed)
+  cat("Training nnet...\n")
+  m_nnet <- train(x = train_data, y = train_label,
+                  method = "nnet",
+                  trControl = trctrl,
+                  tuneLength = 4,
+                  trace = FALSE)
+  models_list$nnet <- m_nnet
+
+  # Evaluate on test set for each model
+  evaluate_model <- function(model, test_data, test_label) {
+    preds <- predict(model, newdata = test_data)
+    probs <- tryCatch(predict(model, newdata = test_data, type = "prob"), error = function(e) NULL)
+    cm <- confusionMatrix(preds, test_label)
+    # multiclass AUC: average of one-vs-rest AUC if probs available
+    auc_avg <- NA
+    if (!is.null(probs)) {
+      # compute multiclass AUC via micro-average: average of pairwise or one-vs-rest AUC
+      labels <- levels(test_label)
+      aucs <- c()
+      for (lab in labels) {
+        true_bin <- ifelse(test_label == lab, 1, 0)
+        roc_obj <- tryCatch(pROC::roc(true_bin, probs[, lab], quiet = TRUE), error = function(e) NULL)
+        if (!is.null(roc_obj)) {
+          aucs <- c(aucs, pROC::auc(roc_obj))
+        }
+      }
+      if (length(aucs) > 0) auc_avg <- mean(aucs)
+    }
+    list(confusion = cm, auc = auc_avg, predictions = preds, probs = probs)
+  }
+
+  for (mname in names(models_list)) {
+    cat("Evaluating", mname, "on test data...\n")
+    results[[mname]] <- evaluate_model(models_list[[mname]], test_data, test_label)
+  }
+
+  return(list(models = models_list, results = results, train_index = train_index,
+       train_data = train_data, train_label = train_label,
+       test_data = test_data, test_label = test_label))
 }
