@@ -1,5 +1,5 @@
 
-############################### Based on moments, number of records #####################
+## Based on moments, number of records ---------------------
 #' Estimation of \eqn{\theta} in LDM Process Based on Number of Records (with optional variance)
 #'
 #' Estimates the parameter \eqn{\theta} in the Linear Drift Model (LDM) process using
@@ -51,7 +51,7 @@ Estimate_LDM_NT <- function(X, variance = TRUE, scale=1) {
   return(list("theta"= theta, "variance"=var))
 }
 
-################################## Unbiased Moments ###############################
+## Unbiased Moments -----------------------------
 
 #' Bias-corrected estimator for theta in LDM (with optional variance)
 #'
@@ -220,7 +220,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
   return(list(theta = theta_unbiased, variance = var_out))
 }
 
-######################## MLE ########################################
+## MLE -------------------------------------
 
 
 #' Maximum Likelihood Estimation of θ Based on record indicator Series (with optional variance)

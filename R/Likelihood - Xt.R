@@ -61,7 +61,7 @@ Likelihood_Xt_Norm_iid <- function(T, x, params) {
 #' @returns numerical value
 #' @export
 #' @examples
-#' Xt=DTRW_series_Norm(T=25,loc=0, sd=3)
+#' Xt=DTRW_series(T=25,dist = "norm", mean=0, sd=3)
 #'> Xt
 #'[1]  0.0000000  1.4880661 -4.8147394 -5.2196358 -1.0585060  0.1213980 -1.9903581
 #'[8] -0.2289111  0.1204328  1.0547639 -0.4275506  0.2533994  2.3335009  3.4109412

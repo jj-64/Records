@@ -14,7 +14,7 @@
 #' @return The log-likelihood value.
 #' @export
 #' @examples
-#' Xt = DTRW_series_Norm(T=25,loc=0, sd=1)
+#' Xt = DTRW_series(T=25, dist = "norm", mean=0, sd=1)
 #' Xt
 #' [1]  0.0000000  1.4880661 -4.8147394 -5.2196358 -1.0585060  0.1213980 -1.9903581
 #' [8] -0.2289111  0.1204328  1.0547639 -0.4275506  0.2533994  2.3335009  3.4109412
@@ -67,7 +67,7 @@ Likelihood_Ln_DTRW = function(L, T) {
 #' @return The log-likelihood value.
 #' @export
 #' @examples
-#' Xt = DTRW_series_Norm(T=25,loc=0, sd=1)
+#' Xt = DTRW_series(T=25, dist = "norm", mean=0, sd=1)
 #' Xt
 #' [1]  0.10608755  2.10580288  4.07636870  2.44521434  1.77945837  1.47440228
 #' [7]  1.25472403  3.35634849  5.13609509  3.39129849  3.57836155  3.95685562
@@ -165,7 +165,7 @@ Likelihood_Rn_Norm_DTRW = function(R,L,T,params){ ##variance
 #' @param params Vector of parameters: mean (\eqn{\mu}) and variance (\eqn{\sigma^2}) of the step distribution.
 #' @return The likelihood value.
 #' @examples
-#' Xt = DTRW_series_Norm(T=25,loc=0, sd=1)
+#' Xt = DTRW_series(T=25,dist = "norm", mean =0, sd=1)
 #' Xt
 #' [1]  0.10608755  2.10580288  4.07636870  2.44521434  1.77945837  1.47440228
 #' [7]  1.25472403  3.35634849  5.13609509  3.39129849  3.57836155  3.95685562
