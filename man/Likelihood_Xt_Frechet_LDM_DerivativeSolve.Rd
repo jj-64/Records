@@ -22,7 +22,7 @@ Estimate the parameters of Log-Likelihood of LDM process with Frechet distributi
 Uses \strong{nleqslv} to solve for parameters \eqn{(a, \theta)}.
 }
 \examples{
-x = LDM_series_Frechet(T=25,theta=0.5,scale=1,shape=2)
+x = LDM_series(T=25,dist = "frechet", theta=0.5,scale=1,shape=2)
 x
  [1]  1.608046  1.549613  2.788720  4.077933  3.886494  6.142666  4.709011
  [8]  5.274752  5.512561  7.164634  6.340624  8.823882  7.447867  7.925539

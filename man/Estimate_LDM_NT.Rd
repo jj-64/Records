@@ -7,11 +7,11 @@
 Estimate_LDM_NT(X, variance = TRUE, scale = 1)
 }
 \arguments{
-\item{X}{A numeric vector representing the time series data.}
+\item{X}{numeric vector representing the time series data.}
 
 \item{variance}{Logical if to compute variance (default = TRUE)}
 
-\item{scale}{Numeric. Default is 1. The scale parameter of the \eqn{Gumbel} underlying distribution used for variance computation.}
+\item{scale}{positive Numeric. Default is 1. The scale parameter of the \eqn{Gumbel} underlying distribution used for variance computation.}
 }
 \value{
 A list with elements:

@@ -23,7 +23,7 @@ The Fisher information is given by:
 \deqn{ I(a) = - A^{-a} \sum_{t=1}^{T} x^{-a} (\log(A x))^2 - \frac{T}{a^2} }
 }
 \examples{
-Xt = LDM_series_Frechet(T=25,theta=0.2, shape=2, scale=1)
+Xt = LDM_series(T=25,dist = "frechet", theta=0.2, shape=2, scale=1)
 Xt
 [1] 1.252804 1.465630 2.622688 2.061684 2.723450 4.932948 2.717134 2.368716
 [9] 2.487995 2.687706 3.656084 4.580848 4.215754 4.284083 4.110642 3.851272

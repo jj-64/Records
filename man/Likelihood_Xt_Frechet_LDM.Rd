@@ -33,6 +33,6 @@ The likelihood function is:
 \deqn{log L(X | ( \theta, A, a )) = T \log(a A^{-a}) - (a+1) \sum \log(X) - \sum (A X)^{-a}}
 }
 \examples{
-Xt = LDM_series_Frechet(T=25, theta=0.2, shape=1, scale=2)
+Xt = LDM_series(T=25, dist = "frechet", theta=0.2, shape=1, scale=2)
 Likelihood_Xt_Frechet_LDM(T=25, x=Xt, params = c(0.2,1/2, 1) )
 }

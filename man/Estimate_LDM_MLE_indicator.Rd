@@ -20,9 +20,9 @@ Estimate_LDM_MLE_indicator(
 
 \item{scale}{Numeric. Scale parameter (default = 1).}
 
-\item{min}{Lower bound for θ search space. Default = 0.0001.}
+\item{min}{Lower bound for θ grid search space. Default = 0.0001.}
 
-\item{max}{Upper bound for θ search space. Default = 5.}
+\item{max}{Upper bound for θ grid search space. Default = 5.}
 
 \item{step}{Search grid step size (default = 0.01).}
 }
@@ -57,8 +57,8 @@ Estimate_LDM_MLE_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1
 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 
 $theta
-[1] 0.3301
+# [1] 0.3301
 
 $variance
-[1] 0.02139224
+# [1] 0.02139224
 }

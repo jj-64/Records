@@ -12,7 +12,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 3.6)
-<<<<<<< HEAD
 RoxygenNote: 7.3.2
-=======
->>>>>>> f84cd0d7b70d365e56c08983ffcda3fdb1cc5d6b
