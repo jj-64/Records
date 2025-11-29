@@ -1,57 +1,48 @@
 #library(combinat)
 ## Wrapper -------------------
-record_stats <- function(model = c("iid", "DTRW", "LDM", "YNM"),
+#' Record Statistics for Multiple Models
+#'
+#' Compute the expected number of records or the variance of the number
+#' of records under a variety of stochastic models.
+#'
+#' @param model Character string specifying the model. Available models:
+#'   \code{"iid"}, \code{"DTRW"}, \code{"LDM"}, \code{"YNM"}.
+#' @param stat Either \code{"mean"} or \code{"var"}.
+#' @param T Integer. Length of the time series.
+#' @param ... Additional arguments passed to model-specific functions.
+#'
+#' @return A numeric value, representing either the expected number
+#'   of records or its variance.
+#'
+#' @export
+#'
+#' @examples
+#' rec_count_stats("iid", stat = "mean", T = 100)
+#' rec_count_stats("YNM", stat = "var", T = 200, gamma = 1.1)
+rec_count_stats <- function(model,
                          stat = c("mean", "var"),
+                         T,
                          ...) {
 
-  model <- match.arg(model)
-  stat  <- match.arg(stat)
+  stat <- match.arg(stat)
 
-  # Extract arguments passed through ...
-  args <- list(...)
+  if (is.null(record_registry[[model]]))
+    stop("Unknown model: ", model)
 
-  # Ensure T exists for all models
-  if (is.null(args$T)) stop("Argument 'T' must be supplied.")
-  T <- args$T
+  entry <- record_registry[[model]]
 
-  # Dispatcher table
-  if (model == "iid") {
-    if (stat == "mean")
-      return(rec_count_mean_iid(T = T, approx = args$approx %||% FALSE))
-    else
-      return(rec_count_var_iid(T = T))
+  # Check required extra arguments
+  missing <- setdiff(entry$required_args, names(list(...)))
+  if (length(missing) > 0) {
+    stop("Model '", model, "' requires arguments: ",
+         paste(missing, collapse = ", "))
   }
 
-  if (model == "DTRW") {
-    if (stat == "mean")
-      return(rec_count_mean_DTRW(T = T, approx = args$approx %||% FALSE))
-    else
-      return(rec_count_var_DTRW(T = T, approx = args$approx %||% FALSE))
-  }
+  # Select mean or var function
+  fun <- if (stat == "mean") entry$mean_fun else entry$var_fun
 
-  if (model == "LDM") {
-    if (is.null(args$theta)) stop("LDM requires argument 'theta'.")
-    if (stat == "mean")
-      return(rec_count_mean_LDM(T = T, theta = args$theta,
-                     dist = args$dist %||% "beta",
-                     n_sim = args$n_sim %||% 1000,
-                     ...))
-    else
-      return(rec_count_var_LDM(T = T, theta = args$theta,
-                     dist = args$dist %||% "beta",
-                     n_sim = args$n_sim %||% 1000,
-                     ...))
-  }
-
-  if (model == "YNM") {
-    if (is.null(args$gamma)) stop("YNM requires argument 'gamma'.")
-    if (stat == "mean")
-      return(rec_count_mean_YNM(T = T, gamma = args$gamma))
-    else
-      return(rec_count_var_YNM(T = T, gamma = args$gamma))
-  }
-
-  stop("Unknown model.")
+  # Call the model-specific function
+  return(fun(T = T, ...))
 }
 
 ## iid -------------------
