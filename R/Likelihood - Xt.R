@@ -144,7 +144,7 @@ Likelihood_Xt_Frechet_YNM <- function(T, x, params) {
 #' @return Numeric value of the log-likelihood.
 #' @export
 #' @examples
-#' Xt = LDM_series_Frechet(T=25, theta=0.2, shape=1, scale=2)
+#' Xt = LDM_series(T=25, dist = "frechet", theta=0.2, shape=1, scale=2)
 #' Likelihood_Xt_Frechet_LDM(T=25, x=Xt, params = c(0.2,1/2, 1) )
 Likelihood_Xt_Frechet_LDM <- function(T, x, params) {
   X <- x - params[1] * (1:T)
@@ -239,7 +239,7 @@ eq_alpha_Right <- function(x, theta) {
 #' @return Numeric vector of estimated parameters in order \eqn{\theta, A, a}
 #' @export
 #' @examples
-#' x = LDM_series_Frechet(T=25,theta=0.5,scale=1,shape=2)
+#' x = LDM_series(T=25,dist = "frechet", theta=0.5,scale=1,shape=2)
 #' x
 #'  [1]  1.608046  1.549613  2.788720  4.077933  3.886494  6.142666  4.709011
 #'  [8]  5.274752  5.512561  7.164634  6.340624  8.823882  7.447867  7.925539
@@ -278,7 +278,7 @@ Likelihood_Xt_Frechet_LDM_DerivativeSolve <- function(x, initial_guess) {  #Solv
 #' @return Estimated parameters \eqn{(\theta, A, a, L_{\max})}.
 #' @export
 #' @examples
-#' x = LDM_series_Frechet(T=25,theta=0.5,scale=1,shape=2)
+#' x = LDM_series(T=25,dist = "frechet", theta=0.5,scale=1,shape=2)
 #' x
 #'  [1]  1.608046  1.549613  2.788720  4.077933  3.886494  6.142666  4.709011
 #'  [8]  5.274752  5.512561  7.164634  6.340624  8.823882  7.447867  7.925539

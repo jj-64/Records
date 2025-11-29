@@ -176,7 +176,7 @@ V_Xt_Frechet_YNM_shape = function(x,params){
 #' @param params Numeric vector of three values:  drift parameter \eqn{\theta > 0};  scale parameter \eqn{A > 0};  shape parameter \eqn{a > 0}.
 #' @return Numeric, variance of theta estimator.
 #' @examples
-#' Xt = LDM_series_Frechet(T=25,theta=0.2, shape=2, scale=1)
+#' Xt = LDM_series(T=25,dist = "frechet", theta=0.2, shape=2, scale=1)
 #'Xt
 #'[1] 1.252804 1.465630 2.622688 2.061684 2.723450 4.932948 2.717134 2.368716
 #'[9] 2.487995 2.687706 3.656084 4.580848 4.215754 4.284083 4.110642 3.851272
@@ -237,7 +237,7 @@ V_Xt_Frechet_LDM_theta =  function(x,params) { ## x vector and theta, A and alph
 #' @inheritParams V_Xt_Frechet_LDM_theta
 #' @return Numeric, variance of A:1/Scale estimator.
 #' @examples
-#' Xt = LDM_series_Frechet(T=25,theta=0.2, shape=2, scale=1)
+#' Xt = LDM_series(T=25,dist = "frechet", theta=0.2, shape=2, scale=1)
 #'Xt
 #'[1] 1.252804 1.465630 2.622688 2.061684 2.723450 4.932948 2.717134 2.368716
 #'[9] 2.487995 2.687706 3.656084 4.580848 4.215754 4.284083 4.110642 3.851272
@@ -298,7 +298,7 @@ V_Xt_Frechet_LDM_scale = function(x,params){
 #' @inheritParams V_Xt_Frechet_LDM_theta
 #' @return Numeric, variance of a shape estimator.
 #' @examples
-#' Xt = LDM_series_Frechet(T=25,theta=0.2, shape=2, scale=1)
+#' Xt = LDM_series(T=25,dist = "frechet", theta=0.2, shape=2, scale=1)
 #'Xt
 #'[1] 1.252804 1.465630 2.622688 2.061684 2.723450 4.932948 2.717134 2.368716
 #'[9] 2.487995 2.687706 3.656084 4.580848 4.215754 4.284083 4.110642 3.851272
