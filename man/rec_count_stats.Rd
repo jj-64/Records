@@ -4,13 +4,13 @@
 \alias{rec_count_stats}
 \title{Record Statistics for Multiple Models}
 \usage{
-rec_count_stats(model, stat = c("mean", "var"), T, ...)
+rec_count_stats(model, stat = c("mean", "var", "dist"), T, m = NULL, ...)
 }
 \arguments{
 \item{model}{Character string specifying the model. Available models:
 \code{"iid"}, \code{"DTRW"}, \code{"LDM"}, \code{"YNM"}.}
 
-\item{stat}{Either \code{"mean"} or \code{"var"}.}
+\item{stat}{Either \code{"mean"} or \code{"var"} or \code{"dist"}.}
 
 \item{T}{Integer. Length of the time series.}
 
@@ -18,13 +18,23 @@ rec_count_stats(model, stat = c("mean", "var"), T, ...)
 }
 \value{
 A numeric value, representing either the expected number
-of records or its variance.
+of records or its variance or distribution.
 }
 \description{
-Compute the expected number of records or the variance of the number
+Compute the distribution, expected number of records or the variance of the number
 of records under a variety of stochastic models.
 }
 \examples{
 rec_count_stats("iid", stat = "mean", T = 100)
+# [1] 5.187378
+rec_count_stats("YNM", stat = c("mean"), T = 200, gamma = 1.1)
+# [1] 20.99712
 rec_count_stats("YNM", stat = "var", T = 200, gamma = 1.1)
+# [1] 17.63478
+rec_count_stats("LDM", stat="dist", T=100, m=7, theta=0.4, scale=1)
+# [1] 0.00000000004169792
+rec_count_stats("LDM", stat="dist", T=25, m=c(1:5), theta=0.4, scale=1)
+# [1] 0.00002232982 0.00030729569 0.00201438186 0.00837570638 0.02481251456
+rec_count_stats("iid", stat="dist", T=50, m=4)
+rec_count_stats("DTRW", stat="dist", T=200, m=10, approx=TRUE)
 }
