@@ -1,5 +1,60 @@
 #library(combinat)
-### iid -------------------
+## Wrapper -------------------
+record_stats <- function(model = c("iid", "DTRW", "LDM", "YNM"),
+                         stat = c("mean", "var"),
+                         ...) {
+
+  model <- match.arg(model)
+  stat  <- match.arg(stat)
+
+  # Extract arguments passed through ...
+  args <- list(...)
+
+  # Ensure T exists for all models
+  if (is.null(args$T)) stop("Argument 'T' must be supplied.")
+  T <- args$T
+
+  # Dispatcher table
+  if (model == "iid") {
+    if (stat == "mean")
+      return(rec_count_mean_iid(T = T, approx = args$approx %||% FALSE))
+    else
+      return(rec_count_var_iid(T = T))
+  }
+
+  if (model == "DTRW") {
+    if (stat == "mean")
+      return(rec_count_mean_DTRW(T = T, approx = args$approx %||% FALSE))
+    else
+      return(rec_count_var_DTRW(T = T, approx = args$approx %||% FALSE))
+  }
+
+  if (model == "LDM") {
+    if (is.null(args$theta)) stop("LDM requires argument 'theta'.")
+    if (stat == "mean")
+      return(rec_count_mean_LDM(T = T, theta = args$theta,
+                     dist = args$dist %||% "beta",
+                     n_sim = args$n_sim %||% 1000,
+                     ...))
+    else
+      return(rec_count_var_LDM(T = T, theta = args$theta,
+                     dist = args$dist %||% "beta",
+                     n_sim = args$n_sim %||% 1000,
+                     ...))
+  }
+
+  if (model == "YNM") {
+    if (is.null(args$gamma)) stop("YNM requires argument 'gamma'.")
+    if (stat == "mean")
+      return(rec_count_mean_YNM(T = T, gamma = args$gamma))
+    else
+      return(rec_count_var_YNM(T = T, gamma = args$gamma))
+  }
+
+  stop("Unknown model.")
+}
+
+## iid -------------------
 #'Exact Expected number of records in Classical Model
 #'
 #' The average expected number of records in an i.i.d process. It is distribution-free,
@@ -13,18 +68,18 @@
 #' If approximated, as the sum of \eqn{1/t} can be approximated by \eqn{log(T) + \omega} where \eqn{\omega = 0.577215} is euler mascheroni constant
 #'
 #' @examples
-#' ENT_iid(T=25)
+#' rec_count_mean_iid(T=25)
 #' # 3.815958
-#' ENT_iid(T=25, approx = TRUE)
+#' rec_count_mean_iid(T=25, approx = TRUE)
 #' # 3.796091
-ENT_iid = function(T, approx = FALSE){
+rec_count_mean_iid = function(T, approx = FALSE){
   if (approx){
     return(log(T) + 0.57721566490153)
   } else {
   return(sum( 1/(1:T) )) }
 }
 
-#####################################################################
+
 #Variance of number of records
 #' Variance of number of records in Classical Model
 #'
@@ -35,13 +90,13 @@ ENT_iid = function(T, approx = FALSE){
 #' @returns a value of the variance of number of records
 #' @export
 #'
-#' @examples VNT_iid(T=25)
+#' @examples rec_count_var_iid(T=25)
 #' # [1] 2.210235
-#' ENT_iid(T=25)
+#' rec_count_mean_iid(T=25)
 #' # [1] 3.815958
 #' # For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
 #' NT_iid(m=1,T=25)
-VNT_iid = function(T){
+rec_count_var_iid = function(T){
   sum( 1/(1:T) ) -  sum( 1/(1:T)^2 )
 }
 
@@ -106,7 +161,7 @@ NT_iid = function(m,T,s=NA){
   s / factorial(T)
 }
 
-#### DTRW ----------------------
+## DTRW ----------------------
 #' Exact Expected number of records in DTRW Model
 #'
 #' The average exact expected number of records in a DTRW process. It is distribution-free, i.e. independent from the process underlying distribution.
@@ -121,11 +176,11 @@ NT_iid = function(m,T,s=NA){
 #' @export
 #'
 #' @examples
-#' ENT_DTRW(T=25)
+#' rec_count_mean_DTRW(T=25)
 #' # [1] 5.726034
-#' ENT_DTRW(T=25, approx = TRUE)
+#' rec_count_mean_DTRW(T=25, approx = TRUE)
 #' # [1] 5.641896
-ENT_DTRW <- function(T, approx = FALSE) {
+rec_count_mean_DTRW <- function(T, approx = FALSE) {
   if(approx) {
     return(sqrt(4*T/pi))
     } else {
@@ -150,20 +205,20 @@ ENT_DTRW <- function(T, approx = FALSE) {
 #' @export
 #'
 #' @examples
-#' VNT_DTRW(T=25, approx = TRUE)
+#' rec_count_var_DTRW(T=25, approx = TRUE)
 #' # [1] 18.16901
-#' ENT_DTRW(T=25, approx = TRUE)
+#' rec_count_mean_DTRW(T=25, approx = TRUE)
 #' # [1] 5.641896
-#' VNT_DTRW(T=25, approx = FALSE)
+#' rec_count_var_DTRW(T=25, approx = FALSE)
 #' # [1] 13.4865
-#' ENT_DTRW(T=25, approx = FALSE)
+#' rec_count_mean_DTRW(T=25, approx = FALSE)
 #' # [1] 5.726034
 #' # For a series of length 25 and following a DTRW model, we expect to observe around 5.62 records with an approximated variance of 18.169
-VNT_DTRW = function(T, approx = FALSE){
+rec_count_var_DTRW = function(T, approx = FALSE){
   if (approx){
   return(2*(1-2/pi)*T)
   } else {
-    m = ENT_DTRW(T, approx= FALSE)
+    m = rec_count_mean_DTRW(T, approx= FALSE)
     v=2*T+2-m-m^2
     return(v)
   }
@@ -234,7 +289,7 @@ Survival=function(n){2^(-2*n) * choose(2*n,n)}
 #' # [1] 0.009273529
 FirstPass=function(n){Survival(n-1)-Survival(n)}
 
-###### LDM --------------
+## LDM --------------
 
 ### Expected number of records LDM
 #'  Expected number of records in Linear Drift Model (LDM)
@@ -270,13 +325,13 @@ FirstPass=function(n){Survival(n-1)-Survival(n)}
 #' @export
 #'
 #' @examples
-#' ENT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
+#' rec_count_mean_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
 #' # [1] 10.93343
-#' ENT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=2)
+#' rec_count_mean_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=2)
 #' # [1] 7.320699
-#' ENT_LDM(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
+#' rec_count_mean_LDM(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
 #' # [1] 13.18
-ENT_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), n_sim = 1000, ...) {
+rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), n_sim = 1000, ...) {
   dist <- match.arg(dist)   # enforce valid choice
   args <- list(...)
 
@@ -318,18 +373,18 @@ ENT_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "
 
 #' For other increment distributions, the variance is estimated by simulation.
 #'
-#' @inheritParams ENT_LDM
+#' @inheritParams rec_count_mean_LDM
 #' @returns a single value: the variance of the number of records
 #' @export
 #'
 #' @examples
-#' VNT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
+#' rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
 #' # [1] 5.761166
-#' VNT_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
+#' rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
 #' # [1] 4.509757
-#' VNT_LDM(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
+#' rec_count_var_LDM(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
 #' # [1] 4.492424
-VNT_LDM <- function(T,
+rec_count_var_LDM <- function(T,
                     theta,
                     dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"),
                     n_sim = 1000,
@@ -355,24 +410,24 @@ VNT_LDM <- function(T,
 
 
 ## Apply Liapanuv conditions
-CLT_LDM = function(X){
-  theta = theta_estm2B(X)
-  t=length(X)
-  N = 1  ## first trivial record
-  for(i in 2:t) {N[i] = rec_counts(X[1:i])}  ## observed number of records series
-  E=1
-  for(i in 2:t) {E[i] = ENT_LDM(T=i, theta=theta)}  ## expected number of records
-  sigm=VNT_LDM(T=1,theta=theta)
-  for(i in 2:t) {sigm[i] =VNT_LDM(T=i,theta=theta)} ## sum of variance
-  s=sqrt(cumsum(sigm))
-
-  Z = (N-E)/s
-  return(Z)
-}
-
-## Fucntion needed to compute the distribution of number of records
-u_t_LDM=function(t,theta,scale=1){
-  exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
+# CLT_LDM = function(X){
+#   theta = theta_estm2B(X)
+#   t=length(X)
+#   N = 1  ## first trivial record
+#   for(i in 2:t) {N[i] = rec_counts(X[1:i])}  ## observed number of records series
+#   E=1
+#   for(i in 2:t) {E[i] = rec_count_mean_LDM(T=i, theta=theta)}  ## expected number of records
+#   sigm=rec_count_var_LDM(T=1,theta=theta)
+#   for(i in 2:t) {sigm[i] =rec_count_var_LDM(T=i,theta=theta)} ## sum of variance
+#   s=sqrt(cumsum(sigm))
+#
+#   Z = (N-E)/s
+#   return(Z)
+# }
+#
+# ## Fucntion needed to compute the distribution of number of records
+# u_t_LDM=function(t,theta,scale=1){
+#   exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
 
 #' Stirling function of the second kind in LDM
 #'
@@ -452,7 +507,7 @@ NT_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirlin
   return(exp(-theta*T/scale) * s[T,m]/ p)
 }
 
-#################### YNM-Nevzorov #####################
+## YNM-Nevzorov -----------------
 
 ### Expected number of records in YANG-Nevzorov process
 #' Expected number of records in YANG-Nevzorov process
@@ -473,9 +528,9 @@ NT_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirlin
 #' @returns a value for the expected number of records
 #' @export
 #'
-#' @examples ENT_YNM (T=25, gamma=1.1)
+#' @examples rec_count_mean_YNM (T=25, gamma=1.1)
 #' [1] 5.000207
-ENT_YNM = function(T,gamma){
+rec_count_mean_YNM = function(T,gamma){
   s=0
   for(k in 1:T){
     #s[k] = (gamma^k * (gamma-1)) / (gamma* (gamma^k -1))
@@ -505,9 +560,9 @@ ENT_YNM = function(T,gamma){
 #' @returns a single value of the variance of number of records
 #' @export
 #'
-#' @examples VNT_YNM(T=25, gamma=1.1)
+#' @examples rec_count_var_YNM(T=25, gamma=1.1)
 #' [1] 3.10049
-VNT_YNM = function(T, gamma){
+rec_count_var_YNM = function(T, gamma){
   s=0; s2=0
   for(k in 1:T){
     s[k] = rec_rate_YNM(gamma,k)

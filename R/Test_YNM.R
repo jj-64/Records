@@ -340,8 +340,8 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
         v <- 1 / gamma_hat
         var_hat <- (1 - v) / (T * v^3)
       } else {
-        # Exact Fisher Information (requires ENT_YNM and rec_rate_YNM)
-        ent <- ENT_YNM(T = T, gamma = gamma_hat)
+        # Exact Fisher Information (requires rec_count_mean_YNM and rec_rate_YNM)
+        ent <- rec_count_mean_YNM(T = T, gamma = gamma_hat)
         a <- (1 / (gamma_hat^2 * (gamma_hat - 1)^2)) * ent
         b <- (1 / gamma_hat^2) * (T - ent)
         c <- T * (1 + gamma_hat^T * (T - 1)) / (gamma_hat^2 * (gamma_hat^T - 1)^2)

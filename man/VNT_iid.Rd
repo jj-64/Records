@@ -20,7 +20,7 @@ where T is the length of series
 \examples{
 VNT_iid(T=25)
 [1] 2.210235
-ENT_iid(T=25)
+rec_count_mean_iid(T=25)
 [1] 3.815958
 For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
 NT_iid(m=1,T=25)
