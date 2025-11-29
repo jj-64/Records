@@ -110,145 +110,145 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 }
 
 
-############## Generate LDM series ##############
+# ############## Generate LDM series ----------------
 
-#' Generate a Linear Drift Model (LDM) Series with Beta Noise
-#'
-#' Generates an LDM series where the noise follows a Beta distribution.
-#'
-#' @details
-#' The series is generated as:
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Beta}(\text{shape1}, \text{shape2})}
-#' where:
-#' - \eqn{\theta} is the linear drift.
-#' - \eqn{y_t} are i.i.d. Beta-distributed random variables.
-#'
-#' @param T Integer. The length of the series.
-#' @param theta Numeric. The linear drift coefficient \eqn{\theta > 0}.
-#' @param shape1 Positive numeric. The first shape parameter of the Beta distribution.
-#' @param shape2 Positive numeric. The second shape parameter of the Beta distribution.
-#' @return A numeric vector representing the LDM series.
-#' @examples
-#' LDM_series_Beta(100, theta = 0.5, shape1 = 2, shape2 = 5)
-LDM_series_Beta <- function(T, theta, shape1 = 1, shape2 = 1) {
-  if (shape1 <= 0 | shape2 <= 0) stop("Enter positive values for shape parameters")
-  y <- rbeta(T, shape1, shape2)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate a Linear Drift Model (LDM) Series with Beta Noise
+# #'
+# #' Generates an LDM series where the noise follows a Beta distribution.
+# #'
+# #' @details
+# #' The series is generated as:
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Beta}(\text{shape1}, \text{shape2})}
+# #' where:
+# #' - \eqn{\theta} is the linear drift.
+# #' - \eqn{y_t} are i.i.d. Beta-distributed random variables.
+# #'
+# #' @param T Integer. The length of the series.
+# #' @param theta Numeric. The linear drift coefficient \eqn{\theta > 0}.
+# #' @param shape1 Positive numeric. The first shape parameter of the Beta distribution.
+# #' @param shape2 Positive numeric. The second shape parameter of the Beta distribution.
+# #' @return A numeric vector representing the LDM series.
+# #' @examples
+# #' LDM_series_Beta(100, theta = 0.5, shape1 = 2, shape2 = 5)
+# LDM_series_Beta <- function(T, theta, shape1 = 1, shape2 = 1) {
+  # if (shape1 <= 0 | shape2 <= 0) stop("Enter positive values for shape parameters")
+  # y <- rbeta(T, shape1, shape2)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
 
-#' Generate an LDM Series with Gumbel Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Gumbel}(\text{loc}, \text{scale})}
-#'
-#' @inheritParams LDM_series_Beta
-#' @param loc Numeric. The location parameter of the Gumbel distribution.
-#' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
-#' @return A numeric vector representing the LDM series.
-LDM_series_Gumbel <- function(T, theta, loc = 0, scale = 1) {
-  if (scale <= 0) stop("Enter a positive value for scale")
-  y <- VGAM::rgumbel(T, loc, scale)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate an LDM Series with Gumbel Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Gumbel}(\text{loc}, \text{scale})}
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @param loc Numeric. The location parameter of the Gumbel distribution.
+# #' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Gumbel <- function(T, theta, loc = 0, scale = 1) {
+  # if (scale <= 0) stop("Enter a positive value for scale")
+  # y <- VGAM::rgumbel(T, loc, scale)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
-#' Generate an LDM Series with Weibull Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Weibull}(\text{scale}, \text{shape})}
-#'
-#' @inheritParams LDM_series_Beta
-#' @param scale Positive numeric. The scale parameter of the Weibull distribution.
-#' @param shape Positive numeric. The shape parameter of the Weibull distribution.
-#' @return A numeric vector representing the LDM series.
-LDM_series_Weibull <- function(T, theta, shape = 1,scale = 1) {
-  if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-  y <- rweibull(T, shape=shape, scale=scale)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate an LDM Series with Weibull Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Weibull}(\text{scale}, \text{shape})}
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @param scale Positive numeric. The scale parameter of the Weibull distribution.
+# #' @param shape Positive numeric. The shape parameter of the Weibull distribution.
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Weibull <- function(T, theta, shape = 1,scale = 1) {
+  # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
+  # y <- rweibull(T, shape=shape, scale=scale)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
-#' Generate an LDM Series with Frechet Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Frechet}(\text{scale}, \text{shape})}
-#'
-#' @inheritParams LDM_series_Beta
-#' @param scale Positive numeric. The scale parameter of the Frechet distribution.
-#' @param shape Positive numeric. The shape parameter of the Frechet distribution.
-#' @return A numeric vector representing the LDM series.
-LDM_series_Frechet <- function(T, theta, scale = 1, shape = 2) {
-  if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-  y <- VGAM::rfrechet(T, loc = 0, scale, shape)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate an LDM Series with Frechet Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Frechet}(\text{scale}, \text{shape})}
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @param scale Positive numeric. The scale parameter of the Frechet distribution.
+# #' @param shape Positive numeric. The shape parameter of the Frechet distribution.
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Frechet <- function(T, theta, scale = 1, shape = 2) {
+  # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
+  # y <- VGAM::rfrechet(T, loc = 0, scale, shape)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
-#' Generate an LDM Series with Exponential Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Exp}(\text{rate})}
-#'
-#' @inheritParams LDM_series_Beta
-#' @param rate Positive numeric. The rate parameter of the Exponential distribution.
-#' @return A numeric vector representing the LDM series.
-LDM_series_Exp <- function(T, theta, rate = 1) {
-  if (rate <= 0) stop("Enter a positive value for scale:1/ rate")
-  y <- rexp(T, rate=rate)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate an LDM Series with Exponential Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Exp}(\text{rate})}
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @param rate Positive numeric. The rate parameter of the Exponential distribution.
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Exp <- function(T, theta, rate = 1) {
+  # if (rate <= 0) stop("Enter a positive value for scale:1/ rate")
+  # y <- rexp(T, rate=rate)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
-#' Generate an LDM Series with Pareto Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Pareto}(\text{scale}, \text{shape})}
-#'
-#' The top 10% of values are filtered out to reduce extreme values.
-#'
-#' @inheritParams LDM_series_Beta
-#' @inheritParams LDM_series_Weibull
-#' @return A numeric vector representing the LDM series.
-LDM_series_Pareto <- function(T, theta, scale = 0.5, shape = 4) {
-  if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-  y <- rpareto(T * 1.5, scale, shape)
-  y <- y[y <= quantile(y, 0.9)] # Remove top 10% of extreme values
-  x <- theta * (1:T) + y[1:T]
-  return(x)
-}
+# #' Generate an LDM Series with Pareto Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Pareto}(\text{scale}, \text{shape})}
+# #'
+# #' The top 10% of values are filtered out to reduce extreme values.
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @inheritParams LDM_series_Weibull
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Pareto <- function(T, theta, scale = 0.5, shape = 4) {
+  # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
+  # y <- rpareto(T * 1.5, scale, shape)
+  # y <- y[y <= quantile(y, 0.9)] # Remove top 10% of extreme values
+  # x <- theta * (1:T) + y[1:T]
+  # return(x)
+# }
 
-#' Generate an LDM Series with Normal Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \mathcal{N}(\text{loc}, \text{sd})}
-#'
-#' @inheritParams LDM_series_Beta
-#' @param loc Numeric. The mean (location) of the normal distribution.
-#' @param sd Positive numeric. The standard deviation of the normal distribution.
-#' @return A numeric vector representing the LDM series.
-LDM_series_Norm <- function(T, theta, loc = 0, sd = 1) {
-  if (sd <= 0) stop("Enter a positive value for standard deviation")
-  y <- rnorm(T, loc, sd)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate an LDM Series with Normal Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \mathcal{N}(\text{loc}, \text{sd})}
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @param loc Numeric. The mean (location) of the normal distribution.
+# #' @param sd Positive numeric. The standard deviation of the normal distribution.
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Norm <- function(T, theta, loc = 0, sd = 1) {
+  # if (sd <= 0) stop("Enter a positive value for standard deviation")
+  # y <- rnorm(T, loc, sd)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
-#' Generate an LDM Series with Uniform Noise
-#'
-#' @details
-#' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Uniform}(\text{min}, \text{max})}
-#'
-#' @inheritParams LDM_series_Beta
-#' @param min Numeric. The lower bound of the uniform distribution.
-#' @param max Numeric. The upper bound of the uniform distribution.
-#' @return A numeric vector representing the LDM series.
-LDM_series_Unif <- function(T, theta, min = -1, max = 1) {
-  y <- runif(T, min, max)
-  x <- theta * (1:T) + y
-  return(x)
-}
+# #' Generate an LDM Series with Uniform Noise
+# #'
+# #' @details
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Uniform}(\text{min}, \text{max})}
+# #'
+# #' @inheritParams LDM_series_Beta
+# #' @param min Numeric. The lower bound of the uniform distribution.
+# #' @param max Numeric. The upper bound of the uniform distribution.
+# #' @return A numeric vector representing the LDM series.
+# LDM_series_Unif <- function(T, theta, min = -1, max = 1) {
+  # y <- runif(T, min, max)
+  # x <- theta * (1:T) + y
+  # return(x)
+# }
 
 
 
