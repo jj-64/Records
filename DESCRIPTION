@@ -1,8 +1,9 @@
-Package: records
+Package: Records
 Type: Package
 Title: Record-count Statistics for Multiple Stochastic Models
 Version: 0.1.0
-Authors@R: person(given = "Auto", family = "Generated", role = c("aut", "cre"), email = "you@example.com")
+Authors@R: person("Jinane", "Jouni", , "jinane.jouni@hotmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0007-7150-9065"))
 Description: Compute expected number of records, variance and exact/count distribution of
     record counts under several models (IID, DTRW, LDM, YNM). Includes a registry-based
     dispatcher and utilities to extend with new models.
