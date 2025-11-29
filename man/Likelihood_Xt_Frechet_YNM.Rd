@@ -29,7 +29,7 @@ The likelihood function is given by:
 \deqn{log L(x | ( \gamma, A, a )) = T \log(a A^{-a}) - (a+1) \sum \log(x) + \frac{T(T+1)}{2} \log(\gamma) - \sum \gamma^t (A x)^{-a}}
 }
 \examples{
-Xt = YNM_series_Frechet(T=25, gamma=1.1, shape=1, scale=2)
+Xt = YNM_series(T=25, dist = "frechet", gamma=1.1, shape=1, scale=2)
 Likelihood_Xt_Frechet_YNM(T=25, x=Xt, params = c(1.1,1/2,1))
 
 }

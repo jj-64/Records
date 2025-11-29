@@ -108,7 +108,7 @@ Likelihood_Xt_Norm_DTRW =  function(x,params){
 #' @return Numeric value of the log-likelihood.
 #' @export
 #' @examples
-#' Xt = YNM_series_Frechet(T=25, gamma=1.1, shape=1, scale=2)
+#' Xt = YNM_series(T=25, dist = "frechet", gamma=1.1, shape=1, scale=2)
 #' Likelihood_Xt_Frechet_YNM(T=25, x=Xt, params = c(1.1,1/2,1))
 #'
 Likelihood_Xt_Frechet_YNM <- function(T, x, params) {

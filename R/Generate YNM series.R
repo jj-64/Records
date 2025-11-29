@@ -93,165 +93,165 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet"
 
 
 
-############## Generate YNM Series ##############
+# ############## Generate YNM Series ##############
 
-#' Generate a YNM Series with Beta Noise
-#'
-#' Generates a YNM series where the noise follows a Beta distribution.
-#'
-#' @details
-#' The series is generated as:
-#' \deqn{X_k = \max(Y_k), \quad Y_k \sim \text{Beta}(\text{shape1}, \text{shape2}), \quad \text{length}(Y_k) = \gamma^k}
-#' where:
-#' - \eqn{\gamma} controls the sample size growth.
-#' - \eqn{X_k} represents the maximum value of the Beta-distributed sample.
-#'
-#' @param T Integer. The length of the series.
-#' @param gamma Positive numeric. Growth parameter controlling sample size \eqn{\gamma \geq 1}.
-#' @param shape1 Positive numeric. The first shape parameter of the Beta distribution.
-#' @param shape2 Positive numeric. The second shape parameter of the Beta distribution.
-#' @return A numeric vector representing the YNM series.
-#' @export
-#' @examples
-#' YNM_series_Beta(100, gamma = 1.1, shape1 = 2, shape2 = 5)
-YNM_series_Beta <- function(T, gamma, shape1 = 1, shape2 = 1) {
-  if (shape1 <= 0 | shape2 <= 0) stop("Enter positive values for shape parameters")
+# #' Generate a YNM Series with Beta Noise
+# #'
+# #' Generates a YNM series where the noise follows a Beta distribution.
+# #'
+# #' @details
+# #' The series is generated as:
+# #' \deqn{X_k = \max(Y_k), \quad Y_k \sim \text{Beta}(\text{shape1}, \text{shape2}), \quad \text{length}(Y_k) = \gamma^k}
+# #' where:
+# #' - \eqn{\gamma} controls the sample size growth.
+# #' - \eqn{X_k} represents the maximum value of the Beta-distributed sample.
+# #'
+# #' @param T Integer. The length of the series.
+# #' @param gamma Positive numeric. Growth parameter controlling sample size \eqn{\gamma \geq 1}.
+# #' @param shape1 Positive numeric. The first shape parameter of the Beta distribution.
+# #' @param shape2 Positive numeric. The second shape parameter of the Beta distribution.
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# #' @examples
+# #' YNM_series_Beta(100, gamma = 1.1, shape1 = 2, shape2 = 5)
+# YNM_series_Beta <- function(T, gamma, shape1 = 1, shape2 = 1) {
+  # if (shape1 <= 0 | shape2 <= 0) stop("Enter positive values for shape parameters")
 
-  X <- numeric(T)
-  for (k in 1:T) {
-    y <- rbeta(gamma^k, shape1, shape2)
-    X[k] <- max(y)
-  }
-  return(X)
-}
+  # X <- numeric(T)
+  # for (k in 1:T) {
+    # y <- rbeta(gamma^k, shape1, shape2)
+    # X[k] <- max(y)
+  # }
+  # return(X)
+# }
 
-#' Generate a YNM Series with Gumbel Noise
-#'
-#' @details
-#' \deqn{X_i = \text{loc} - \text{scale} \cdot \log(-\log(U^{1/\gamma^i}))}
-#' where \eqn{U \sim \text{Uniform}(0,1)}.
-#'
-#' @inheritParams YNM_series_Beta
-#' @param loc Numeric. The location parameter of the Gumbel distribution.
-#' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
-#' @return A numeric vector representing the YNM series.
-#' @export
-YNM_series_Gumbel <- function(T, gamma, loc = 0, scale = 1) {
-  if (scale <= 0) stop("Enter a positive value for scale")
+# #' Generate a YNM Series with Gumbel Noise
+# #'
+# #' @details
+# #' \deqn{X_i = \text{loc} - \text{scale} \cdot \log(-\log(U^{1/\gamma^i}))}
+# #' where \eqn{U \sim \text{Uniform}(0,1)}.
+# #'
+# #' @inheritParams YNM_series_Beta
+# #' @param loc Numeric. The location parameter of the Gumbel distribution.
+# #' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# YNM_series_Gumbel <- function(T, gamma, loc = 0, scale = 1) {
+  # if (scale <= 0) stop("Enter a positive value for scale")
 
-  y <- numeric(T)
-  for (i in 1:T) {
-    y[i] <- loc - scale * log(-log(runif(1)^(1/gamma^i)))
-  }
-  return(y)
-}
+  # y <- numeric(T)
+  # for (i in 1:T) {
+    # y[i] <- loc - scale * log(-log(runif(1)^(1/gamma^i)))
+  # }
+  # return(y)
+# }
 
-#' Generate a YNM Series with Weibull Noise
-#'
-#' @details
-#' \deqn{X_i = (-\text{scale}^\text{shape} \cdot \log(1 - U^{1/\gamma^i}))^{1/\text{shape}}}
-#' where \eqn{U \sim \text{Uniform}(0,1)}.
-#'
-#' @inheritParams YNM_series_Beta
-#' @param scale Positive numeric. The scale parameter of the Weibull distribution.
-#' @param shape Positive numeric. The shape parameter of the Weibull distribution.
-#' @return A numeric vector representing the YNM series.
-#' @export
-YNM_series_Weibull <- function(T, gamma, scale = 1, shape = 1) {
-  if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
+# #' Generate a YNM Series with Weibull Noise
+# #'
+# #' @details
+# #' \deqn{X_i = (-\text{scale}^\text{shape} \cdot \log(1 - U^{1/\gamma^i}))^{1/\text{shape}}}
+# #' where \eqn{U \sim \text{Uniform}(0,1)}.
+# #'
+# #' @inheritParams YNM_series_Beta
+# #' @param scale Positive numeric. The scale parameter of the Weibull distribution.
+# #' @param shape Positive numeric. The shape parameter of the Weibull distribution.
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# YNM_series_Weibull <- function(T, gamma, scale = 1, shape = 1) {
+  # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
 
-  X <- numeric(T)
-  for (i in 1:T) {
-    X[i] <- (-scale^shape * log(1 - runif(1)^(1/gamma^i)))^(1/shape)
-  }
-  return(X)
-}
+  # X <- numeric(T)
+  # for (i in 1:T) {
+    # X[i] <- (-scale^shape * log(1 - runif(1)^(1/gamma^i)))^(1/shape)
+  # }
+  # return(X)
+# }
 
-#' Generate a YNM Series with Frechet Noise
-#'
-#' @details
-#' \deqn{X_i = \text{scale} \cdot \left(-\frac{1}{\gamma^i} \log(U) \right)^{-1/\text{shape}}}
-#' where \eqn{U \sim \text{Uniform}(0,1)}.
-#'
-#' @inheritParams YNM_series_Beta
-#' @param scale Positive numeric. The scale parameter of the Frechet distribution.
-#' @param shape Positive numeric. The shape parameter of the Frechet distribution.
-#' @return A numeric vector representing the YNM series.
-#' @export
-YNM_series_Frechet <- function(T, gamma, shape, scale) {
-  if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
+# #' Generate a YNM Series with Frechet Noise
+# #'
+# #' @details
+# #' \deqn{X_i = \text{scale} \cdot \left(-\frac{1}{\gamma^i} \log(U) \right)^{-1/\text{shape}}}
+# #' where \eqn{U \sim \text{Uniform}(0,1)}.
+# #'
+# #' @inheritParams YNM_series_Beta
+# #' @param scale Positive numeric. The scale parameter of the Frechet distribution.
+# #' @param shape Positive numeric. The shape parameter of the Frechet distribution.
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# YNM_series_Frechet <- function(T, gamma, shape, scale) {
+  # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
 
-  y <- numeric(T)
-  for (i in 1:T) {
-    y[i] <- scale * (-(1/gamma^i) * log(runif(1)))^(-1/shape)
-  }
-  return(y)
-}
+  # y <- numeric(T)
+  # for (i in 1:T) {
+    # y[i] <- scale * (-(1/gamma^i) * log(runif(1)))^(-1/shape)
+  # }
+  # return(y)
+# }
 
-#' Generate a YNM Series with Exponential Noise
-#'
-#' @details
-#' \deqn{X_i = -\frac{\log(1 - U^{1/\gamma^i})}{\text{rate}}}
-#' where \eqn{U \sim \text{Uniform}(0,1)}.
-#'
-#' @inheritParams YNM_series_Beta
-#' @param rate Positive numeric. The rate parameter of the Exponential distribution.
-#' @return A numeric vector representing the YNM series.
-#' @export
-YNM_series_Exp <- function(T, gamma, rate = 1) {
-  if (rate <= 0) stop("Enter a positive value for rate")
+# #' Generate a YNM Series with Exponential Noise
+# #'
+# #' @details
+# #' \deqn{X_i = -\frac{\log(1 - U^{1/\gamma^i})}{\text{rate}}}
+# #' where \eqn{U \sim \text{Uniform}(0,1)}.
+# #'
+# #' @inheritParams YNM_series_Beta
+# #' @param rate Positive numeric. The rate parameter of the Exponential distribution.
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# YNM_series_Exp <- function(T, gamma, rate = 1) {
+  # if (rate <= 0) stop("Enter a positive value for rate")
 
-  y <- numeric(T)
-  for (i in 1:T) {
-    y[i] <- -log(1 - runif(1)^(1/gamma^i)) / rate
-  }
-  return(y)
-}
+  # y <- numeric(T)
+  # for (i in 1:T) {
+    # y[i] <- -log(1 - runif(1)^(1/gamma^i)) / rate
+  # }
+  # return(y)
+# }
 
-#' Generate a YNM Series with Pareto Noise
-#'
-#' @details
-#' \deqn{X_i = \text{scale} \cdot (1 - U^{1/\gamma^i})^{-1/\text{shape}}}
-#' where \eqn{U \sim \text{Uniform}(0,1)}.
-#'
-#' @inheritParams YNM_series_Beta
-#' @inheritParams YNM_series_Weibull
-#' @return A numeric vector representing the YNM series.
-#' @export
-YNM_series_Pareto <- function(T, gamma, scale = 0.5, shape = 4) {
-  if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
+# #' Generate a YNM Series with Pareto Noise
+# #'
+# #' @details
+# #' \deqn{X_i = \text{scale} \cdot (1 - U^{1/\gamma^i})^{-1/\text{shape}}}
+# #' where \eqn{U \sim \text{Uniform}(0,1)}.
+# #'
+# #' @inheritParams YNM_series_Beta
+# #' @inheritParams YNM_series_Weibull
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# YNM_series_Pareto <- function(T, gamma, scale = 0.5, shape = 4) {
+  # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
 
-  X <- numeric(T)
-  for (i in 1:T) {
-    X[i] <- scale * (1 - runif(1)^(1/gamma^i))^(-1/shape)
-  }
-  return(X)
-}
+  # X <- numeric(T)
+  # for (i in 1:T) {
+    # X[i] <- scale * (1 - runif(1)^(1/gamma^i))^(-1/shape)
+  # }
+  # return(X)
+# }
 
-#' Generate a YNM Series with Normal Noise
-#'
-#' @details
-#' The series is generated as:
-#' \deqn{X_i = \max(Y_i), \quad Y_i \sim \mathcal{N}(\text{loc}, \text{sd}), \quad \text{length}(Y_i) = \gamma^i}
-#'
-#' @inheritParams YNM_series_Beta
-#' @param mean Numeric. The mean (location) of the normal distribution.
-#' @param sd Positive numeric. The standard deviation of the normal distribution.
-#' @return A numeric vector representing the YNM series.
-#' @export
-YNM_series_Norm <- function(T, gamma, mean = 0, sd = 1) {
-if (sd <= 0) stop("Enter a positive value for standard deviation")
+# #' Generate a YNM Series with Normal Noise
+# #'
+# #' @details
+# #' The series is generated as:
+# #' \deqn{X_i = \max(Y_i), \quad Y_i \sim \mathcal{N}(\text{loc}, \text{sd}), \quad \text{length}(Y_i) = \gamma^i}
+# #'
+# #' @inheritParams YNM_series_Beta
+# #' @param mean Numeric. The mean (location) of the normal distribution.
+# #' @param sd Positive numeric. The standard deviation of the normal distribution.
+# #' @return A numeric vector representing the YNM series.
+# #' @export
+# YNM_series_Norm <- function(T, gamma, mean = 0, sd = 1) {
+# if (sd <= 0) stop("Enter a positive value for standard deviation")
 
-# Pre-allocate
-y <- numeric(T)
+# # Pre-allocate
+# y <- numeric(T)
 
-for (i in 1:T) {
-  m <- gamma^i
-  u <- runif(1)                # uniform random variable
-  y[i] <- qnorm(u^(1/m), mean = mean, sd = sd)
-}
-y= y[is.finite(y)]
+# for (i in 1:T) {
+  # m <- gamma^i
+  # u <- runif(1)                # uniform random variable
+  # y[i] <- qnorm(u^(1/m), mean = mean, sd = sd)
+# }
+# y= y[is.finite(y)]
 
-return(y)
-}
+# return(y)
+# }
 
