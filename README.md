@@ -8,4 +8,4 @@ and exact distributions of the number of records for several stochastic models:
 - LDM (linear drift model)
 - YNM (Yule–Simon / preferential attachment family)
 
-The package uses a registry-based dispatcher. See `record_stats()` for unified access.
+The package uses a registry-based dispatcher. See `rec_count_stats()` for unified access.
