@@ -1,0 +1,23 @@
+---
+title: "Record Statistics Across Models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\\VignetteIndexEntry{Record Statistics Across Models}
+  %\\VignetteEngine{knitr::rmarkdown}
+  %\\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(records)
+```
+
+## Introduction
+
+This vignette demonstrates use of `record_stats()` for mean, variance and distribution
+for a few models.
+
+```{r examples}
+record_stats("iid", "mean", T = 30)
+record_stats("DTRW", "mean", T = 100, approx = TRUE)
+record_stats("DTRW", "dist", T = 20, m = 4, approx = TRUE)
+```

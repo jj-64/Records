@@ -1,6 +1,11 @@
-## Readme
+# records: Record-count statistics
 
-Records Package
+This package provides utilities to compute expected number of records, variances,
+and exact distributions of the number of records for several stochastic models:
 
+- IID (independent identical)
+- DTRW (discrete-time random walk)
+- LDM (linear drift model)
+- YNM (Yule–Simon / preferential attachment family)
 
-Under Development
+The package uses a registry-based dispatcher. See `record_stats()` for unified access.

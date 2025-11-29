@@ -1,15 +1,13 @@
-Package: Records
-Title: Records Relates, Estimation & Tests
-Version: 0.0.0.9000
-Authors@R: 
-    person("Jinane", "Jouni", , "jinane.jouni@hotmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0007-7150-9065"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Package: records
+Type: Package
+Title: Record-count Statistics for Multiple Stochastic Models
+Version: 0.1.0
+Authors@R: person(given = "Auto", family = "Generated", role = c("aut", "cre"), email = "you@example.com")
+Description: Compute expected number of records, variance and exact/count distribution of
+    record counts under several models (IID, DTRW, LDM, YNM). Includes a registry-based
+    dispatcher and utilities to extend with new models.
+License: GPL-3
 Encoding: UTF-8
+LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+Depends: R (>= 3.6)

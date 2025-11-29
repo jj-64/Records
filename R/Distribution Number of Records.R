@@ -29,7 +29,6 @@
 #' # [1] 0.00002232982 0.00030729569 0.00201438186 0.00837570638 0.02481251456
 #' rec_count_stats("iid", stat="dist", T=50, m=4)
 #' rec_count_stats("DTRW", stat="dist", T=200, m=10, approx=TRUE)
-#'
 rec_count_stats <- function(model,
                          stat = c("mean", "var", "dist"),
                          T,
@@ -68,7 +67,6 @@ rec_count_stats <- function(model,
 
   stop("Unknown stat: ", stat)
 }
-
 
 ## iid -------------------
 #'Exact Expected number of records in Classical Model
@@ -116,29 +114,6 @@ rec_count_var_iid = function(T){
   sum( 1/(1:T) ) -  sum( 1/(1:T)^2 )
 }
 
-##Distribution of number of records
-#' Stirling of the first kind
-#'
-#'Stirling numbers of the first kind arise in the study of permutations \eqn{s(n,k)} where \eqn{k<=n}, otherwise it is 0. They may be defined directly to be the number of permutations of \eqn{n} elements with \eqn{k} disjoint cycles
-#'
-#'Compute the
-#' @param n elements, integer
-#' @param k disjoint cycles, integer
-#'
-#' @returns a single value
-#'
-#' @examples Stirling_first_kind(n=4, k=3)
-#' # [1] 6
-#' Stirling_first_kind(n=4, k=0)
-#' # [1] 0
-#' Stirling_first_kind(n=4, k=5)
-#' # [1] 0
-#' @export
-Stirling_first_kind <- function(n, k) {
-    if (n == 0 && k == 0) return(1)
-    if (n == 0 || k == 0) return(0)
-    return( (n-1) * Stirling_first_kind(n-1, k) + Stirling_first_kind(n-1, k-1))
-  }
 
 #' Distribution of number of records in Classical Model
 #'
