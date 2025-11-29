@@ -39,7 +39,7 @@ where \eqn{ \Phi(\cdot) } is the normal cumulative distribution function (CDF).
 For the log-Likelihood, refer to \code{\link{Likelihood_Rn_Norm_DTRW}}.
 }
 \examples{
-Xt = DTRW_series_Norm(T=25,loc=0, sd=1)
+Xt = DTRW_series(T=25,dist = "norm", mean =0, sd=1)
 Xt
 [1]  0.10608755  2.10580288  4.07636870  2.44521434  1.77945837  1.47440228
 [7]  1.25472403  3.35634849  5.13609509  3.39129849  3.57836155  3.95685562
