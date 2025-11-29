@@ -21,9 +21,9 @@
 #'
 #' This estimator is known to be biased, and a bias-corrected version is provided in
 #' \code{\link{Estimate_LDM_NT_unbiased}}.
-#' @param X A numeric vector representing the time series data.
+#' @param X numeric vector representing the time series data.
 #' @param variance Logical if to compute variance (default = TRUE)
-#' @param scale Numeric. Default is 1. The scale parameter of the \eqn{Gumbel} underlying distribution used for variance computation.
+#' @param scale positive Numeric. Default is 1. The scale parameter of the \eqn{Gumbel} underlying distribution used for variance computation.
 #' @return A list with elements:
 #'   \item{theta}{Estimate of \eqn{\theta}.}
 #'   \item{variance}{Asymptotic variance (or NA if variance = FALSE or could not be computed).}
@@ -42,14 +42,19 @@
 #' [1] 0.5625
 Estimate_LDM_NT <- function(X, variance = TRUE, scale=1) {
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
+  # stopifnot(is.numeric(X), length(X) >= 4)
+  # stopifnot(scale > 0)
   if (scale <= 0)
     stop("scale must be positive.")
 
+	# estimator
     theta = -log(1 - rec_counts(X) / length(X))
-    var = NA
-  if(variance) {var =  (1-exp(-theta/scale))/exp(-theta/scale) }
-  return(list("theta"= theta, "variance"=var))
+    var_theta = NA
+	 # variance formula
+  if(variance) {var_theta =  (1-exp(-theta/scale))/exp(-theta/scale) }
+  return(list("theta"= theta, "variance"=var_theta))
 }
+
 
 ## Unbiased Moments -----------------------------
 
@@ -126,11 +131,13 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
   if (!exists("Estimate_LDM_NT", mode = "function")) {
     stop("Required helper function 'Estimate_LDM_NT' not found in the environment.")
   }
+  
+  	## Obtain biased estimator
   Estimated <- Estimate_LDM_NT(X = X, variance = TRUE, scale = scale)
   if (!is.list(Estimated) || is.null(Estimated$theta)) {
     stop("Estimate_LDM_NT must return a list with at least element $theta.")
   }
-
+  
   theta_biased <- Estimated$theta
   # theta in this function is treated as theta_scaled = theta / scale (user said theta is theta/scale)
   # but to be explicit: treat input/returned theta on same scale as Estimate_LDM_NT
@@ -192,6 +199,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
     mean_dP_t <- mean(dP_t)             # 1/T * sum dP_t
     mean_d2P_t <- mean(d2P_t)           # 1/T * sum d2P_t
 
+    # dH/dθ (vectorized)
     # Compute derivative dH_T/dtheta using the formula (vectorized pieces)
     dH_T_dtheta <- 1 -
       (dP_dtheta / (1 - P_theta)^2) * (mean_P_t - P_theta) +
@@ -200,6 +208,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
       (1 / (2 * (1 - P_theta)^2)) * (mean_dP_t / T - mean_d2P_t / T) +
       2 * (mean_P_t - P_theta) * (mean_dP_t - dP_dtheta)
 
+	 # lambda = variance of biased NT estimator
     # lambda_theta: variance of the biased NT-estimator (obtained from Estimate_LDM_NT if available)
     # If Estimate_LDM_NT returned variance use it; otherwise fallback to analytical function if available.
     lambda_theta <- NA_real_
@@ -233,8 +242,8 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #' @param X Numeric vector — the observed time series.
 #' @param variance Logical. If TRUE, compute variance of θ. Default = TRUE.
 #' @param scale Numeric. Scale parameter (default = 1).
-#' @param min Lower bound for θ search space. Default = 0.0001.
-#' @param max Upper bound for θ search space. Default = 5.
+#' @param min Lower bound for θ grid search space. Default = 0.0001.
+#' @param max Upper bound for θ grid search space. Default = 5.
 #' @param step Search grid step size (default = 0.01).
 #'
 #' @details
@@ -265,10 +274,10 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #'
 #' $theta
-#' [1] 0.3301
+#' # [1] 0.3301
 #'
 #' $variance
-#' [1] 0.02139224
+#' # [1] 0.02139224
 Estimate_LDM_MLE_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001, max = 5, step = 0.01) {
   if (!is.numeric(X) || length(X) < 4)
     stop("X must be a numeric vector with length > 4.")
@@ -322,3 +331,4 @@ Estimate_LDM_MLE_indicator <- function(X, variance = TRUE, scale = 1, min = 0.00
 
   return(list(theta = theta_hat, variance = var_out))
 }
+

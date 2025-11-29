@@ -61,67 +61,67 @@ DTRW_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
   return(X)
 }
 
-############## Generate DTRW Series ##############
+# ## Generate DTRW Series --------------------
 
-#' Generate a Discrete-Time Random Walk (DTRW) Series with Cauchy Noise
-#'
-#' Generates a DTRW series where the increments follow a Cauchy distribution.
-#'
-#' @details
-#' The series is generated recursively as:
-#' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \text{Cauchy}(\text{loc}, \text{scale})}
-#' where:
-#' - \eqn{T} is the length of the series.
-#' - \eqn{e_t} are i.i.d. random variables from a Cauchy distribution.
-#' - \eqn{\text{loc}} is the location parameter.
-#' - \eqn{\text{scale}} is the scale parameter.
-#'
-#' @param T Integer. The length of the series.
-#' @param loc Numeric. The location parameter of the Cauchy distribution (default = 0).
-#' @param scale Positive numeric. The scale parameter of the Cauchy distribution (default = 1).
-#' @return A numeric vector representing the DTRW series.
-#' @export
-#' @examples
-#' DTRW_series_Cauchy(100, loc = 0, scale = 1)
-DTRW_series_Cauchy <- function(T, loc = 0, scale = 1) {
-  if (scale <= 0) stop("Enter a positive value for scale")
-  e <- rcauchy(T, location = loc, scale = scale) ## Generate increments
-  x <- numeric(T)
-
-  for (i in 2:T) {
-    x[i] <- x[i - 1] + e[i]
-  }
-
-  return(x)
-}
-
-#' Generate a Discrete-Time Random Walk (DTRW) Series with Normal Noise
-#'
-#' Generates a DTRW series where the increments follow a Normal distribution.
-#'
-#' @details
-#' The series is generated recursively as:
-#' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \mathcal{N}(\text{mean}, \text{sd})}
-#' where:
-#' - \eqn{T} is the length of the series.
-#' - \eqn{e_t} are i.i.d. random variables from a Normal distribution.
-#' - \eqn{\text{mean}} is the mean of the Normal distribution.
-#' - \eqn{\text{sd}} is the standard deviation of the Normal distribution.
-#'
-#' @param T Integer. The length of the series.
-#' @param mean Numeric. The mean (location) parameter of the normal distribution.
-#' @param sd Positive numeric. The standard deviation of the normal distribution.
-#' @return A numeric vector representing the DTRW series.
-#' @export
-#' @examples
-#' DTRW_series_Norm(100, mean = 0, sd = 1)
-DTRW_series_Norm <- function(T, mean, sd) {
-  if (sd <= 0) stop("Enter a positive value for standard deviation")
-  # e <- rnorm(T, mean = mean, sd = sd) ## Generate increments
+# #' Generate a Discrete-Time Random Walk (DTRW) Series with Cauchy Noise
+# #'
+# #' Generates a DTRW series where the increments follow a Cauchy distribution.
+# #'
+# #' @details
+# #' The series is generated recursively as:
+# #' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \text{Cauchy}(\text{loc}, \text{scale})}
+# #' where:
+# #' - \eqn{T} is the length of the series.
+# #' - \eqn{e_t} are i.i.d. random variables from a Cauchy distribution.
+# #' - \eqn{\text{loc}} is the location parameter.
+# #' - \eqn{\text{scale}} is the scale parameter.
+# #'
+# #' @param T Integer. The length of the series.
+# #' @param loc Numeric. The location parameter of the Cauchy distribution (default = 0).
+# #' @param scale Positive numeric. The scale parameter of the Cauchy distribution (default = 1).
+# #' @return A numeric vector representing the DTRW series.
+# #' @export
+# #' @examples
+# #' DTRW_series_Cauchy(100, loc = 0, scale = 1)
+# DTRW_series_Cauchy <- function(T, loc = 0, scale = 1) {
+  # if (scale <= 0) stop("Enter a positive value for scale")
+  # e <- rcauchy(T, location = loc, scale = scale) ## Generate increments
   # x <- numeric(T)
 
-  x <- cumsum(rnorm(T, mean = mean, sd = sd))
-  #x <- x - x[1] # Normalize the series so it starts at 0
-  return(x)
-}
+  # for (i in 2:T) {
+    # x[i] <- x[i - 1] + e[i]
+  # }
+
+  # return(x)
+# }
+
+# #' Generate a Discrete-Time Random Walk (DTRW) Series with Normal Noise
+# #'
+# #' Generates a DTRW series where the increments follow a Normal distribution.
+# #'
+# #' @details
+# #' The series is generated recursively as:
+# #' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \mathcal{N}(\text{mean}, \text{sd})}
+# #' where:
+# #' - \eqn{T} is the length of the series.
+# #' - \eqn{e_t} are i.i.d. random variables from a Normal distribution.
+# #' - \eqn{\text{mean}} is the mean of the Normal distribution.
+# #' - \eqn{\text{sd}} is the standard deviation of the Normal distribution.
+# #'
+# #' @param T Integer. The length of the series.
+# #' @param mean Numeric. The mean (location) parameter of the normal distribution.
+# #' @param sd Positive numeric. The standard deviation of the normal distribution.
+# #' @return A numeric vector representing the DTRW series.
+# #' #@export
+# #' @examples
+# #' DTRW_series_Norm(100, mean = 0, sd = 1)
+# DTRW_series_Norm <- function(T, mean, sd) {
+#  if (sd <= 0) stop("Enter a positive value for standard deviation")
+#  # e <- rnorm(T, mean = mean, sd = sd) ## Generate increments
+#  # x <- numeric(T)
+#
+#  x <- cumsum(rnorm(T, mean = mean, sd = sd))
+#  #x <- x - x[1] # Normalize the series so it starts at 0
+#  return(x)
+# }
 
