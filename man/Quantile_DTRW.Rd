@@ -19,7 +19,7 @@ A numeric vector of length 2 containing:
 \description{
 Computes lower and upper quantile bounds for the distribution of the number
 of records in a Discrete-Time Random Walk (DTRW) of length \code{T}, using
-theoretical probabilities from the function \code{NT_DTRW}.
+theoretical probabilities from the function \code{rec_count_dist_DTRW}.
 }
 \details{
 The function constructs the empirical cumulative distribution function (CDF)
@@ -32,7 +32,7 @@ length \eqn{T}. The cumulative distribution function (CDF) is computed as:
 \deqn{
   F(n) = \sum_{i=1}^{n} P(N_T = i)
 }
-where \eqn{P(N_T = i)} is obtained from \code{NT_DTRW(m = i, T = T)}.
+where \eqn{P(N_T = i)} is obtained from \code{rec_count_dist_DTRW(m = i, T = T)}.
 
 #' The function then finds the quantile indices corresponding to the
 lower and upper tail probabilities \eqn{\alpha} and \eqn{1 - \alpha}:
@@ -49,5 +49,5 @@ Quantile_DTRW(alpha = 0.05, T = 50)
 
 }
 \seealso{
-\code{\link{Test_DTRW_NT}}, \code{\link{NT_DTRW}}
+\code{\link{Test_DTRW_NT}}, \code{\link{rec_count_dist_DTRW}}
 }

@@ -133,7 +133,7 @@ Test_DTRW_Indep2 = function(X,alpha=0.05){
 #'
 #' Computes lower and upper quantile bounds for the distribution of the number
 #' of records in a Discrete-Time Random Walk (DTRW) of length \code{T}, using
-#' theoretical probabilities from the function \code{NT_DTRW}.
+#' theoretical probabilities from the function \code{rec_count_dist_DTRW}.
 #'
 #'
 #' @details
@@ -147,7 +147,7 @@ Test_DTRW_Indep2 = function(X,alpha=0.05){
 #' \deqn{
 #'   F(n) = \sum_{i=1}^{n} P(N_T = i)
 #' }
-#' where \eqn{P(N_T = i)} is obtained from \code{NT_DTRW(m = i, T = T)}.
+#' where \eqn{P(N_T = i)} is obtained from \code{rec_count_dist_DTRW(m = i, T = T)}.
 #'
 #' #' The function then finds the quantile indices corresponding to the
 #' lower and upper tail probabilities \eqn{\alpha} and \eqn{1 - \alpha}:
@@ -166,7 +166,7 @@ Test_DTRW_Indep2 = function(X,alpha=0.05){
 #' \item{1}{Lower quantile index corresponding to \eqn{\alpha}.}
 #' \item{2}{Upper quantile index corresponding to \eqn{1 - \alpha}.}
 #'
-#' @seealso \code{\link{Test_DTRW_NT}}, \code{\link{NT_DTRW}}
+#' @seealso \code{\link{Test_DTRW_NT}}, \code{\link{rec_count_dist_DTRW}}
 #'
 #' @examples
 #' Quantile_DTRW(alpha = 0.05, T = 50)
@@ -175,7 +175,7 @@ Test_DTRW_Indep2 = function(X,alpha=0.05){
 Quantile_DTRW <- function(alpha = 0.05, T) {
   Prob <- numeric(T)
   for (i in 1:T) {
-    Prob[i] <- NT_DTRW(m = i, T = T)
+    Prob[i] <- rec_count_dist_DTRW(m = i, T = T)
   }
   CDF <- cumsum(Prob)
   c(

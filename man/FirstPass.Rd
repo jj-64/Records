@@ -17,5 +17,5 @@ Probability of \eqn{{X_1, ..., X_n-1}} to stay below zero and \eqn{X_n} to pass 
 }
 \examples{
 FirstPass(10)
-[1] 0.009273529
+# [1] 0.009273529
 }

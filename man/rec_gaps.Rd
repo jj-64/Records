@@ -18,5 +18,5 @@ Inter-record times, i.e the time between two consecutive records. "1" means that
 \examples{
 Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 rec_gaps(X=Xt)
-[1] 1 1 4
+# [1] 1 1 4
 }

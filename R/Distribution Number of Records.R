@@ -2,48 +2,73 @@
 ## Wrapper -------------------
 #' Record Statistics for Multiple Models
 #'
-#' Compute the expected number of records or the variance of the number
+#' Compute the distribution, expected number of records or the variance of the number
 #' of records under a variety of stochastic models.
 #'
 #' @param model Character string specifying the model. Available models:
 #'   \code{"iid"}, \code{"DTRW"}, \code{"LDM"}, \code{"YNM"}.
-#' @param stat Either \code{"mean"} or \code{"var"}.
+#' @param stat Either \code{"mean"} or \code{"var"} or \code{"dist"}.
 #' @param T Integer. Length of the time series.
 #' @param ... Additional arguments passed to model-specific functions.
 #'
 #' @return A numeric value, representing either the expected number
-#'   of records or its variance.
+#'   of records or its variance or distribution.
 #'
 #' @export
 #'
 #' @examples
 #' rec_count_stats("iid", stat = "mean", T = 100)
+#' # [1] 5.187378
+#' rec_count_stats("YNM", stat = c("mean"), T = 200, gamma = 1.1)
+#' # [1] 20.99712
 #' rec_count_stats("YNM", stat = "var", T = 200, gamma = 1.1)
+#' # [1] 17.63478
+#' rec_count_stats("LDM", stat="dist", T=100, m=7, theta=0.4, scale=1)
+#' # [1] 0.00000000004169792
+#' rec_count_stats("LDM", stat="dist", T=25, m=c(1:5), theta=0.4, scale=1)
+#' # [1] 0.00002232982 0.00030729569 0.00201438186 0.00837570638 0.02481251456
+#' rec_count_stats("iid", stat="dist", T=50, m=4)
+#' rec_count_stats("DTRW", stat="dist", T=200, m=10, approx=TRUE)
+#'
 rec_count_stats <- function(model,
-                         stat = c("mean", "var"),
+                         stat = c("mean", "var", "dist"),
                          T,
-                         ...) {
+                         m = NULL,
+                         ...){
 
   stat <- match.arg(stat)
 
+  # check model exists
   if (is.null(record_registry[[model]]))
     stop("Unknown model: ", model)
 
   entry <- record_registry[[model]]
 
-  # Check required extra arguments
-  missing <- setdiff(entry$required_args, names(list(...)))
+  # check required args for model
+  passed <- list(...)
+  missing <- setdiff(entry$required_args, names(passed))
   if (length(missing) > 0) {
-    stop("Model '", model, "' requires arguments: ",
-         paste(missing, collapse = ", "))
+    stop("Model '", model, "' requires argument(s): ",
+         paste(missing, collapse=", "))
   }
 
-  # Select mean or var function
-  fun <- if (stat == "mean") entry$mean_fun else entry$var_fun
+  # dispatch based on stat
+  if (stat == "mean") {
+    return(entry$mean_fun(T = T, ...))
+  }
 
-  # Call the model-specific function
-  return(fun(T = T, ...))
+  if (stat == "var") {
+    return(entry$var_fun(T = T, ...))
+  }
+
+  if (stat == "dist") {
+    if (is.null(m)) stop("Argument 'm' must be provided for stat='dist'.")
+    return(entry$dist_fun(m = m, T = T, ...))
+  }
+
+  stop("Unknown stat: ", stat)
 }
+
 
 ## iid -------------------
 #'Exact Expected number of records in Classical Model
@@ -86,7 +111,7 @@ rec_count_mean_iid = function(T, approx = FALSE){
 #' rec_count_mean_iid(T=25)
 #' # [1] 3.815958
 #' # For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
-#' NT_iid(m=1,T=25)
+#' rec_count_dist_iid(m=1,T=25)
 rec_count_var_iid = function(T){
   sum( 1/(1:T) ) -  sum( 1/(1:T)^2 )
 }
@@ -132,13 +157,13 @@ Stirling_first_kind <- function(n, k) {
 #' @return A probability value (numeric) less than or equal to 1.
 #'
 #' @examples
-#' NT_iid(m = 1, T = 25)
+#' rec_count_dist_iid(m = 1, T = 25)
 #' # [1] 0.04
 #'
-#' NT_iid(m = 2, T = 25)
+#' rec_count_dist_iid(m = 2, T = 25)
 #' # [1] 0.1510383
 #'
-#' NT_iid(m = 2, T = 25, s = Stirling_first_kind(n = 25, k = 2))
+#' rec_count_dist_iid(m = 2, T = 25, s = Stirling_first_kind(n = 25, k = 2))
 #' # [1] 0.1510383
 #'
 #' @references
@@ -146,8 +171,8 @@ Stirling_first_kind <- function(n, k) {
 #' \doi{10.1090/surv/172}
 #'
 #' @export
-NT_iid = function(m,T,s=NA){
-  if(is.na(s)== TRUE) s=abs(Stirling1(n=T, k=m))
+rec_count_dist_iid = function(m,T,s=NA){
+  if(is.na(s)== TRUE) s=abs(gmp::Stirling1(n=T, k=m))
       #Stirling_first_kind(n=T, k=m)
   s / factorial(T)
 }
@@ -237,15 +262,15 @@ rec_count_var_DTRW = function(T, approx = FALSE){
 #' @export
 #'
 #' @examples
-#' NT_DTRW(m=1,T=25, approx = TRUE)
+#' rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
 #' # [1]  0.1117152
-#' NT_DTRW(m=1,T=25, approx = TRUE)
+#' rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
 #' # [1] 0.1122752
-#' NT_DTRW(m=1,T=25)
+#' rec_count_dist_DTRW(m=1,T=25)
 #' # [1] 0.1122752
-#' NT_DTRW(m=5,T=25)
+#' rec_count_dist_DTRW(m=5,T=25)
 #' # [1] 0.09867345
-NT_DTRW=function(m,T, approx = FALSE){
+rec_count_dist_DTRW=function(m,T, approx = FALSE){
   if ( approx){
   return (exp(-m^2/(4*T))/sqrt(pi*T))
   } else {
@@ -417,8 +442,7 @@ rec_count_var_LDM <- function(T,
 # }
 #
 # ## Fucntion needed to compute the distribution of number of records
-# u_t_LDM=function(t,theta,scale=1){
-#   exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
+
 
 #' Stirling function of the second kind in LDM
 #'
@@ -446,6 +470,9 @@ rec_count_var_LDM <- function(T,
 #'[4,] 0.7077578 2.484250 2.778481 1.000000    0
 #'[5,] 0.9433531 4.018954 6.187619 4.111357    1
 Stirling_2nd_LDM = function(T,theta,scale=1){  ## compute stirling number of second kind
+
+   u_t_LDM=function(t,theta,scale=1){
+     exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
 
   u = u_t_LDM(t=1:T,theta=theta,scale=scale)
 
@@ -486,11 +513,14 @@ Stirling_2nd_LDM = function(T,theta,scale=1){  ## compute stirling number of sec
 #' @returns a probability less than one
 #' @export
 #'
-#' @examples NT_LDM(m=5,T=25, theta=0.5)
+#' @examples rec_count_dist_LDM(m=5,T=25, theta=0.5)
 #' 0.006915892
-#' NT_LDM(m=5,T=25, theta=0.5, s = Stirling_2nd_LDM(T=25,theta=0.5,scale=1))
+#' rec_count_dist_LDM(m=5,T=25, theta=0.5, s = Stirling_2nd_LDM(T=25,theta=0.5,scale=1))
 #' 0.006915892
-NT_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirling matrix
+rec_count_dist_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirling matrix
+
+  u_t_LDM=function(t,theta,scale=1){
+    exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
 
   ## compute stirling matrix
   if(is.na(s)[1] == TRUE) {s=Stirling_2nd_LDM(T=T,theta=theta,scale=scale)}
@@ -561,13 +591,6 @@ rec_count_var_YNM = function(T, gamma){
   }
    return(sum(s)-sum(s2))
 }
-
-
-## Function needed to compute the distribution of number of records
-u_t_YNM=function(t,gamma){
-  (1-gamma^t)/ ((1-gamma)*gamma^t) }
-
-
 
 
 # 'Weighted Stirling Numbers of the Second Kind (YANG-Nevzorov version)
@@ -656,11 +679,11 @@ Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
 #' @returns Probability value \eqn{P(N_T = m)} less than one
 #' @export
 #'
-#' @examples NT_YNM(m=5,T=25, gamma=1.1)
+#' @examples rec_count_dist_YNM(m=5,T=25, gamma=1.1)
 #'  0.2223667
-#' NT_YNM(m=5,T=25, gamma=1.1, s = Stirling_2nd_YNM(T=25,gamma=1.1))
+#' rec_count_dist_YNM(m=5,T=25, gamma=1.1, s = Stirling_2nd_YNM(T=25,gamma=1.1))
 #'  0.2223667
-NT_YNM <- function(m, T, gamma, s = NULL) {
+rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
   if (is.null(s)) {
     s <- Stirling_2nd_YNM(T = T, gamma = gamma)
   }

@@ -21,7 +21,10 @@ Stirling numbers of the first kind arise in the study of permutations \eqn{s(n,k
 Compute the
 }
 \examples{
-Stirling_first_kind(n=4, k=3)  [1] 6
-Stirling_first_kind(n=4, k=0)  [1] 0
-Stirling_first_kind(n=4, k=5)  [1] 0
+Stirling_first_kind(n=4, k=3)
+# [1] 6
+Stirling_first_kind(n=4, k=0)
+# [1] 0
+Stirling_first_kind(n=4, k=5)
+# [1] 0
 }

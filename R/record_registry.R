@@ -1,9 +1,13 @@
+## To add a new model
+## register_record_model("new_model", rec_count_mean_new, rec_count_var_new)
+
 record_registry <- new.env()
 
-register_record_model <- function(model, mean_fun, var_fun, required_args = NULL) {
+register_record_model <- function(model, mean_fun, var_fun, dist_fun, required_args = NULL) {
   record_registry[[model]] <- list(
     mean_fun = mean_fun,
     var_fun = var_fun,
+    dist_fun = dist_fun,
     required_args = required_args
   )
 }
@@ -11,19 +15,22 @@ register_record_model <- function(model, mean_fun, var_fun, required_args = NULL
 register_record_model(
   "iid",
   mean_fun = rec_count_mean_iid,
-  var_fun  = rec_count_var_iid
+  var_fun  = rec_count_var_iid,
+  dist_fun = rec_count_dist_iid
 )
 
 register_record_model(
   "DTRW",
   mean_fun = rec_count_mean_DTRW,
-  var_fun  = rec_count_var_DTRW
+  var_fun  = rec_count_var_DTRW,
+  dist_fun = rec_count_dist_DTRW
 )
 
 register_record_model(
   "LDM",
   mean_fun = rec_count_mean_LDM,
   var_fun  = rec_count_var_LDM,
+  dist_fun = rec_count_dist_LDM,
   required_args = c("theta")
 )
 
@@ -31,5 +38,7 @@ register_record_model(
   "YNM",
   mean_fun = rec_count_mean_YNM,
   var_fun  = rec_count_var_YNM,
+  dist_fun = rec_count_dist_YNM,
   required_args = c("gamma")
 )
+

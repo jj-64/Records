@@ -17,5 +17,5 @@ Probability of \eqn{{X_1, ..., X_n}} to stay below zero
 }
 \examples{
 Survival(10)
-[1] 0.1761971
+# [1] 0.1761971
 }

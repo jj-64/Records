@@ -105,7 +105,7 @@ Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8, info = c("All"), rec
 #' @details
 #' The function computes the distribution of the number of records under the LDM,
 #' using the Stirling numbers of the second kind (\code{Stirling_2nd_LDM}) and
-#' the probability mass function \code{NT_LDM}.
+#' the probability mass function \code{rec_count_dist_LDM}.
 #' The cumulative distribution function (CDF) is then compared to the
 #' desired quantile levels.
 #'
@@ -118,7 +118,7 @@ Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {
 
   # Vectorized probability computation
   Prob <- vapply(1:T, function(i) {
-    NT_LDM(m = i, T = T, theta = theta, scale = scale, s = S)
+    rec_count_dist_LDM(m = i, T = T, theta = theta, scale = scale, s = S)
   }, numeric(1))
 
   # Cumulative distribution

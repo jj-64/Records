@@ -32,7 +32,7 @@ If \eqn{\gamma} is unknown, it is estimated using \code{\link{Estim_gamma_indica
 Its variance is computed via \code{\link{Estim_gamma_indicator_Variance}}.
 
 The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
-\deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{NT_YNM}}
+\deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_YNM}}
 }
 \examples{
 set.seed(123)

@@ -8,7 +8,7 @@ Estimate_LDM_MLE_indicator(
   X,
   variance = TRUE,
   scale = 1,
-  min = 0.0001,
+  min = 1e-04,
   max = 5,
   step = 0.01
 )

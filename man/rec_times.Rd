@@ -18,5 +18,5 @@ The position of records in a series. Always start by 1 referring to initial triv
 \examples{
 Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 rec_times(X=Xt)
-[1] 1 2 3 7
+# [1] 1 2 3 7
 }

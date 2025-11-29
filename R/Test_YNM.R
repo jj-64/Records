@@ -278,7 +278,7 @@ Quantile_YNM=function(T,gamma, alpha= 0.05){
   Prob = 0
 
   for(i in 1:T){
-    Prob[i]= NT_YNM(m=i, T=T,gamma=gamma)
+    Prob[i]= rec_count_dist_YNM(m=i, T=T,gamma=gamma)
   }
   CDF = cumsum(Prob)  ## cumulative distribution
 
@@ -301,7 +301,7 @@ Quantile_YNM=function(T,gamma, alpha= 0.05){
 #' Its variance is computed via \code{\link{Estim_gamma_indicator_Variance}}.
 #'
 #' The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
-#' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{NT_YNM}}
+#' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_YNM}}
 #'
 #' @param X A numeric vector (time series).
 #' @param gamma Optional. The power parameter of the YNM-Nevzorov Model. If not provided, it will be estimated.
@@ -365,7 +365,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
     stat_theo <- z_theo
   } else {
     # --- Fallback to exact quantiles ---
-    probs <- vapply(1:T, function(i) NT_YNM(m = i, T = T, gamma = gamma), numeric(1))
+    probs <- vapply(1:T, function(i) rec_count_dist_YNM(m = i, T = T, gamma = gamma), numeric(1))
     cdf <- cumsum(probs)
 
     lower <- which.min(abs(cdf - (alpha / 2)))  ##Quantile_YNM(T=T, gamma=gamma, alpha= alpha)[1]

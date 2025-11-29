@@ -179,13 +179,9 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #'   \item{perm_dec_table}{Contingency Table of waht each permutation returns}
 #'   \item{accuracy_by_perm}{How often each permutation recovered the true H0}
 #' }
-#' @export
 #' @examples
-#' \dontrun{
-#' sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
-#' generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
-#' H0 = "DTRW", info = "All)
 #'
+#' # sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", info = "All)
 #'
 #' ### 75% of the permutations trees return "DTRW" and 25% return "YNM".
 #' ### On average, one simulation will return the following:
@@ -250,7 +246,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #' #     22        YDLC          0.5
 #' #     23        YLCD          1.0
 #' #     24        YLDC          1.0
-#' }
+#' @export
 Simulation_Permutation_Analysis <- function(
     n_sim = 1000,
     T = 50,

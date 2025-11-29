@@ -26,7 +26,7 @@ of the number of records under the Linear Drift Model (LDM) under Gumble (µ, σ
 \details{
 The function computes the distribution of the number of records under the LDM,
 using the Stirling numbers of the second kind (\code{Stirling_2nd_LDM}) and
-the probability mass function \code{NT_LDM}.
+the probability mass function \code{rec_count_dist_LDM}.
 The cumulative distribution function (CDF) is then compared to the
 desired quantile levels.
 }

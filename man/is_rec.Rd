@@ -18,5 +18,5 @@ Compute the indicator function of records in a series. "1" will indicate the ent
 \examples{
 Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 is_rec(X=Xt)
-[1] 1 1 1 0 0 0 1 0 0 0
+# [1] 1 1 1 0 0 0 1 0 0 0
 }
