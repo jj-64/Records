@@ -10,7 +10,7 @@ Test_Permutation(
   lag = 10,
   warmup = 2,
   print = TRUE,
-  info = c("All"),
+  info = c("all"),
   record_times = NA,
   approximate = FALSE,
   one.sided = FALSE
@@ -25,7 +25,7 @@ Test_Permutation(
 
 \item{warmup}{Integer. Warm-up parameter for YNM test (default = 2).}
 
-\item{info}{String. "All" if data provided is the whole series \eqn{X_t} or
+\item{info}{String. "all" if data provided is the whole series \eqn{X_t} or
 "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}
 
@@ -58,7 +58,7 @@ that test is recorded as the output of the permutation.
 }
 \examples{
 \dontrun{
-result <- Test_Permutation(X = rnorm(50), print = FALSE, info = "All")
+result <- Test_Permutation(X = rnorm(50), print = FALSE, info = "all")
 
 print(result$decision)
 #  Permutation Accepted_Test  Decision

@@ -15,7 +15,7 @@ Simulation_Permutation_Analysis(
   lag = 10,
   warmup = 2,
   print = FALSE,
-  info = "All",
+  info = "all",
   approximate = FALSE,
   one.sided = FALSE
 )
@@ -43,7 +43,7 @@ argument "T" is not included}
 
 \item{print}{logical default is FALSE, summary is not printed}
 
-\item{info}{String. "All" if data provided is the whole series \eqn{X_t} or
+\item{info}{String. "all" if data provided is the whole series \eqn{X_t} or
 "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.
 Forced in case "info" = "Records"}
@@ -70,7 +70,7 @@ and records which test (if any) is accepted by each permutation.
 }
 \examples{
 
-# sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", info = "All)
+# sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", info = "all)
 
 ### 75\% of the permutations trees return "DTRW" and 25\% return "YNM".
 ### On average, one simulation will return the following:

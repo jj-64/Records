@@ -18,7 +18,7 @@ Numeric, variance of a estimator.
 Variance of Shape Parameter a for IID Frechet Process using full dataset
 }
 \details{
-Estimators are obtained by maximizing the Log-Likelihood based on full dataset \eqn{X_t} \code{\link{Likelihood_Xt_Frechet_iid}}
+Estimators are obtained by maximizing the Log-Likelihood based on full dataset \eqn{X_t} \code{\link{Likelihood_Xt_iid}}
 The Fisher information is given by:
 \deqn{ I(a) = -\frac{T}{a^2} - \sum_{t=1}^{T} \frac{[\log(A x_t)]^2}{(A x_t)^a} }
 }
@@ -34,7 +34,7 @@ lower_bounds <- c( 0.1, 0.1)
 upper_bounds <- c(20,20)
 start_values <- c( 0.1, 0.1)
 
-Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_Frechet_iid(T=T, x=Xt, gAa)) }
+Log_L= function(gAa){ x=Xt; T=T; return(-Likelihood_Xt_iid(T=T, x=Xt, dist = "frechet", gAa)) }
 
 ## Run optimization using optim with L-BFGS-B method
 MLE_C <- optim(par = start_values,           # Starting values for gAa

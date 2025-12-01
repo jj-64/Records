@@ -8,7 +8,7 @@ Test_LDM_Regression(
   X,
   alpha = 0.05,
   RSq = 0.8,
-  info = c("All"),
+  info = c("all"),
   record_times = NA
 )
 }
@@ -20,7 +20,7 @@ Test_LDM_Regression(
 \item{RSq}{Numeric, minimum adjusted R-squared required to accept the LDM
 hypothesis (default = 0.8).}
 
-\item{info}{String. "All" if data provided is the whole series \eqn{X_t} or
+\item{info}{String. "all" if data provided is the whole series \eqn{X_t} or
 "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}
 

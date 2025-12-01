@@ -64,7 +64,7 @@ Estimate_YNM_NT <- function(X, variance = TRUE) {
 
   # --- Return structured output ---
   return(list(
-    gamma = gamma_hat,
+    param = gamma_hat,
     variance = var_hat
   ))
 }
@@ -169,7 +169,7 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
 
   T <- length(X)
 
-  # --- 0. Obtain baseline NT estimate (assumes this function exists and returns list(gamma, variance)) ---
+  # --- 0. Obtain baseline NT estimate (assumes this function exists and returns list(param, variance)) ---
   # Use variance = FALSE to avoid unnecessary computation inside that function if we will compute variance here
   if (!exists("Estimate_YNM_NT", mode = "function")) {
     stop("Required helper function 'Estimate_YNM_NT' not found in the environment.")
@@ -238,7 +238,7 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
     }
   }
 
-  return(list(gamma = gamma, variance = var_out))
+  return(list(param = gamma, variance = var_out))
 }
 
 
@@ -370,7 +370,7 @@ Estimate_YNM_MLE_Indicator <- function(X, variance = TRUE, approximate = FALSE,
 
   # --- Return results ---
   return(list(
-    gamma = gamma_hat,
+    param = gamma_hat,
     variance = var_hat
   ))
 }

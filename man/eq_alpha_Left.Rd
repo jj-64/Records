@@ -4,10 +4,10 @@
 \alias{eq_alpha_Left}
 \title{Solve for Shape Parameter Alpha (Left-Side Equation) in Frechet LDM process}
 \usage{
-eq_alpha_Left(a, x, theta)
+eq_alpha_Left(shape, x, theta)
 }
 \arguments{
-\item{a}{Shape parameter.}
+\item{shape}{Shape parameter.}
 
 \item{x}{Numeric vector of observations.}
 

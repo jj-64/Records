@@ -424,11 +424,11 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' @param K Integer, number of categories for chi-squared grouping.
 #'   If NULL, defaults to \eqn{min(4, length(gaps))}.
 #' @param warmup Integer, number of initial gaps to discard (default = NULL).
-#' @param info String. "All" if data provided is the whole series \eqn{X_t} or
-#' "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+#' @param obs_type String. "all" if data provided is the whole series \eqn{X_t} or
+#' "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 #' record_times must be provided.
 #' @param record_times Numeric vector of the occurence times of records. (Default is NA).
-#' Forced in case "info" = "Records"
+#' Forced in case "obs_type" = "records"
 #' @return A list with elements:
 #' \item{obs_counts}{Observed counts per category.}
 #' \item{exp_counts}{Expected counts per category under fitted geometric law.}
@@ -476,12 +476,12 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #'
 #'# $decision
 #'# [1] "YNM"
-Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL, info = c("All", "Records"), record_times=NA) {
+Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("all", "records"), record_times=NA) {
 
     ##Force to provide record times in case only records are used
-  if (info == "Records" & length(record_times) != length(X) ){
+  if (obs_type == "records" & length(record_times) != length(X) ){
     stop("Number of records is not the same as record times (Or not provided)")
-  } else  if (info == "Records" & is.numeric(record_times[1])){
+  } else  if (obs_type == "records" & is.numeric(record_times[1])){
     gaps = diff(record_times)
   }
 
@@ -490,7 +490,7 @@ Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL, info = c("All", "R
     return(list(decision = "NO"))}
 
   ## if vector Xt is provided
-  if(info == "All") gaps = rec_gaps(X)
+  if(obs_type == "all") gaps = rec_gaps(X)
 
   ## Warmup
   if (is.null(warmup) ){ warmup = ceiling(1/3* length(gaps)) }

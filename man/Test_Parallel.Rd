@@ -6,7 +6,7 @@
 \usage{
 Test_Parallel(
   X,
-  info = c("All", "Records"),
+  info = c("all", "Records"),
   record_times = NA,
   alpha = 0.05,
   lag = 10,
@@ -23,7 +23,7 @@ Test_Parallel(
 \arguments{
 \item{X}{Numeric vector. The observed series.}
 
-\item{info}{String. "All" or "Records" depending on the series provided.}
+\item{info}{String. "all" or "Records" depending on the series provided.}
 
 \item{alpha}{Numeric. Significance level for all tests (default = 0.05).}
 
@@ -62,7 +62,7 @@ Applies all 10 possible Tests (if applicable) of four record-based tests (D, L, 
 on the same series \code{X} independently.
 }
 \examples{
-tests = Test_Parallel(X=rnorm(50), info = "All", alpha = 0.05)
+tests = Test_Parallel(X=rnorm(50), info = "all", alpha = 0.05)
 tests$decision
 # iid_NT.decision        DTRW_NT.decision         YNM_NT.decision       YNM_Pearson.decision       YNM_Geom.decision         LDM_NT.decision
 # "Classical"                  "DTRW"                    "NO"                      NA                    "NO"                    "NO"

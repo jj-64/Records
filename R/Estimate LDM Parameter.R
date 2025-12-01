@@ -131,13 +131,13 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
   if (!exists("Estimate_LDM_NT", mode = "function")) {
     stop("Required helper function 'Estimate_LDM_NT' not found in the environment.")
   }
-  
+
   	## Obtain biased estimator
   Estimated <- Estimate_LDM_NT(X = X, variance = TRUE, scale = scale)
   if (!is.list(Estimated) || is.null(Estimated$theta)) {
     stop("Estimate_LDM_NT must return a list with at least element $theta.")
   }
-  
+
   theta_biased <- Estimated$theta
   # theta in this function is treated as theta_scaled = theta / scale (user said theta is theta/scale)
   # but to be explicit: treat input/returned theta on same scale as Estimate_LDM_NT
@@ -226,7 +226,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
     }
   }
 
-  return(list(theta = theta_unbiased, variance = var_out))
+  return(list(param = theta_unbiased, variance = var_out))
 }
 
 ## MLE -------------------------------------
@@ -329,6 +329,6 @@ Estimate_LDM_MLE_indicator <- function(X, variance = TRUE, scale = 1, min = 0.00
     var_out <- (a * b + T - b - cc - dd)^(-1)
   }
 
-  return(list(theta = theta_hat, variance = var_out))
+  return(list(param = theta_hat, variance = var_out))
 }
 

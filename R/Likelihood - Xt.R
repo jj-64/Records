@@ -1,93 +1,101 @@
-###########################Classical #########################
+logLik_records <- function(model, obs_type, dist, data, params) {
+  # lookup
+  f <- loglik_registry[[model]][[obs_type]][[dist]]
+
+  if (is.null(f))
+    stop("Likelihood expression not registered for this (model, obs_type, dist).")
+
+  f(data, params)
+}
+
+## convenience wrapper for user
+lik <- function(model, obs_type, dist, data, params) {
+  logLik_records(model, obs_type, dist, data, params)
+}
+#lik("LDM","records","gumbel",data = list(rec_values = c(0.1,0.2,0.3,0.4), rec_times = c(1,4,7,8), time = 10), params = list(theta=0.3, loc=1, scale=1))
+
+## Optional: create formula objects for documentation
+# list_likelihoods <- function() {
+#   lapply(as.list(loglik_registry), names)
+# }
+
+
+## Classical -----------------------------
 #' Compute Log-Likelihood for IID Frechet Model
 #'
-#' Computes the log-likelihood of independent and identically distributed (IID) Frechet variables based on full information of the series.
+#' Computes the log-likelihood of independent and identically distributed (IID)
+#' variables based on full information of the series, and under different
+#' underlying distribution.
 #'
 #' @details
-#' Uses the **VGAM** package to compute:
-#' \deqn{llog L = \sum \log(f_{\text{Frechet}}(x; scale=1/A, shape=a))}
-#' Note that the growth parameter \eqn{\gamma} is fixed to 1 in the IID case.
+#' For \code{Frechet} distribution, use the **VGAM** package to compute:
+#' \deqn{llog L = \sum \log(f_{\text{Frechet}}(x; scale shape))}
 #'
-#' @param T Integer. Length of the series.
+#' For \code{Normal} distribution, use the **dnorm** function:
+#' \deqn{log L = \sum \log(f_{\text{Normal}}(x; \mu, \sigma))}
 #' @param x Numeric vector. Observed data.
-#' @param params Numeric vector of parameters \eqn{( A, a )}:
+#' @param dist Character, distribution name. One of:
+#'   "norm", "frechet"
+#' @param params list of vector of parameter:
 #'  \itemize{
-#'   \item \eqn{A}: 1/Scale parameter (1/scale).
-#'   \item \eqn{a}: Shape parameter.
+#'   \item Frechet: scale and shape.
+#'   \item Norm: mean and sd.
 #'  }
 #' @return Numeric value of the log-likelihood.
 #' @export
-Likelihood_Xt_Frechet_iid <- function(T, x, params) {
-  sum(log(VGAM::dfrechet(x = x, 0, scale = 1 / params[1], shape = params[2])))
+#' @examples
+#' Xt = VGAM::rfrechet(n = 100, shape = 1, scale = 2)
+#' Likelihood_Xt_iid(x = Xt, dist = "frechet", params =  list(shape = 1, scale=2))
+#' Likelihood_Xt_iid(x = Xt, dist = "norm", params =  list(mean = mean(X), sd= sd(X) ))
+Likelihood_Xt_iid <- function(x, dist = c("frechet","norm"), params) {
+  dist <- match.arg(dist)
 
-  # s1=T*log(params[1]*params[2])
-  # s2 = -(params[2]+1)*sum(log(params[1]*x))
-  # s3 = -sum((params[1]*x)^(-params[2]))
-  # s1+s2+s3
+  if(dist == "frechet"){
+  return(sum(log(VGAM::dfrechet(x = x, 0, scale = params$scale, shape =params$shape))))
+  }
+  if(dist == "norm"){
+    return(sum(log(dnorm(x = x, mean = params$mean, sd = params$sd ))))
+  }
 }
 
-#' Compute Log-Likelihood for IID Normal Model
-#'
-#' Computes the log-likelihood of independent and identically distributed (IID) normal variables.
-#'
-#' @details
-#' Uses the **dnorm** function:
-#' \deqn{log L = \sum \log(f_{\text{Normal}}(x; \mu, \sigma))}
-#'Note that the growth parameter \eqn{\gamma} is fixed to 1 in the IID case.
-#' @inheritParams Likelihood_Xt_Frechet_YNM
-#' @return Numeric value of the log-likelihood.
-#' @export
-Likelihood_Xt_Norm_iid <- function(T, x, params) {
-  sum(log(dnorm(x = x, mean = params[1], sd = params[2])))
-
-  # s1=T*log(params[1]*params[2])
-  # s2 = -(params[2]+1)*sum(log(params[1]*x))
-  # s3 = -sum((params[1]*x)^(-params[2]))
-  # s1+s2+s3
-}
-
-################### Likelihood DTRW Xt #######################
+##  Likelihood DTRW Xt--------------------
 
 #' Log-Likelihood expression
 #'
-#'Compute Log-Likelihood for DTRW Model with Gaussian Noise
+#'Compute Log-Likelihood for DTRW Model with Gaussian, Cauchy or uniform noise
 #' @param x Numeric vector. Observed data.
-#' @param params Numeric vector of parameters \eqn{( A, a )}:
+#' @param dist Character, distribution name. One of:
+#'   "norm", "cauchy", "uniform"
+#' @param params list of vector of parameter:
 #'  \itemize{
-#'   \item \eqn{A}: Mean of normal distribution assumed 0 for no drift models.
-#'   \item \eqn{a}: variance of normal distribution
+#'   \item norm: mean and sd
+#'   \item cauchy: loc and scale.
+#'   \item unifrom: min and max
 #'  }
-#'
 #' @returns numerical value
 #' @export
 #' @examples
-#' Xt=DTRW_series(T=25,dist = "norm", mean=0, sd=3)
-#'> Xt
-#'[1]  0.0000000  1.4880661 -4.8147394 -5.2196358 -1.0585060  0.1213980 -1.9903581
-#'[8] -0.2289111  0.1204328  1.0547639 -0.4275506  0.2533994  2.3335009  3.4109412
-#'[15]  3.1307010  5.0952581  5.8665243  8.9529542  7.2892812  4.8499811  0.7474847
-#'[22] -0.7717111 -2.3678676 -5.8535865 -4.9697589
-#' Likelihood_Xt_Norm_DTRW(x=Xt, params=c(0,3))
-#' -61.32352
-#' Likelihood_Xt_Norm_DTRW(x=Xt, params=c(0,1))
-#' -89.51009
-Likelihood_Xt_Norm_DTRW =  function(x,params){
-
-
+#' Xt = DTRW_series(T=25,dist = "norm", mean=0, sd=3)
+#' Likelihood_Xt_DTRW(x=Xt, dist = "norm", params=list(mean =0, sd= 3))
+#' Likelihood_Xt_DTRW(x=Xt, dist = "cauchy", params = list (loc =0, scale = 3))
+#' Likelihood_Xt_DTRW(x=Xt, dist = "uniform", params = list (min =-1, max = 1))
+Likelihood_Xt_DTRW =  function(x, dist = c("norm", "cauchy", "uniform"), params){
   if (length(x) < 2) {
     stop("The time series must have at least two observations.")
   }
-  logL=sum(log(dnorm(x=diff(x),mean=params[1],sd = sqrt(params[2]))))
-  #T <- length(x) - 1  # Number of steps in the random walk
-  #increments <- diff(x)  # Compute X_t - X_{t-1}
-
-  #logL <- - (T / 2) * log(2 * pi * params[2]) - sum((increments-params[1])^2) / (2 * params[2])
-
-  return(logL)
-
+  dist <- match.arg(dist)
+  if(dist == "norm"){
+ return(sum(log(dnorm(x=diff(x),mean=params$mean,sd = params$sd ))))
+  }
+  if(dist == "cauchy"){
+    return(sum(log(dcauchy(x=diff(x),location=params$loc, scale = params$scale ))))
+  }
+  if(dist == "uniform"){
+    return(sum(log(dunif(x=diff(x),min=params$min, max = params$max ))))
+  }
 }
 
-############## Likelihood Functions for YNM Process ##############
+## Likelihood Functions for YNM Process ------------------
 
 #' Compute Log-Likelihood for Frechet YNM Process
 #'
@@ -95,9 +103,8 @@ Likelihood_Xt_Norm_DTRW =  function(x,params){
 #'
 #' @details
 #' The likelihood function is given by:
-#' \deqn{log L(x | ( \gamma, A, a )) = T \log(a A^{-a}) - (a+1) \sum \log(x) + \frac{T(T+1)}{2} \log(\gamma) - \sum \gamma^t (A x)^{-a}}
+#' \deqn{log L(x | ( \gamma, scale = A, shape =a )) = T \log(a A^{-a}) - (a+1) \sum \log(x) + \frac{T(T+1)}{2} \log(\gamma) - \sum \gamma^t (A x)^{-a}}
 #'
-#' @param T Integer. Length of the series.
 #' @param x Numeric vector. Observed data.
 #' @param params Numeric vector of parameters \eqn{( \gamma, A, a )}:
 #'  \itemize{
@@ -109,18 +116,22 @@ Likelihood_Xt_Norm_DTRW =  function(x,params){
 #' @export
 #' @examples
 #' Xt = YNM_series(T=25, dist = "frechet", gamma=1.1, shape=1, scale=2)
-#' Likelihood_Xt_Frechet_YNM(T=25, x=Xt, params = c(1.1,1/2,1))
-#'
-Likelihood_Xt_Frechet_YNM <- function(T, x, params) {
-  s1 <- T * log(params[3] * params[2]^(-params[3]))
-  s2 <- -(params[3] + 1) * sum(log(x))
-  s3 <- (T * (T + 1) / 2) * log(params[1])
-  s4 <- -sum(params[1]^(1:T) * (params[2] * x)^(-params[3]))
-  return(s1 + s2 + s3 + s4)
+#' Likelihood_Xt_YNM(x=Xt, dist = "frechet", params = list(gamma = 1.1, shape= 1, scale=2))
+Likelihood_Xt_YNM <- function (x, dist = "frechet", params) {
+  dist <- match.arg(dist)
+
+  n= length(x)
+  if(dist == "frechet"){
+  s1 <- n* log(params$scale * params$shape^(-params$scale) )
+  s2 <- -(params$scale + 1) * sum(log(x))
+  s3 <- (n* (n+ 1) / 2) * log(params$gamma)
+  s4 <- -sum(params$gamma^(1:T) * (params$shape * x)^(-params$scale))
+  Lik = s1 + s2 + s3 + s4
+  }
+  return(Lik)
 }
 
-
-############## Likelihood Functions for LDM  Process ##############
+## Likelihood Functions for LDM  Process --------------------
 #' Compute Log-Likelihood for Frechet LDM Model
 #'
 #' Computes the log-likelihood of a series using a **Frechet-distributed** Linear Drift Model (LDM), based on full information
@@ -133,7 +144,6 @@ Likelihood_Xt_Frechet_YNM <- function(T, x, params) {
 #' The likelihood function is:
 #' \deqn{log L(X | ( \theta, A, a )) = T \log(a A^{-a}) - (a+1) \sum \log(X) - \sum (A X)^{-a}}
 #'
-#' @param T Integer. Length of the series.
 #' @param x Numeric vector. Observed data.
 #' @param params Numeric vector of parameters \eqn{( \theta, A, a )}:
 #'  \itemize{
@@ -145,39 +155,42 @@ Likelihood_Xt_Frechet_YNM <- function(T, x, params) {
 #' @export
 #' @examples
 #' Xt = LDM_series(T=25, dist = "frechet", theta=0.2, shape=1, scale=2)
-#' Likelihood_Xt_Frechet_LDM(T=25, x=Xt, params = c(0.2,1/2, 1) )
-Likelihood_Xt_Frechet_LDM <- function(T, x, params) {
-  X <- x - params[1] * (1:T)
+#' Likelihood_Xt_LDM(x=Xt, dist = "frechet", params = list(theta = 0.2, shape = 1/2, scale= 1) )
+Likelihood_Xt_LDM <- function (x, dist = "frechet", params) {
+
+  dist <- match.arg(dist)
+
+  n = length(x)
+
+  X <- x - params$theta * (1:n)
 
   if (any(X <= 0)) return(-1000)
 
-  A <- (sum(X^-params[3]) / T)^(1/params[3])
+  if(dist == "frechet"){
+  A <- (sum(X^-params$scale) / n)^(1/params$scale)
 
-  s1 <- T * log(params[3] * A^(-params[3]))
-  s2 <- -(params[3] + 1) * sum(log(X))
-  s3 <- -sum((A * X)^(-params[3]))
-
-  return(s1 + s2 + s3)
+  s1 <- n * log(params$scale * A^(-params$scale))
+  s2 <- -(params$scale + 1) * sum(log(X))
+  s3 <- -sum((A * X)^(-params$scale))
+  Lik = s1 + s2 + s3
+  }
+  return(Lik)
 }
 
+## Functions to Maximize Log-Likelihood LDM -------------------
 
-
-
-
-############## Functions to Maximize Log-Likelihood LDM ##############
-
-#' Estimate Scale Parameter A in Frechet LDM Process
+#' Estimate Scale Parameter in Frechet LDM Process
 #'
 #'Equation to solve the 1/Scale parameter in the case of Frechet distribution in LDM process.
 #'Using the first derivative equations, \deqn{A = (\frac{\sum X^{-a}}{T})^{1/a}}
-#' @param a Shape parameter.
+#' @param shape Shape parameter.
 #' @param x Numeric vector of observations.
 #' @param theta Drift parameter.
 #' @return Numeric value of scale parameter A.
-eq_A <- function(a, x, theta) {
-  T <- length(x)
-  X <- x - theta * (1:T)
-  return((sum(X^-a) / T)^(1/a))
+eq_A <- function(shape, x, theta) {
+  n <- length(x)
+  X <- x - theta * (1:n)
+  return((sum(X^-shape) / n)^(1/shape))
 }
 
 #' Solve for Drift Parameter Theta (Left-Side Equation) in Frechet LDM process
@@ -188,31 +201,31 @@ eq_A <- function(a, x, theta) {
 #' \deqn{\sum t \times Y_t^{-a} / \sum t \times Y_t^{-1}  }
 #'
 #' @return Numeric value for the equation.
-eq_theta_Left <- function(a, x, theta) {
-  T <- length(x)
-  X <- x - theta * (1:T)
-  return(sum((1:T) * X^-a) / sum((1:T) * X^-1))
+eq_theta_Left <- function(shape, x, theta) {
+  n <- length(x)
+  X <- x - theta * (1:n)
+  return(sum((1:n) * X^-shape) / sum((1:n) * X^-1))
 }
 
 #' Solve for Drift Parameter Theta (Right-Side Equation) in Frechet LDM process
 #'
 #' @inheritParams eq_A
 #' @return Numeric value for the equation.
-eq_theta_Right <- function(a, x, theta) {
-  T <- length(x)
-  X <- x - theta * (1:T)
-  return((a + 1) * sum(X^-a) / (T * a))
+eq_theta_Right <- function(shape, x, theta) {
+  n <- length(x)
+  X <- x - theta * (1:n)
+  return((shape + 1) * sum(X^-shape) / (n * shape))
 }
 
 #' Solve for Shape Parameter Alpha (Left-Side Equation) in Frechet LDM process
 #'
 #' @inheritParams eq_A
 #' @return Numeric value for the equation.
-eq_alpha_Left <- function(a, x, theta) {
-  T <- length(x)
-  X <- x - theta * (1:T)
-  A <- eq_A(a, x, theta)
-  return(sum((A * X)^(-a) * log(A * X)) + T * (1 - log(A)) / a)
+eq_alpha_Left <- function(shape, x, theta) {
+  n <- length(x)
+  X <- x - theta * (1:n)
+  A <- eq_A(shape, x, theta)
+  return(sum((A * X)^(-shape) * log(A * X)) + n * (1 - log(A)) / shape)
 }
 
 #' Solve for Shape Parameter Alpha (Right-Side Equation) in Frechet LDM process
@@ -220,8 +233,8 @@ eq_alpha_Left <- function(a, x, theta) {
 #' @inheritParams eq_A
 #' @return Numeric value for the equation.
 eq_alpha_Right <- function(x, theta) {
-  T <- length(x)
-  return(sum(log(x - theta * (1:T))))
+  n <- length(x)
+  return(sum(log(x - theta * (1:n))))
 }
 
 
@@ -246,27 +259,27 @@ eq_alpha_Right <- function(x, theta) {
 #'  [15]  8.550669  9.028977  9.253112 10.572839  9.988717 11.996890 12.049306
 #'  [22] 12.226410 11.992932 12.747571 13.098460
 #' Likelihood_Xt_Frechet_LDM_DerivativeSolve(x, c(1,0.2))
-#'      theta         A         a
+#'      theta         A         shape
 #'   0.4383729 0.5824738 1.8204038
 Likelihood_Xt_Frechet_LDM_DerivativeSolve <- function(x, initial_guess) {  #Solve_Log
   system_of_eqs <- function(vars) {
-    a <- vars[1]
+    shape <- vars[1]
     theta <- vars[2]
 
     X <- x - theta * (1:length(x))
-    A <- eq_A(a, x, theta)
+    A <- eq_A(shape, x, theta)
 
-    f1 <- eq_theta_Left(a, x, theta) - eq_theta_Right(a, x, theta)
-    f2 <- eq_alpha_Left(a, x, theta) - eq_alpha_Right(x, theta)
+    f1 <- eq_theta_Left(shape, x, theta) - eq_theta_Right(shape, x, theta)
+    f2 <- eq_alpha_Left(shape, x, theta) - eq_alpha_Right(x, theta)
 
     return(c(f1, f2))
   }
 
   solution <- nleqslv(initial_guess, system_of_eqs)
 
-  A <- eq_A(a = solution$x[1], x = x, theta = solution$x[2])
+  A <- eq_A(shape = solution$x[1], x = x, theta = solution$x[2])
 
-  return(c(theta=solution$x[2], A=A, a=solution$x[1]))
+  return(c(theta=solution$x[2], A=A, shape=solution$x[1]))
 }
 
 
@@ -285,7 +298,7 @@ Likelihood_Xt_Frechet_LDM_DerivativeSolve <- function(x, initial_guess) {  #Solv
 #'  [15]  8.550669  9.028977  9.253112 10.572839  9.988717 11.996890 12.049306
 #'  [22] 12.226410 11.992932 12.747571 13.098460
 #' Likelihood_Xt_Frechet_LDM_OptSolve(x)
-#'theta           A           a        logL
+#'theta           A           shape        logL
 #'0.4909235   0.9644116   2.5826999 -20.9373215
 Likelihood_Xt_Frechet_LDM_OptSolve <- function(x) {
   T=length(x)
@@ -302,7 +315,7 @@ Likelihood_Xt_Frechet_LDM_OptSolve <- function(x) {
   X <- x - result$par[1] * (1:T)
   A <- (sum(X^-result$par[3]) / T)^(1/result$par[3])
 
-  return(c(theta=result$par[1], A=A, a=result$par[3], logL=-result$objective))
+  return(c(theta=result$par[1], A=A, shape=result$par[3], logL=-result$objective))
 }
 
 #library(nleqslv)

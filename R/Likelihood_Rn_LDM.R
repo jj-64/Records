@@ -41,9 +41,9 @@ Likelihood_Rn_Gumbel_LDM = function(R,L,T,params){
   x = R - params[1]* L ## Rn-theta*ln
 
   ## pdf
-  pdf=function(x,par) {dgumbel(x=x, loc=par[1], scale=par[2])}
+  pdf=function(x,par) {VGAM::dgumbel(x=x, loc=par[1], scale=par[2])}
   ## cdf
-  cdf=function(x,par) {pgumbel(q=x, loc=par[1], scale=par[2])}
+  cdf=function(x,par) {VGAM::pgumbel(q=x, loc=par[1], scale=par[2])}
 
   # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or params[3] <= 0, we return -Inf)
   # if (any(params <= 0)) {

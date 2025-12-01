@@ -73,7 +73,7 @@ normal approximation:
 }
 \examples{
 set.seed(123)
-X <- YNM_series_Gumbel(T = 50, gamma = 1.2)
+X <- YNM_series(T = 50, dist = "gumbel", gamma = 1.2, loc = 0, scale= 1)
 Test_YNM_Geom(X, alpha = 0.05, K = 4, warmup=2)
 
 # $obs_counts

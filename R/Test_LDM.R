@@ -9,11 +9,11 @@
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param RSq Numeric, minimum adjusted R-squared required to accept the LDM
 #'   hypothesis (default = 0.8).
-#' @param info String. "All" if data provided is the whole series \eqn{X_t} or
-#' "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+#' @param obs_type String. "all" if data provided is the whole series \eqn{X_t} or
+#' "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 #' record_times must be provided.
 #' @param record_times Numeric vector of the occurence times of records. (Default is NA).
-#' Forced in case "info" = "Records"
+#' Forced in case "obs_type" = "records"
 #' @return A list with components:
 #' \describe{
 #'   \item{stat}{Estimated slope coefficient (drift parameter).}
@@ -41,16 +41,16 @@
 #' X <- 0.3 * t + rnorm(50, sd = 5)  # Linear drift with noise
 #' Test_LDM_Regression(X, alpha = 0.05, RSq = 0.7)
 #' @export
-Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8, info = c("All"), record_times=NA) {
+Test_LDM_Regression <- function(X, alpha = 0.05, RSq = 0.8, obs_type = c("all"), record_times=NA) {
 
   ##Force to provide record times in case only records are used
-  if (info == "Records" & length(record_times) != length(X) ){
+  if (obs_type == "records" & length(record_times) != length(X) ){
     stop("Number of records is not the same as record times (Or not provided)")
-  } else  if (info == "Records" & is.numeric(record_times[1])){
+  } else  if (obs_type == "records" & is.numeric(record_times[1])){
     t= record_times
   }
 
-  if (info == "All") {t <- seq_along(X)}
+  if (obs_type == "all") {t <- seq_along(X)}
 
   # Centralize data
   t <- t - mean(t)

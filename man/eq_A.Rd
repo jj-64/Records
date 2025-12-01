@@ -2,12 +2,12 @@
 % Please edit documentation in R/Likelihood - Xt.R
 \name{eq_A}
 \alias{eq_A}
-\title{Estimate Scale Parameter A in Frechet LDM Process}
+\title{Estimate Scale Parameter in Frechet LDM Process}
 \usage{
-eq_A(a, x, theta)
+eq_A(shape, x, theta)
 }
 \arguments{
-\item{a}{Shape parameter.}
+\item{shape}{Shape parameter.}
 
 \item{x}{Numeric vector of observations.}
 

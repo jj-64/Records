@@ -12,15 +12,15 @@
 #' @param alpha Numeric. Significance level for all tests (default = 0.05).
 #' @param lag Integer. Lag parameter for Box-Jenkins test (default = 10).
 #' @param warmup Integer. Warm-up parameter for YNM test (default = 2).
-#' @param info String. "All" if data provided is the whole series \eqn{X_t} or
-#' "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+#' @param obs_type String. "all" if data provided is the whole series \eqn{X_t} or
+#' "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 #' record_times must be provided.
 #' @param record_times Numeric vector of the occurence times of records. (Default is NA).
-#' Forced in case "info" = "Records"
+#' Forced in case "obs_type" = "records"
 #' @param approximate Logical, if \code{TRUE} use the asymptotic normal approximation for DTRW \eqn{N_T}-test
-#'   (default = \code{FALSE} for the exact quantile test). Forced when info = "Records".
+#'   (default = \code{FALSE} for the exact quantile test). Forced when obs_type = "records".
 #' @param one.sided Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
-#'   (default = \code{FALSE} for two-sided). Forced when info = "Records".
+#'   (default = \code{FALSE} for two-sided). Forced when obs_type = "records".
 #' @return A list containing:
 #'
 #' 1 - decision: A data frame with 24 rows:
@@ -35,7 +35,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' result <- Test_Permutation(X = rnorm(50), print = FALSE, info = "All")
+#' result <- Test_Permutation(X = rnorm(50), print = FALSE, obs_type = "all")
 #'
 #' print(result$decision)
 #' #  Permutation Accepted_Test  Decision
@@ -69,25 +69,25 @@
 #' #        1 Classical   12
 #' #        2       YNM   12
 #' }
-Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE, info = c("All"), record_times = NA, approximate = FALSE, one.sided= FALSE) {
+Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE, obs_type = c("all"), record_times = NA, approximate = FALSE, one.sided= FALSE) {
   # Ensure combinat is available
   if (!requireNamespace("combinat", quietly = TRUE)) {
     stop("Please install the 'combinat' package with install.packages('combinat').")
   }
 
   ## ---------- Helper: run one test safely ----------
-  if (info != "Records" | info == "All"){
+  if (obs_type != "records" | obs_type == "all"){
   run_test <- function(test_id, X, alpha) {
     res <- switch(test_id,
                   D = tryCatch(Test_DTRW_Indep(X, alpha = alpha)$decision, error = function(e) NA),
                   L = tryCatch(Test_LDM_Sequential(X, alpha = alpha)$decision, error = function(e) NA),
                   C = tryCatch(Test_iid_BoxJenkins(X, alpha = alpha, lag = lag)$decision, error = function(e) NA),
-                  Y = tryCatch(Test_YNM_Geom(X, alpha = alpha, warmup = warmup, info = "All")$decision, error = function(e) NA),
+                  Y = tryCatch(Test_YNM_Geom(X, alpha = alpha, warmup = warmup, obs_type = "all")$decision, error = function(e) NA),
                   NA)
     if (is.null(res) || length(res) == 0) res <- NA
     return(res)
   }
-  } else if (info == "Records"){
+  } else if (obs_type == "records"){
   run_test <- function(test_id, X, alpha) {
     res <- switch(test_id,
                   D = tryCatch(Test_DTRW_NT(X, alpha = alpha)$decision, error = function(e) NA),
@@ -164,10 +164,10 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #' @param lag Integer. Lag parameter for Box-Jenkins test (default = 10)
 #' @param warmup Integer. Warm-up parameter for YNM test (default = 2)
 #' @param print logical default is FALSE, summary is not printed
-#' @param info String. "All" if data provided is the whole series \eqn{X_t} or
-#' "Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+#' @param obs_type String. "all" if data provided is the whole series \eqn{X_t} or
+#' "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 #' record_times must be provided.
-#' Forced in case "info" = "Records"
+#' Forced in case "obs_type" = "records"
 #' @param approximate Logical, if \code{TRUE} use the asymptotic normal approximation for DTRW \eqn{N_T}-test
 #'   (default = \code{FALSE} for the exact quantile test).
 #' @param one.sided Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
@@ -181,7 +181,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #' }
 #' @examples
 #'
-#' # sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", info = "All)
+#' # sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", obs_type = "all)
 #'
 #' ### 75% of the permutations trees return "DTRW" and 25% return "YNM".
 #' ### On average, one simulation will return the following:
@@ -258,7 +258,7 @@ Simulation_Permutation_Analysis <- function(
     lag = 10,
     warmup = 2,
     print = FALSE,
-    info="All",
+    obs_type="all",
     approximate = FALSE,
     one.sided = FALSE
 ) {
@@ -288,7 +288,7 @@ Simulation_Permutation_Analysis <- function(
   for (i in seq_len(n_sim)) {
     X <- do.call(generator, args)
     record_times = rec_times(X)
-    perm_result <-  Test_Permutation(X, alpha = alpha, lag = lag, warmup = warmup, print= print, info = info, record_times = record_times,
+    perm_result <-  Test_Permutation(X, alpha = alpha, lag = lag, warmup = warmup, print= print, obs_type = obs_type, record_times = record_times,
                                      approximate = approxiamte, one.sided = one.sided)
 
     # store results for this simulation
@@ -403,7 +403,7 @@ Test_Permutation_OLD = function(x, sig=0.05){
 #' on the same series `X` independently.
 #'
 #' @param X Numeric vector. The observed series.
-#' @param info String. "All" or "Records" depending on the series provided.
+#' @param obs_type String. "all" or "records" depending on the series provided.
 #' @param alpha Numeric. Significance level for all tests (default = 0.05).
 #' @param lag Integer. Lag parameter for Box-Jenkins test (default = 10).
 #' @param warmup Integer. Warm-up parameter for YNM test (default = 2).
@@ -426,18 +426,18 @@ Test_Permutation_OLD = function(x, sig=0.05){
 #' }
 #' @export
 #' @examples
-#' tests = Test_Parallel(X=rnorm(50), info = "All", alpha = 0.05)
+#' tests = Test_Parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
 #' tests$decision
 #' # iid_NT.decision        DTRW_NT.decision         YNM_NT.decision       YNM_Pearson.decision       YNM_Geom.decision         LDM_NT.decision
 #' # "Classical"                  "DTRW"                    "NO"                      NA                    "NO"                    "NO"
 #' # LDM_Sequential.decision     LDM_Regression.decision        iid_Box.decision     DTRW_Indep.decision
 #' #     "NO"                           "NO"                       "Classical"             "NO"
-Test_Parallel <- function(X, info = c("All","Records") , record_times = NA, alpha = 0.05, lag = 10, warmup = 2, approximate = FALSE, one.sided = FALSE, method="Bonf",
+Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA, alpha = 0.05, lag = 10, warmup = 2, approximate = FALSE, one.sided = FALSE, method="Bonf",
                           K= NULL, estimate_gamma = TRUE, gamma = NULL, RSq = 0.8) {
   results = list()
-  info <- match.arg(info)
+  obs_type <- match.arg(obs_type)
 
-  if (info == "All" | info == "Records"){
+  if (obs_type == "all" | obs_type == "records"){
   ## iid_NT
   results$"iid_NT" = Test_iid_NT(X=X, alpha= alpha)
 
@@ -463,7 +463,7 @@ Test_Parallel <- function(X, info = c("All","Records") , record_times = NA, alph
   results$"LDM_Regression" = Test_LDM_Regression(X=X, alpha = alpha, RSq = RSq)
   }
 
-  if (info == "All"){
+  if (obs_type == "all"){
     ## iid_Box
     results$"iid_Box" = Test_iid_BoxJenkins(X=X, alpha= alpha, lags = lag)
 
@@ -478,7 +478,7 @@ Test_Parallel <- function(X, info = c("All","Records") , record_times = NA, alph
   return(list(results = results, decision= decision_items))
 }
 
-##########--------------- Sequential Limited info --------------########
+##########--------------- Sequential Limited obs_type --------------########
 
 #' Sequential Permutation Testing of Record Process Models
 #'

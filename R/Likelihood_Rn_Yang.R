@@ -178,9 +178,10 @@ Likelihood_Rn_Gumbel_YNM <- function(R,L,T, params) {  ## vector of R, L, value 
   # Loop to calculate Sum4
   s4a=0
   for (j in 1:(m - 1)) {
+    if((Ln[j]+1 <= Ln[j+1]-1) == TRUE){ ## we have non-records in between
     s4a[j] = (((params[1]^(L[j] + 1)) - (params[1]^L[j + 1])) / (1 - params[1])) *
-      log(VGAM::pgumbel(R[j], loc = params[2], scale = params[3]))
-  }
+      log(VGAM::dgumbel(R[j], location = params[2], scale = params[3]))
+  }}
   s4=sum(s4a)
 
   # Calculate Sum5

@@ -24,6 +24,21 @@ of records or its variance or distribution.
 Compute the distribution, expected number of records or the variance of the number
 of records under a variety of stochastic models.
 }
+\details{
+For model-specific functions and formulas, look at
+\code{\link{rec_count_mean_iid}}
+\code{\link{rec_count_var_iid}}
+\code{\link{rec_count_dist_iid}}
+\code{\link{rec_count_mean_DTRW}}
+\code{\link{rec_count_var_DTRW}}
+\code{\link{rec_count_dist_DTRW}}
+\code{\link{rec_count_mean_LDM}}
+\code{\link{rec_count_var_LDM}}
+\code{\link{rec_count_dist_LDM}}
+\code{\link{rec_count_mean_YNM}}
+\code{\link{rec_count_var_YNM}}
+\code{\link{rec_count_dist_YNM}}
+}
 \examples{
 rec_count_stats("iid", stat = "mean", T = 100)
 # [1] 5.187378

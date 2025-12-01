@@ -4,10 +4,10 @@
 \alias{eq_theta_Left}
 \title{Solve for Drift Parameter Theta (Left-Side Equation) in Frechet LDM process}
 \usage{
-eq_theta_Left(a, x, theta)
+eq_theta_Left(shape, x, theta)
 }
 \arguments{
-\item{a}{Shape parameter.}
+\item{shape}{Shape parameter.}
 
 \item{x}{Numeric vector of observations.}
 

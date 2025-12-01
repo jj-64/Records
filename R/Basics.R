@@ -9,7 +9,8 @@
 #' @returns the indicator vector of same length of the original X vector
 #' @export
 #'
-#' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
+#' @examples
+#' Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' is_rec(X=Xt)
 #' # [1] 1 1 1 0 0 0 1 0 0 0
 is_rec = function(X){
@@ -31,7 +32,8 @@ is_rec = function(X){
 #' @returns integer: the number of records
 #' @export
 #'
-#' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
+#' @examples
+#' Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_counts(X=Xt)
 #' # 4
 rec_counts = function(X){
@@ -47,7 +49,8 @@ rec_counts = function(X){
 #' @returns a vector of the record values available in the series
 #' @export
 #'
-#' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
+#' @examples
+#' Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_values(X=Xt)
 #' # [1] -0.5 -0.4  0.2  0.8
 rec_values = function(X){  ## previously Rn
@@ -62,7 +65,8 @@ rec_values = function(X){  ## previously Rn
 #' @returns a vector of the position of records in a series
 #' @export
 #'
-#' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
+#' @examples
+#' Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_times(X=Xt)
 #' # [1] 1 2 3 7
 rec_times = function(X){  ## previously Ln
@@ -78,7 +82,8 @@ rec_times = function(X){  ## previously Ln
 #' @returns a vector of the inter-record times
 #' @export
 #'
-#' @examples Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
+#' @examples
+#' Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
 #' rec_gaps(X=Xt)
 #' # [1] 1 1 4
 rec_gaps =  function(X){   ## previously rec_gaps
@@ -86,7 +91,6 @@ rec_gaps =  function(X){   ## previously rec_gaps
   # Ln_delta_pos=0
   # for(i in 2:length(Ln_pos)){
   #   Ln_delta_pos[i-1] = Ln_pos[i]-Ln_pos[i-1]}
-  Ln_delta_pos = diff(rec_times(X))
-  return(Ln_delta_pos)
+  return(diff(rec_times(X)))
 }
 ########################################################################

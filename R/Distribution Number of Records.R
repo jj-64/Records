@@ -4,7 +4,19 @@
 #'
 #' Compute the distribution, expected number of records or the variance of the number
 #' of records under a variety of stochastic models.
-#'
+#' @details For model-specific functions and formulas, look at
+#' \code{\link{rec_count_mean_iid}}
+#' \code{\link{rec_count_var_iid}}
+#' \code{\link{rec_count_dist_iid}}
+#' \code{\link{rec_count_mean_DTRW}}
+#' \code{\link{rec_count_var_DTRW}}
+#' \code{\link{rec_count_dist_DTRW}}
+#' \code{\link{rec_count_mean_LDM}}
+#' \code{\link{rec_count_var_LDM}}
+#' \code{\link{rec_count_dist_LDM}}
+#' \code{\link{rec_count_mean_YNM}}
+#' \code{\link{rec_count_var_YNM}}
+#' \code{\link{rec_count_dist_YNM}}
 #' @param model Character string specifying the model. Available models:
 #'   \code{"iid"}, \code{"DTRW"}, \code{"LDM"}, \code{"YNM"}.
 #' @param stat Either \code{"mean"} or \code{"var"} or \code{"dist"}.
