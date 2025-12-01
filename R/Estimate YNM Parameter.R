@@ -175,11 +175,11 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
     stop("Required helper function 'Estimate_YNM_NT' not found in the environment.")
   }
   Estimated <- Estimate_YNM_NT(X = X, variance = TRUE)
-  if (!is.list(Estimated) || is.null(Estimated$gamma)) {
-    stop("Estimate_LDM_NT must return a list with at least element $gamma.")
+  if (!is.list(Estimated) || is.null(Estimated$param)) {
+    stop("Estimate_YNM_NT must return a list with at least element $gamma.")
   }
 
-  gamma_biased = Estimated$gamma
+  gamma_biased = Estimated$param
 
   hT = mean(rec_rate_YNM(gamma_biased,1:T)) ## sum /T
 

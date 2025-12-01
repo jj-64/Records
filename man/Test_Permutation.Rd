@@ -10,7 +10,7 @@ Test_Permutation(
   lag = 10,
   warmup = 2,
   print = TRUE,
-  info = c("all"),
+  obs_type = c("all"),
   record_times = NA,
   approximate = FALSE,
   one.sided = FALSE
@@ -25,18 +25,18 @@ Test_Permutation(
 
 \item{warmup}{Integer. Warm-up parameter for YNM test (default = 2).}
 
-\item{info}{String. "all" if data provided is the whole series \eqn{X_t} or
-"Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+\item{obs_type}{String. "all" if data provided is the whole series \eqn{X_t} or
+"records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}
 
 \item{record_times}{Numeric vector of the occurence times of records. (Default is NA).
-Forced in case "info" = "Records"}
+Forced in case "obs_type" = "records"}
 
 \item{approximate}{Logical, if \code{TRUE} use the asymptotic normal approximation for DTRW \eqn{N_T}-test
-(default = \code{FALSE} for the exact quantile test). Forced when info = "Records".}
+(default = \code{FALSE} for the exact quantile test). Forced when obs_type = "records".}
 
 \item{one.sided}{Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
-(default = \code{FALSE} for two-sided). Forced when info = "Records".}
+(default = \code{FALSE} for two-sided). Forced when obs_type = "records".}
 }
 \value{
 A list containing:
@@ -58,7 +58,7 @@ that test is recorded as the output of the permutation.
 }
 \examples{
 \dontrun{
-result <- Test_Permutation(X = rnorm(50), print = FALSE, info = "all")
+result <- Test_Permutation(X = rnorm(50), print = FALSE, obs_type = "all")
 
 print(result$decision)
 #  Permutation Accepted_Test  Decision

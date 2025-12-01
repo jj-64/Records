@@ -1,5 +1,5 @@
 
-##################Variance estimators - Xt - Frechet - YNM ##########################
+### Variance estimators - Xt - Frechet - YNM -------------------------
 #' Variance of LogL Gamma Estimator for full Frechet YANG-Nevzorov Process
 #'
 #' Computes the variance of the gamma estimator using the Fisher information matrix.
@@ -163,7 +163,7 @@ V_Xt_Frechet_YNM_shape = function(x,params){
 }
 
 
-##################Variance estimators - Xt - Frechet - LDM ##########################
+### Variance estimators - Xt - Frechet - LDM --------------------------------
 
 #' Variance of Theta LogL Estimator for Frechet LDM using full dataset
 #'
@@ -350,7 +350,7 @@ V_Xt_Frechet_LDM_shape = function(x,params){
   return(-1/fisher)
 }
 
-##################Variance estimators - Xt - Frechet - iid ##########################
+### Variance estimators - Xt - Frechet - iid----------------------
 
 ## Variance of 1/scale A
 #' Variance of 1/Scale Parameter A for IID Frechet Process full dataset
@@ -459,3 +459,20 @@ V_Xt_Frechet_iid_shape = function(x,params){
 
   return(var_a)
 }
+
+### DTRW, Normal --------------------------
+## Variance of the variance estimator sigma2
+V_Xt_Norm_DTRW_scale = function(x,params){
+  a= params[2]
+  T=length(x)
+  XX=diff(x)
+
+  #s1 = T/(2*a^2)
+
+  #s2 = - sum( (XX)^2) / (a^3)
+
+  #var_a = -1 / (s1+s2)
+  var_a = 2*a^2/(T)  ## 2*sigma^2/T
+  return(var_a)
+}
+

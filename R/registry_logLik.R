@@ -1,3 +1,13 @@
+logLik_records <- function(model, obs_type, dist, data, params) {
+  # lookup
+  f <- loglik_registry[[model]][[obs_type]][[dist]]
+
+  if (is.null(f))
+    stop("Likelihood expression not registered for this (model, obs_type, dist).")
+
+  f(data, params)
+}
+
 ## Helper ---------------------------------
 # empty container
 loglik_registry <- new.env(parent = emptyenv())
@@ -20,8 +30,9 @@ register_loglik( model = "iid", obs_type = "all", dist = "norm",
   fun = function(data, params) {
     if(!is.numeric(data)) stop("data should be a numerical vector")
     if( all(c("mean", "sd") %in% names(params)) == FALSE ) stop("parameters mean, sd should be present in a list.")
-
-    sum(dnorm(data, mean =as.numeric(params$mean) , sd = as.numeric(params$sd), log = TRUE))
+    mean <- as.numeric(params['mean'])
+    sd <- as.numeric(params["sd"])
+    sum(dnorm(data, mean =mean , sd = sd, log = TRUE))
   }
 )
   ## Frechet
@@ -60,12 +71,12 @@ register_loglik("iid", "records", "norm",
 
     Rn <- data$rec_values
     Ln <- data$rec_times
-    T  <- data$T
+    n  <- data$time[1]
 
     if( all(c("mean", "sd") %in% names(params)) == FALSE ) stop("parameters mean, sd should be present in a list.")
 
-    mean = params$mean
-    sd<- as.numeric(params$sd)
+    mean <- as.numeric(params['mean'])
+    sd <- as.numeric(params["sd"])
     m = length(Rn) #m= rec_counts(y)
 
     ## sum of log(f_rn)
@@ -75,8 +86,8 @@ register_loglik("iid", "records", "norm",
     s2b <- intervals * log(pnorm(Rn[-m], mean = mean, sd = sd))
     s2 <- sum(s2b)
     ##Compute s3 only if needed
-    s3 <- if (Ln[m] < T) {
-      (T - Ln[m]) * log(pnorm(Rn[m], mean = mean, sd = sd))
+    s3 <- if (Ln[m] < n) {
+      (n - Ln[m]) * log(pnorm(Rn[m], mean = mean, sd = sd))
     } else {
       0
     }
@@ -92,12 +103,12 @@ register_loglik("iid", "records", "frechet",
 
                   Rn <- data$rec_values
                   Ln <- data$rec_times
-                  T  <- data$time
+                  n  <- data$time[1]
 
                   if( all(c("shape", "scale") %in% names(params)) == FALSE ) stop("parameters shape, scale should be present in a list.")
 
-                  scale = params$scale
-                  shape = params$shape
+                  scale = as.numeric(params["scale"])
+                  shape = as.numeric(params["shape"])
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
@@ -107,8 +118,8 @@ register_loglik("iid", "records", "frechet",
                   s2b <- intervals * log(VGAM::pfrechet(Rn[-m], shape, scale))
                   s2 <- sum(s2b)
                   ##Compute s3 only if needed
-                  s3 <- if (Ln[m] < T) {
-                    (T - Ln[m]) * log(VGAM::pfrechet(Rn[m], shape, scale))
+                  s3 <- if (Ln[m] < n) {
+                    (n - Ln[m]) * log(VGAM::pfrechet(Rn[m], shape, scale))
                   } else {
                     0
                   }
@@ -124,12 +135,12 @@ register_loglik("iid", "records", "gumbel",
 
                   Rn <- data$rec_values
                   Ln <- data$rec_times
-                  T  <- data$time
+                  n  <- data$time[1]
 
                   if( all(c("loc", "scale") %in% names(params)) == FALSE ) stop("parameters loc, scale should be present in a list.")
 
-                  scale = params$scale
-                  loc = params$loc
+                  scale = as.numeric(params["scale"])
+                  loc = as.numeric(params["loc"])
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
@@ -139,8 +150,8 @@ register_loglik("iid", "records", "gumbel",
                   s2b <- intervals * log(VGAM::pgumbel(Rn[-m], loc, scale))
                   s2 <- sum(s2b)
                   ##Compute s3 only if needed
-                  s3 <- if (Ln[m] < T) {
-                    (T - Ln[m]) * log(VGAM::pfrechetgumbel(Rn[m], loc, scale))
+                  s3 <- if (Ln[m] < n) {
+                    (n - Ln[m]) * log(VGAM::pfrechetgumbel(Rn[m], loc, scale))
                   } else {
                     0
                   }
@@ -156,12 +167,12 @@ register_loglik("iid", "records", "weibull",
 
                   Rn <- data$rec_values
                   Ln <- data$rec_times
-                  T  <- data$time
+                  n  <- data$time[1]
 
                   if( all(c("shape", "scale") %in% names(params)) == FALSE ) stop("parameters shape, scale should be present in a list.")
 
-                  scale = params$scale
-                  shape = params$shape
+                  scale = as.numeric(params["scale"])
+                  shape = as.numeric(params["shape"])
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
@@ -171,8 +182,8 @@ register_loglik("iid", "records", "weibull",
                   s2b <- intervals * log(pweibull(Rn[-m], shape, scale))
                   s2 <- sum(s2b)
                   ##Compute s3 only if needed
-                  s3 <- if (Ln[m] < T) {
-                    (T - Ln[m]) * log(pweibull(Rn[m], shape, scale))
+                  s3 <- if (Ln[m] < n) {
+                    (n - Ln[m]) * log(pweibull(Rn[m], shape, scale))
                   } else {
                     0
                   }
@@ -192,7 +203,10 @@ register_loglik("DTRW", "all", "norm",
 
     if( all(c("mean", "sd") %in% names(params)) == FALSE ) stop("parameters mean, sd should be present in a list.")
 
-    sum(log(dnorm(x = diff(data), mean =as.numeric(params$mean) , sd = as.numeric(params$sd))))
+    mean <- as.numeric(params['mean'])
+    sd <- as.numeric(params["sd"])
+
+    sum(log(dnorm(x = diff(data), mean =mean , sd = sd)))
   }
 )
 
@@ -214,11 +228,11 @@ register_loglik( "DTRW", "records", "norm",
 
     Rn <- data$rec_values
     Ln <- data$rec_times
-    T <- data$time
+    n <- data$time[1]
     if( all(c( "scale") %in% names(params)) == FALSE ) stop("parameters scale should be present in a list.")
 
     loc = 0
-    sd =as.numeric(params$sd)
+    sd =as.numeric(params["sd"])
 
     # Example: probability that S_1, S_2, ..., S_5 all < 0
     # sigma_cov = function(k, sigma){  ## k should be less than 1000, sigma is variance
@@ -243,9 +257,9 @@ register_loglik( "DTRW", "records", "norm",
 
     ## case where NT<T
     s2=0
-    if (Ln[m] < T) {
-      #s2=log(mvtnorm::pmvnorm(lower=-Inf, upper=rep(0,(T - Ln[m])), sigma = sigma_cov((T - Ln[m]),params))[1])
-      s2 = -0.5*log(pi * (T - Ln[m]))
+    if (Ln[m] < n) {
+      #s2=log(mvtnorm::pmvnorm(lower=-Inf, upper=rep(0,(n - Ln[m])), sigma = sigma_cov((n - Ln[m]),params))[1])
+      s2 = -0.5*log(pi * (n - Ln[m]))
     }
 
     return(s1+s2)
@@ -259,12 +273,12 @@ register_loglik( "DTRW", "records", "cauchy",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T <- data$time
+                   n <- data$time[1]
 
                    if( all(c("scale") %in% names(params)) == FALSE ) stop("parameters  scale should be present in a list.")
 
                    loc = 0
-                   scale = as.numeric(params$scale)
+                   scale = as.numeric(params["scale"])
                    m= length(Rn)  # Number of observed time points
 
                    if (m < 2) {
@@ -276,7 +290,7 @@ register_loglik( "DTRW", "records", "cauchy",
 
                    ## case where NT<T
                    s2=0
-                   if (Ln[m] < T) { s2 = -0.5*log(pi * (T - Ln[m])) }
+                   if (Ln[m] < n) { s2 = -0.5*log(pi * (n - Ln[m])) }
 
                   ## Return
                    return(s1+s2)
@@ -417,7 +431,8 @@ register_loglik( "YNM", "records", "frechet",
 
     Rn <- data$rec_values
     Ln <- data$rec_times
-    T <- data$time
+    n <- data$time[1]
+
     if( all(c("gamma", "shape", "scale") %in% names(params)) == FALSE ) stop("parameters gamma, shape, scale should be present.")
 
     gamma <- as.numeric(params["gamma"])
@@ -448,8 +463,8 @@ register_loglik( "YNM", "records", "frechet",
     s3 = sum(na.omit(s3b))
 
     s4=0
-    if (Ln[m] < T) {
-      s4 = sum(log(cdf(Rn[m], par = list(shape=shape, scale=scale))^((gamma^(Ln[m]+1) - gamma^(T+1))/(1-gamma) ) ))
+    if (Ln[m] < n) {
+      s4 = sum(log(cdf(Rn[m], par = list(shape=shape, scale=scale))^((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
       }
      return(s1+s2+s3+s4)
     }
@@ -462,7 +477,7 @@ register_loglik( "YNM", "records", "gumbel",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T = data$time
+                   n = data$time[1]
                    if( all(c("gamma", "loc", "scale") %in% names(params)) == FALSE ) stop("parameters gamma, loc, scale should be present.")
 
                    gamma <- as.numeric(params["gamma"])
@@ -495,8 +510,8 @@ register_loglik( "YNM", "records", "gumbel",
                    s3 = sum(na.omit(s3b))
 
                    s4=0
-                   if (Ln[m] < T) {
-                     s4 = sum(log(cdf(Rn[m], par = list(loc = loc, scale=scale))^( (gamma^(Ln[m]+1) - gamma^(T+1))/(1-gamma) ) ))
+                   if (Ln[m] < n) {
+                     s4 = sum(log(cdf(Rn[m], par = list(loc = loc, scale=scale))^( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
                    }
                    return(s1+s2+s3+s4)
                  }
@@ -509,7 +524,7 @@ register_loglik( "YNM", "records", "norm",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T = data$time
+                   n = data$time[1]
                    if( all(c("gamma", "mean", "sd") %in% names(params)) == FALSE ) stop("parameters gamma, mean, sd should be present.")
 
                    gamma <- as.numeric(params["gamma"])
@@ -523,9 +538,9 @@ register_loglik( "YNM", "records", "norm",
                    }
 
                    ## pdf
-                   pdf=function(x,par) {dnorm(x=x, meanation=par$mean, sd=par$sd)}
+                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd)}
                    ## cdf
-                   cdf=function(x,par) {pnorm(q=x, meanation=par$mean, sd=par$sd)}
+                   cdf=function(x,par) {pnorm(q=x, mean=par$mean, sd=par$sd)}
 
 
                    # your exact YNM record-pair likelihood
@@ -540,8 +555,8 @@ register_loglik( "YNM", "records", "norm",
                    s3 = sum(na.omit(s3b))
 
                    s4=0
-                   if (Ln[m] < T) {
-                     s4 = sum(log(cdf(Rn[m], par = list(mean = mean, sd=sd))^( (gamma^(Ln[m]+1) - gamma^(T+1))/(1-gamma) ) ))
+                   if (Ln[m] < n) {
+                     s4 = sum(log(cdf(Rn[m], par = list(mean = mean, sd=sd))^( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
                    }
                    return(s1+s2+s3+s4)
                  }
@@ -554,7 +569,7 @@ register_loglik( "YNM", "records", "weibull",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T <- data$time
+                   n <- data$time[1]
                    if( all(c("gamma", "shape", "scale") %in% names(params)) == FALSE ) stop("parameters gamma, shape, scale should be present.")
 
                    gamma <- as.numeric(params["gamma"])
@@ -585,8 +600,8 @@ register_loglik( "YNM", "records", "weibull",
                    s3 = sum(na.omit(s3b))
 
                    s4=0
-                   if (Ln[m] < T) {
-                     s4 = sum(log(cdf(Rn[m], par = list(shape=shape, scale=scale))^((gamma^(Ln[m]+1) - gamma^(T+1))/(1-gamma) ) ))
+                   if (Ln[m] < n) {
+                     s4 = sum(log(cdf(Rn[m], par = list(shape=shape, scale=scale))^((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
                    }
                    return(s1+s2+s3+s4)
                  }
@@ -602,7 +617,7 @@ register_loglik( "LDM", "all", "norm",
                    if( all(c("theta", "mean", "sd") %in% names(params)) == FALSE ) stop("parameterstheta, mean, sd should be present.")
 
                    theta <- as.numeric(params["theta"])
-                   mean <- as.numeric(as.numeric(params$mean))
+                   mean <- as.numeric(as.numeric(params["mean"]))
                    sd <- as.numeric(params["sd"])
 
                    ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
@@ -648,7 +663,7 @@ register_loglik( "LDM", "all", "frechet",
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
                    s1 = sum(log(pdf(x=x, par=list(shape= shape, scale= scale))))
 
-                   # scale = 1/params$scale
+                   # scale = 1/params["scale"]
                    # if (any(x <= 0)) return(-1000)
                    # A <- (sum(x^-scale) / n)^(1/scale)
                    # s1 <- n * log(scale * A^(-scale))
@@ -697,7 +712,7 @@ register_loglik( "LDM", "records", "gumbel",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T <- data$time
+                   n <- data$time[1]
 
                    if( all(c("theta", "loc", "scale") %in% names(params)) == FALSE ) stop("parameterstheta, loc, scale should be present.")
                    theta <- as.numeric(params["theta"])
@@ -733,8 +748,8 @@ register_loglik( "LDM", "records", "gumbel",
 
                    ## case where last record is not last observation
                    s3=0
-                   if( (Ln[m] < T) == TRUE  ) {
-                     s3a=log(cdf( Rn[m]-theta * (Ln[m]+1):T, par=list(loc = loc, scale = scale) )  )
+                   if( (Ln[m] < n) == TRUE  ) {
+                     s3a=log(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(loc = loc, scale = scale) )  )
                      s3 = sum(s3a[is.finite(s3a)])
                    }
                    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
@@ -749,7 +764,8 @@ register_loglik( "LDM", "records", "norm",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T <- data$time
+                   n <- data$time[1]
+
                    if( all(c("theta", "mean", "sd") %in% names(params)) == FALSE ) stop("parameterstheta, mean, sd should be present.")
                    theta <- as.numeric(params["theta"])
                    mean <- as.numeric(params["mean"])
@@ -784,8 +800,8 @@ register_loglik( "LDM", "records", "norm",
 
                    ## case where last record is not last observation
                    s3=0
-                   if( (Ln[m] < T) == TRUE  ) {
-                     s3a= log(cdf( Rn[m]-theta * (Ln[m]+1):T, par=list(mean = mean, sd = sd) )  )
+                   if( (Ln[m] < n) == TRUE  ) {
+                     s3a= log(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(mean = mean, sd = sd) )  )
                      s3 = sum(s3a[is.finite(s3a)])
                      }
                    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
@@ -801,7 +817,8 @@ register_loglik( "LDM", "records", "frechet",
 
                    Rn <- data$rec_values
                    Ln <- data$rec_times
-                   T <- data$time
+                   n <- data$time[1]
+
                    if( all(c("theta", "shape", "scale") %in% names(params)) == FALSE ) stop("parameters theta, shape, scale should be present.")
                    theta <- as.numeric(params["theta"])
                    shape <- as.numeric(params["shape"])
@@ -836,8 +853,8 @@ register_loglik( "LDM", "records", "frechet",
 
                    ## case where last record is not last observation
                    s3=0
-                   if( (Ln[m] < T) == TRUE  ) {
-                     s3a=log(cdf( Rn[m]-theta * (Ln[m]+1):T, par=list(shape = shape, scale = scale) )  )
+                   if( (Ln[m] < n) == TRUE  ) {
+                     s3a=log(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(shape = shape, scale = scale) )  )
                      s3 = sum(s3a[is.finite(s3a)])
                    }
                    if (is.nan(s3) || !is.finite(s3)) return(-Inf)

@@ -9,7 +9,7 @@ Test_YNM_Geom(
   alpha = 0.05,
   K = NULL,
   warmup = NULL,
-  info = c("All", "Records"),
+  obs_type = c("all", "records"),
   record_times = NA
 )
 }
@@ -23,12 +23,12 @@ If NULL, defaults to \eqn{min(4, length(gaps))}.}
 
 \item{warmup}{Integer, number of initial gaps to discard (default = NULL).}
 
-\item{info}{String. "All" if data provided is the whole series \eqn{X_t} or
-"Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+\item{obs_type}{String. "all" if data provided is the whole series \eqn{X_t} or
+"records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}
 
 \item{record_times}{Numeric vector of the occurence times of records. (Default is NA).
-Forced in case "info" = "Records"}
+Forced in case "obs_type" = "records"}
 }
 \value{
 A list with elements:

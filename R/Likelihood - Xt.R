@@ -1,12 +1,4 @@
-logLik_records <- function(model, obs_type, dist, data, params) {
-  # lookup
-  f <- loglik_registry[[model]][[obs_type]][[dist]]
 
-  if (is.null(f))
-    stop("Likelihood expression not registered for this (model, obs_type, dist).")
-
-  f(data, params)
-}
 
 ## convenience wrapper for user
 lik <- function(model, obs_type, dist, data, params) {

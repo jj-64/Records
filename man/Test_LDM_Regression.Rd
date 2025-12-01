@@ -8,7 +8,7 @@ Test_LDM_Regression(
   X,
   alpha = 0.05,
   RSq = 0.8,
-  info = c("all"),
+  obs_type = c("all"),
   record_times = NA
 )
 }
@@ -20,12 +20,12 @@ Test_LDM_Regression(
 \item{RSq}{Numeric, minimum adjusted R-squared required to accept the LDM
 hypothesis (default = 0.8).}
 
-\item{info}{String. "all" if data provided is the whole series \eqn{X_t} or
-"Records" if the underlying series is \eqn{R_n}. In this case, the parameter
+\item{obs_type}{String. "all" if data provided is the whole series \eqn{X_t} or
+"records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}
 
 \item{record_times}{Numeric vector of the occurence times of records. (Default is NA).
-Forced in case "info" = "Records"}
+Forced in case "obs_type" = "records"}
 }
 \value{
 A list with components:
