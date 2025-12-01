@@ -328,7 +328,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 
   # --- Estimate gamma if not provided ---
   if (is.na(gamma)) {
-    estimated =  Estimate_YNM_MLE_Indicator(X, variance = TRUE, approximate=FALSE, min = 1.01, max=5, step=0.01)
+    estimated =  estimate_YNM_mle_indicator(X, variance = TRUE, approximate=FALSE, min = 1.01, max=5, step=0.01)
     gamma <- estimated$gamma
     v_gamma = estimated$variance
   }

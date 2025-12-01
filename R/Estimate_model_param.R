@@ -59,21 +59,21 @@ estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias 
   if(obs_type == "records"){
   if (model == "LDM"){
     if (method == "moments" && bias == TRUE) {
-      est <- Estimate_LDM_NT(X, variance = variance, scale=args$scale)
+      est <- estimate_LDM_moments(X, variance = variance, scale=args$scale)
 
     } else if (method == "moments" && bias == FALSE) {
-      est = Estimate_LDM_NT_unbiased(X, variance = variance, scale=args$scale)
+      est = estimate_LDM_moments_unbias(X, variance = variance, scale=args$scale)
 
     } else if (method == "MLE_indicator") {
-      est = Estimate_LDM_MLE_indicator(X, variance = variance, scale=args$scale, min = args$min, max=args$max, step=args$step)
+      est = estimate_LDM_mle_indicator(X, variance = variance, scale=args$scale, min = args$min, max=args$max, step=args$step)
 
     }
   } else if(model == "YNM"){
     if (method == "moments" && bias == TRUE) {
-      est <- Estimate_YNM_NT(X, variance = variance)
+      est <- estimate_YNM_moments(X, variance = variance)
 
     } else if (method == "moments" && bias == FALSE) {
-      est = Estimate_YNM_NT_unbiased(X, variance = variance)
+      est = estimate_YNM_moments_unbias(X, variance = variance)
 
     } else if (method == "MLE_indicator") {
       est = Estimate_YNM_MLE_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)

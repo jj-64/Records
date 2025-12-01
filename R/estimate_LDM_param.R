@@ -20,7 +20,7 @@
 #' \deqn{ V(\hat{\theta}) = \frac{1 - e^{-\theta / \text{scale}}}{e^{-\theta / \text{scale}}} }
 #'
 #' This estimator is known to be biased, and a bias-corrected version is provided in
-#' \code{\link{Estimate_LDM_NT_unbiased}}.
+#' \code{\link{estimate_LDM_moments_unbias}}.
 #' @param X numeric vector representing the time series data.
 #' @param variance Logical if to compute variance (default = TRUE)
 #' @param scale positive Numeric. Default is 1. The scale parameter of the \eqn{Gumbel} underlying distribution used for variance computation.
@@ -32,15 +32,15 @@
 #' Yt <- rnorm(25)
 #' Xt <- Yt + 0.2 * (1:25)
 #' rec_counts(Xt)  # Number of records
-#' Estimate_LDM_NT(X = Xt)
-#' Estimate_LDM_NT(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
+#' estimate_LDM_moments(X = Xt)
+#' estimate_LDM_moments(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
 #' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #' $theta
 #' [1] 0.4462871
 #'
 #' $variance
 #' [1] 0.5625
-Estimate_LDM_NT <- function(X, variance = TRUE, scale=1) {
+estimate_LDM_moments <- function(X, variance = TRUE, scale=1) {
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
   # stopifnot(is.numeric(X), length(X) >= 4)
   # stopifnot(scale > 0)
@@ -61,13 +61,13 @@ Estimate_LDM_NT <- function(X, variance = TRUE, scale=1) {
 #' Bias-corrected estimator for theta in LDM (with optional variance)
 #'
 #' Compute a bias-corrected estimate of \eqn{\theta} for the Linear Drift Model (LDM)
-#' based on the number of records (NT) estimator in \code{\link{Estimate_LDM_NT}},
+#' based on the number of records (NT) estimator in \code{\link{estimate_LDM_moments}},
 #' and optionally compute the
 #' asymptotic variance of the bias-corrected estimator.
 #' If requested (variance = TRUE), it computes the variance \eqn{\vartheta(\theta)}
 #' for the unbiased estimator of \eqn{\theta} in the LDM process.
 #'
-#' The function calls the (unbiased) NT estimator routine "Estimate_LDM_NT"
+#' The function calls the (unbiased) NT estimator routine "estimate_LDM_moments"
 #' (which must return a list with \eqn{\theta} and optionally "variance"), applies the
 #' analytical bias correction and — if requested — computes the variance using the
 #' first order derivative formula and the variance of the original estimator.
@@ -108,17 +108,17 @@ Estimate_LDM_NT <- function(X, variance = TRUE, scale=1) {
 #' Yt <- rnorm(25)
 #' Xt <- Yt + 0.2 * (1:25)
 #' rec_counts(Xt)  # Number of records
-#' res <- Estimate_LDM_NT_unbiased(Xt, variance = TRUE, scale = 1)
+#' res <- estimate_LDM_moments_unbias(Xt, variance = TRUE, scale = 1)
 #' res$theta; res$variance
 #' }
-#' Estimate_LDM_NT_unbiased(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
+#' estimate_LDM_moments_unbias(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
 #' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #' $theta
 #' [1] 0.3601306
 #'
 #' $variance
 #' [1] 0.3116952
-Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
+estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
 
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
   if (scale <= 0)
@@ -128,19 +128,19 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 
   # --- 0. Obtain baseline NT estimate (assumes this function exists and returns list(theta, variance)) ---
   # Use variance = FALSE to avoid unnecessary computation inside that function if we will compute variance here
-  if (!exists("Estimate_LDM_NT", mode = "function")) {
-    stop("Required helper function 'Estimate_LDM_NT' not found in the environment.")
+  if (!exists("estimate_LDM_moments", mode = "function")) {
+    stop("Required helper function 'estimate_LDM_moments' not found in the environment.")
   }
 
   	## Obtain biased estimator
-  Estimated <- Estimate_LDM_NT(X = X, variance = TRUE, scale = scale)
+  Estimated <- estimate_LDM_moments(X = X, variance = TRUE, scale = scale)
   if (!is.list(Estimated) || is.null(Estimated$theta)) {
-    stop("Estimate_LDM_NT must return a list with at least element $theta.")
+    stop("estimate_LDM_moments must return a list with at least element $theta.")
   }
 
   theta_biased <- Estimated$theta
   # theta in this function is treated as theta_scaled = theta / scale (user said theta is theta/scale)
-  # but to be explicit: treat input/returned theta on same scale as Estimate_LDM_NT
+  # but to be explicit: treat input/returned theta on same scale as estimate_LDM_moments
   theta_scaled_biased <- theta_biased / scale
 
   # --- 1. Bias correction (vectorized) ---
@@ -160,11 +160,11 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 
   bias_est <- term1 + term2 * term4
 
-  # bias corrected theta (on original scale returned by Estimate_LDM_NT)
+  # bias corrected theta (on original scale returned by estimate_LDM_moments)
   theta_unbiased <- theta_biased - bias_est
 
-  # If these theta values are supposed to be returned scaled or unscaled depends on Estimate_LDM_NT contract
-  # We return on the same scale as Estimate_LDM_NT returned theta (consistent).
+  # If these theta values are supposed to be returned scaled or unscaled depends on estimate_LDM_moments contract
+  # We return on the same scale as estimate_LDM_moments returned theta (consistent).
 
   # --- 2. Optional: compute variance of the unbiased estimator ---
   var_out <- NA_real_
@@ -209,8 +209,8 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
       2 * (mean_P_t - P_theta) * (mean_dP_t - dP_dtheta)
 
 	 # lambda = variance of biased NT estimator
-    # lambda_theta: variance of the biased NT-estimator (obtained from Estimate_LDM_NT if available)
-    # If Estimate_LDM_NT returned variance use it; otherwise fallback to analytical function if available.
+    # lambda_theta: variance of the biased NT-estimator (obtained from estimate_LDM_moments if available)
+    # If estimate_LDM_moments returned variance use it; otherwise fallback to analytical function if available.
     lambda_theta <- NA_real_
     if (!is.null(Estimated$variance) && is.numeric(Estimated$variance)) {
       lambda_theta <- Estimated$variance
@@ -267,10 +267,10 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #' Yt <- rnorm(25)
 #' Xt <- Yt + 0.2 * (1:25)
 #' rec_counts(Xt)  # Number of records
-#' res <- Estimate_LDM_MLE_indicator(Xt, variance = TRUE, scale = 1)
+#' res <- estimate_LDM_mle_indicator(Xt, variance = TRUE, scale = 1)
 #' res$theta; res$variance
 #'
-#' Estimate_LDM_MLE_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
+#' estimate_LDM_mle_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
 #' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #'
 #' $theta
@@ -278,7 +278,7 @@ Estimate_LDM_NT_unbiased <- function(X, variance = TRUE, scale = 1) {
 #'
 #' $variance
 #' # [1] 0.02139224
-Estimate_LDM_MLE_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001, max = 5, step = 0.01) {
+estimate_LDM_mle_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001, max = 5, step = 0.01) {
   if (!is.numeric(X) || length(X) < 4)
     stop("X must be a numeric vector with length > 4.")
   if (scale <= 0)

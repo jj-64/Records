@@ -40,7 +40,7 @@
 #' [29] 2.1392445 2.1252441 3.2127646 2.2451416 2.6506264 2.7209208 2.5084019 2.8734849 3.1062846 2.5480120 2.6141440 2.5286307 2.5044793 2.8896440
 #' [43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067 3.1171138
 #'
-#' Estimate_YNM_NT(X)
+#' estimate_YNM_moments(X)
 #' # $gamma
 #' # [1] 1.282051
 #' #
@@ -48,7 +48,7 @@
 #' # [1] 0.4635951
 #'
 #' @export
-Estimate_YNM_NT <- function(X, variance = TRUE) {
+estimate_YNM_moments <- function(X, variance = TRUE) {
   if (!is.numeric(X) || length(X) < 4)
     stop("X must be a numeric vector of length > 4.")
 
@@ -73,7 +73,7 @@ Estimate_YNM_NT <- function(X, variance = TRUE) {
 #' Unbiased Estimation of Gamma Parameter based on number of records (with optional variance)
 #'
 #' Computes **bias-corrected** estimator of the (\eqn{\gamma}) parameter using a bias correction, correcting
-#' \code{\link{Estimate_YNM_NT}}, and
+#' \code{\link{estimate_YNM_moments}}, and
 #' optionally computes its analytical variance.
 #'
 #' @details
@@ -157,13 +157,13 @@ Estimate_YNM_NT <- function(X, variance = TRUE) {
 #' [29] 2.1392445 2.1252441 3.2127646 2.2451416 2.6506264 2.7209208 2.5084019 2.8734849 3.1062846 2.5480120 2.6141440 2.5286307 2.5044793 2.8896440
 #' [43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067 3.1171138
 #'
-#' Estimate_YNM_NT_unbiased(X)
+#' estimate_YNM_moments_unbias(X)
 #' # $gamma
 #' # [1] 1.212979
 #' #
 #' # $variance
 #' # [1] 0.2997593
-Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second estimator*
+estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the second estimator*
 
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
 
@@ -171,12 +171,12 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
 
   # --- 0. Obtain baseline NT estimate (assumes this function exists and returns list(param, variance)) ---
   # Use variance = FALSE to avoid unnecessary computation inside that function if we will compute variance here
-  if (!exists("Estimate_YNM_NT", mode = "function")) {
-    stop("Required helper function 'Estimate_YNM_NT' not found in the environment.")
+  if (!exists("estimate_YNM_moments", mode = "function")) {
+    stop("Required helper function 'estimate_YNM_moments' not found in the environment.")
   }
-  Estimated <- Estimate_YNM_NT(X = X, variance = TRUE)
+  Estimated <- estimate_YNM_moments(X = X, variance = TRUE)
   if (!is.list(Estimated) || is.null(Estimated$param)) {
-    stop("Estimate_YNM_NT must return a list with at least element $gamma.")
+    stop("estimate_YNM_moments must return a list with at least element $gamma.")
   }
 
   gamma_biased = Estimated$param
@@ -222,7 +222,7 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
     fisher = fisher + (3*dP *(sum(P_t*(1-P_t))/T^2) * (term)^2 ) /(1-P)^4
     fisher = fisher + (mean_dP_t/T - sum(dP_t^2)/T^2 + 2*(term) * (mean_dP_t - dP) ) /(1-P)^3
 
-    # lambda_gamma: variance of the biased NT-estimator (obtained from Estimate_LDM_NT if available)
+    # lambda_gamma: variance of the biased NT-estimator (obtained from estimate_LDM_moments if available)
         lambda_gamma <- NA_real_
     if (!is.null(Estimated$variance) && is.numeric(Estimated$variance)) {
       lambda_gamma <- Estimated$variance
@@ -305,21 +305,21 @@ Estimate_YNM_NT_unbiased = function(X, variance = TRUE){ ## compute the second e
 #' [29] 2.1392445 2.1252441 3.2127646 2.2451416 2.6506264 2.7209208 2.5084019 2.8734849 3.1062846 2.5480120 2.6141440 2.5286307 2.5044793 2.8896440
 #' [43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067 3.1171138
 #'
-#' Estimate_YNM_MLE_Indicator(X)
+#' estimate_YNM_mle_indicator(X)
 #' # $gamma
 #' # [1] 1.183
 #' #
 #' # $variance
 #' # [1] 0.006915017
 #'
-#' Estimate_YNM_MLE_Indicator(X, approximate = TRUE)
+#' estimate_YNM_mle_indicator(X, approximate = TRUE)
 #' # $gamma
 #' # [1] 1.183
 #'
 #' # $variance
 #' # [1] 0.00512213
 #' @export
-Estimate_YNM_MLE_Indicator <- function(X, variance = TRUE, approximate = FALSE,
+estimate_YNM_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
                                        min = 1, max = 5, step = 0.001) {
 
   if (!is.numeric(X) || length(X) < 4)
