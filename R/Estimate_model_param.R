@@ -16,21 +16,21 @@
 #' X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
 #' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729)
 #'
-#' Estimate_model_param(X, method="moments", bias = TRUE, model = "LDM", scale=1)
+#' estimate_model_param(X, method="moments", bias = TRUE, model = "LDM", scale=1)
 #' #  $param
 #' # [1] 0.4462871
 #'
 #' #  $variance
 #' # [1] 0.5625
 #'
-#'> Estimate_model_param(X, method="moments", bias = FALSE, model = "LDM", scale=1)
+#'> estimate_model_param(X, method="moments", bias = FALSE, model = "LDM", scale=1)
 #' #  $param
 #' #  [1] 0.3601306
 # '
 #' #  $variance
 #' #  [1] 0.3116952
 #'
-#' Estimate_model_param(X, method="moments", model = "YNM")
+#' estimate_model_param(X, method="moments", model = "YNM")
 #'
 #' # $param
 #' # 1.5625
@@ -38,20 +38,20 @@
 #' # $variance
 #' # [1] 1.373291
 #'
-#' Estimate_model_param(X, method="moments", bias = FALSE, model = "YNM")
+#' estimate_model_param(X, method="moments", bias = FALSE, model = "YNM")
 #' # $param
 #' # [1] 1.388625
 #'
 #' # $variance
 #' # [1] 0.7497066
 #'
-#' Estimate_model_param(X, method="MLE_indicator", model = "YNM")
+#' estimate_model_param(X, method="MLE_indicator", model = "YNM")
 #' # $param
 #' # [1] 1.388625
 #'
 #' # $variance
 #' # [1] 0.7497066
-Estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias = TRUE ,model=c("LDM","YNM"), variance = TRUE, obs_type = "records", ...) {
+estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias = TRUE ,model=c("LDM","YNM"), variance = TRUE, obs_type = "records", ...) {
   method <- match.arg(method)
   model <- match.arg(model)
   args <- list(...)
@@ -66,6 +66,7 @@ Estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias 
 
     } else if (method == "MLE_indicator") {
       est = Estimate_LDM_MLE_indicator(X, variance = variance, scale=args$scale, min = args$min, max=args$max, step=args$step)
+
     }
   } else if(model == "YNM"){
     if (method == "moments" && bias == TRUE) {
