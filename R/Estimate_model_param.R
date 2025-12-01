@@ -1,15 +1,20 @@
 #' Estimate theta parameter in LDM model
 #'
 #' Estimates the drift parameter theta in the Linear Drift Model (LDM)
-#' using different methods: "moments", "moments_unbias", or "MLE".
+#' using different methods: "moments", or "MLE" using indicator series
 #'
 #' @param X Numeric vector of the LDM process.
-#' @param method Character string, one of "moments", "moments_unbias", or "MLE_indicator".
+#' @param method Character string, one of "moments" or "mle_indicator".
 #' @param bias Logical, if biased estimator when moments estimation (default = TRUE)
 #' @param model Character string, one of "LDM", "YNM"
 #' @param variance logical to return variance or nor (default = TRUE)
 #' @param scale Scale parameter of the underlying Gumbel distribution (default = 1).
 #' @param min,max Search bounds for MLE method.
+#' @details choosing the "mle_indicator" should provide additional arguments of
+#' min, max, step for the parameter grid search
+#' approximate : Logical for variance.
+#' scale in case of LDM
+#' For more info, see \code{\link{estimate_YNM_mle_indicator}} and \code{\link{estimate_LDM_mle_indicator}}
 #' @return Numeric estimate of theta and variance (if TRUE)
 #' @export
 #' @examples
@@ -23,12 +28,20 @@
 #' #  $variance
 #' # [1] 0.5625
 #'
-#'> estimate_model_param(X, method="moments", bias = FALSE, model = "LDM", scale=1)
+#'  estimate_model_param(X, method="moments", bias = FALSE, model = "LDM", scale=1)
 #' #  $param
 #' #  [1] 0.3601306
 # '
 #' #  $variance
 #' #  [1] 0.3116952
+#'
+#'#' estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1, min= 0.01, max=2, step = 0.001, approximate = FALSE)
+#' # $param
+#' # [1] 0.328
+#'
+#' # $variance
+#' # [1] 0.02128002
+#'
 #'
 #' estimate_model_param(X, method="moments", model = "YNM")
 #'
@@ -45,13 +58,13 @@
 #' # $variance
 #' # [1] 0.7497066
 #'
-#' estimate_model_param(X, method="MLE_indicator", model = "YNM")
+#' estimate_model_param(X, method="mle_indicator", model = "YNM", min= 1, max=5, step = 0.001, approximate = FALSE)
 #' # $param
-#' # [1] 1.388625
+#' # [1] 1.388
 #'
 #' # $variance
-#' # [1] 0.7497066
-estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias = TRUE ,model=c("LDM","YNM"), variance = TRUE, obs_type = "records", ...) {
+#' # [1] 0.0409829
+estimate_model_param <- function(X, method = c("moments","mle_indicator"), bias = TRUE ,model=c("LDM","YNM"), variance = TRUE, obs_type = "records", ...) {
   method <- match.arg(method)
   model <- match.arg(model)
   args <- list(...)
@@ -64,8 +77,8 @@ estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias 
     } else if (method == "moments" && bias == FALSE) {
       est = estimate_LDM_moments_unbias(X, variance = variance, scale=args$scale)
 
-    } else if (method == "MLE_indicator") {
-      est = estimate_LDM_mle_indicator(X, variance = variance, scale=args$scale, min = args$min, max=args$max, step=args$step)
+    } else if (method == "mle_indicator") {
+      est = estimate_LDM_mle_indicator(X, variance = variance, min = args$min, max=args$max, step=args$step, scale = args$scale)
 
     }
   } else if(model == "YNM"){
@@ -75,8 +88,8 @@ estimate_model_param <- function(X, method = c("moments","MLE_indicator"), bias 
     } else if (method == "moments" && bias == FALSE) {
       est = estimate_YNM_moments_unbias(X, variance = variance)
 
-    } else if (method == "MLE_indicator") {
-      est = Estimate_YNM_MLE_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)
+    } else if (method == "mle_indicator") {
+      est = estimate_YNM_mle_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)
     }
   }
   }
