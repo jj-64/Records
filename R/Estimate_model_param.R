@@ -1,6 +1,7 @@
-#' Estimate theta parameter in LDM model
+#' Estimate drift/power parameters in LDM and YNM
 #'
 #' Estimates the drift parameter theta in the Linear Drift Model (LDM)
+#' and the gamma/power parameter in Yang-Nevzrovo model (YNM)
 #' using different methods: "moments", or "MLE" using indicator series
 #'
 #' @param X Numeric vector of the LDM process.
@@ -35,7 +36,7 @@
 #' #  $variance
 #' #  [1] 0.3116952
 #'
-#'#' estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1, min= 0.01, max=2, step = 0.001, approximate = FALSE)
+#' estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1, min= 0.01, max=2, step = 0.001, approximate = FALSE)
 #' # $param
 #' # [1] 0.328
 #'
@@ -44,7 +45,6 @@
 #'
 #'
 #' estimate_model_param(X, method="moments", model = "YNM")
-#'
 #' # $param
 #' # 1.5625
 #'

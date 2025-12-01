@@ -1,4 +1,42 @@
-#################### IID #####################
+#' @title Record Rate
+#' @description Computes the record rate/Probability ob observing a record at times \eqn{P(R_t)} at time \eqn{t}
+#'   (or its asymptotic limit as \eqn{t \to \infty})
+#'   different record process.
+#'
+#' @param model character, model name one of "iid", "LDM", "YNM" or "DTRW"
+#' @param t Time index (integer). If \code{t = Inf} or \code{NULL},
+#'   the asymptotic record rate \eqn{P(R_\infty)} is returned.
+#'
+#' @details
+#' For more details look at \code{\link{rec_rate_YNM}}, \code{\link{rec_rate_LDM}},
+#' \code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
+#' @return A numeric value representing the record rate probability.
+#'
+#' @examples
+#' rec_rate(model = "iid", t=10)
+#' rec_rate("DTRW",10, approximate = FALSE)
+#' rec_rate("DTRW",10, approximate = TRUE)
+#' rec_rate("LDM",t = 10,theta = 0.1, scale= 1)
+#' rec_rate(model = "YNM", gamma = 1.1, t = 10)
+#' rec_rate(model = "YNM", gamma = 1.1, t = Inf)
+#' @export
+rec_rate <- function(model = c("iid", "DTRW", "YNM", "LDM"), t, approximate = FALSE, ...){
+
+  model <- match.arg(model)
+  args <- list(...)
+
+  if(model == "iid"){
+    return(rec_rate_iid(t))
+  } else if (model == "DTRW"){
+    return(rec_rate_DTRW(t, approximate = approximate))
+  } else if (model == "YNM"){
+    return(rec_rate_YNM(gamma = args$gamma, t= t))
+  } else if (model == "LDM"){
+    return(rec_rate_LDM(theta = args$theta, t, scale = args$scale))
+  }
+}
+
+##  IID ------------------------------
 #' @title Record Rate in the Classical Model (iid)
 #'
 #' @description Computes the probability of observing a record at time \eqn{t} for an i.i.d. sequence.
@@ -12,7 +50,7 @@ rec_rate_iid = function(t){
   1/t
 }
 
-#################### DTRW #####################
+##  DTRW--------------------------
 #' @title Record Rate for the Discrete-Time Random Walk (DTRW) Process
 #'
 #' @description Computes the record rate/probability of observing record \eqn{P(R_t)} at time \eqn{t}
@@ -67,7 +105,7 @@ rec_rate_DTRW <- function(t, approximate = FALSE) {
   }
 }
 
-#################### LDM #####################
+## LDM ----------------------------
 #' @title Record Rate in the Linear Drift Model (LDM)
 #'
 #' @description Computes the record rate/probability of observing record \eqn{P(R_t)} at time \eqn{t}
@@ -114,7 +152,7 @@ rec_rate_DTRW <- function(t, approximate = FALSE) {
 #' abline(h = rec_rate_LDM(0.5, Inf, scale = 1), col = "red", lty = 2)
 #'
 #' @export
-rec_rate_LDM <- function(theta, t = Inf, location = 0, scale = 1) {
+rec_rate_LDM <- function(theta, t = Inf, loc = 0, scale = 1) {
   if (is.infinite(t[1]) || is.null(t)) {
     # Asymptotic case
     return(1 - exp(-theta / scale))
@@ -126,7 +164,7 @@ rec_rate_LDM <- function(theta, t = Inf, location = 0, scale = 1) {
 
 
 
-#################### YNM-Nevzorov #####################
+## YNM-Nevzorov -----------------------------
 #' @title Record Rate in YNM-Nevzorov Model
 #' @description Computes the record rate/Probability ob observing a record at times \eqn{P(R_t)} at time \eqn{t}
 #'   (or its asymptotic limit as \eqn{t \to \infty})
