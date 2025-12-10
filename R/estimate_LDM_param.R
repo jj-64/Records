@@ -52,7 +52,7 @@ estimate_LDM_moments <- function(X, variance = TRUE, scale=1) {
     var_theta = NA
 	 # variance formula
   if(variance) {var_theta =  (1-exp(-theta/scale))/exp(-theta/scale) }
-  return(list("theta"= theta, "variance"=var_theta))
+  return(list("param"= theta, "variance"=var_theta))
 }
 
 
@@ -134,11 +134,11 @@ estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
 
   	## Obtain biased estimator
   Estimated <- estimate_LDM_moments(X = X, variance = TRUE, scale = scale)
-  if (!is.list(Estimated) || is.null(Estimated$theta)) {
-    stop("estimate_LDM_moments must return a list with at least element $theta.")
+  if (!is.list(Estimated) || is.null(Estimated$param)) {
+    stop("estimate_LDM_moments must return a list with at least element $param.")
   }
 
-  theta_biased <- Estimated$theta
+  theta_biased <- Estimated$param
   # theta in this function is treated as theta_scaled = theta / scale (user said theta is theta/scale)
   # but to be explicit: treat input/returned theta on same scale as estimate_LDM_moments
   theta_scaled_biased <- theta_biased / scale
