@@ -40,8 +40,9 @@ register_loglik( "iid", "all", "frechet",
   fun = function(data, params) {
     if(!is.numeric(data)) stop("data should be a numerical vector")
     if( all(c("shape", "scale") %in% names(params)) == FALSE ) stop("parameters shape, scale should be present in a list.")
+    location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(data)-1e-6))
 
-    sum(VGAM::dfrechet(x = data, location = 0, shape = as.numeric(params["shape"]), scale = params["scale"] ,log = TRUE))
+    sum(VGAM::dfrechet(x = data, location = location, shape = as.numeric(params["shape"]), scale = params["scale"] ,log = TRUE))
   }
 )
 
@@ -60,7 +61,7 @@ register_loglik( "iid", "all", "weibull",
                    if(!is.numeric(data)) stop("data should be a numerical vector")
                    if( all(c("shape", "scale") %in% names(params)) == FALSE ) stop("parameters shape, scale should be present in a list.")
 
-                   sum(log(dweibull(x = data, shape = as.numeric(params["shape"]), scale = as.numeric(params["scale"]) )))
+                   return(sum(dweibull(x = data, shape = as.numeric(params["shape"]), scale = as.numeric(params["scale"]), log= TRUE )))
                  }
 )
 ## Classical, Rn ------------------------
@@ -109,17 +110,18 @@ register_loglik("iid", "records", "frechet",
 
                   scale = as.numeric(params["scale"])
                   shape = as.numeric(params["shape"])
+                  location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(Rn)-1e-6))
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
-                  s1 <- sum(log(VGAM::dfrechet(Rn[-1], shape, scale)))
+                  s1 <- sum(log(VGAM::dfrechet(Rn[-1],  location = location, shape = shape, scale= scale)))
                   #Compute s2 using vectorized approach
                   intervals <- diff(Ln)-1
-                  s2b <- intervals * log(VGAM::pfrechet(Rn[-m], shape, scale))
+                  s2b <- intervals * VGAM::pfrechet(Rn[-m], location = location, shape = shape, scale= scale, log = TRUE)
                   s2 <- sum(s2b)
                   ##Compute s3 only if needed
                   s3 <- if (Ln[m] < n) {
-                    (n - Ln[m]) * log(VGAM::pfrechet(Rn[m], shape, scale))
+                    (n - Ln[m]) * VGAM::pfrechet(Rn[m], location = location,  shape = shape, scale= scale, log = TRUE)
                   } else {
                     0
                   }
@@ -151,7 +153,7 @@ register_loglik("iid", "records", "gumbel",
                   s2 <- sum(s2b)
                   ##Compute s3 only if needed
                   s3 <- if (Ln[m] < n) {
-                    (n - Ln[m]) * log(VGAM::pfrechetgumbel(Rn[m], loc, scale))
+                    (n - Ln[m]) * log(VGAM::pgumbel(Rn[m], loc, scale))
                   } else {
                     0
                   }
@@ -216,7 +218,7 @@ register_loglik("DTRW", "all", "cauchy",
                   if(!is.numeric(data)) stop("data should be a numerical vector")
                   if( all(c("loc", "scale") %in% names(params)) == FALSE ) stop("parameters loc, scale should be present in a list.")
 
-                  sum(log(dnorm(x = diff(data), location =params["loc"] , scale = as.numeric(params["scale"]))))
+                  sum(log(dcauchy(x = diff(data), location =as.numeric(params["loc"]) , scale = as.numeric(params["scale"]))))
                 }
 )
 
@@ -229,9 +231,9 @@ register_loglik( "DTRW", "records", "norm",
     Rn <- data$rec_values
     Ln <- data$rec_times
     n <- data$time[1]
-    if( all(c( "scale") %in% names(params)) == FALSE ) stop("parameters scale should be present in a list.")
+    if( all(c( "sd") %in% names(params)) == FALSE ) stop("parameters sd should be present in a list.")
 
-    loc = 0
+    mean = 0
     sd =as.numeric(params["sd"])
 
     # Example: probability that S_1, S_2, ..., S_5 all < 0
@@ -305,11 +307,13 @@ register_loglik( "YNM", "all", "frechet",
                    x=data
                    if(!is.numeric(x)) stop("data should be a numerical vector")
                    n= length(as.numeric(x))
+
                    if( all(c("gamma", "shape", "scale") %in% names(params)) == FALSE ) stop("parameters gamma, shape, scale should be present.")
 
                    gamma <- as.numeric(params["gamma"])
                    shape <- as.numeric(params["shape"])
                    scale <- as.numeric(params["scale"])
+                   location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(x)-1e-6))
 
                    ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
                    if (shape <=0 | scale <= 0) { ##
@@ -317,13 +321,13 @@ register_loglik( "YNM", "all", "frechet",
                    }
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dfrechet(x, shape=par$shape, scale=par$scale)}
-                   cdf=function(x,par) {VGAM::pfrechet(x, shape=par$shape, scale=par$scale)}
+                   pdf=function(x,par) {VGAM::dfrechet(x, location = par$location, shape=par$shape, scale=par$scale, log = TRUE)}
+                   cdf=function(x,par) {VGAM::pfrechet(x, location = par$location, shape=par$shape, scale=par$scale, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(gamma^(1:n)))
-                   s2 = sum(log(cdf(x, par=list(shape= shape, scale= scale))^(-1+gamma^(1:n))))
-                   s3 = sum(log(pdf(x, par=list(shape= shape, scale= scale))))
+                   s1 =  sum( (1:n) * log(gamma))
+                   s2 = sum( (-1+gamma^(1:n))  * cdf(x, par=list(location = location, shape= shape, scale= scale))  )
+                   s3 = sum(pdf(x, par=list(location = location, shape= shape, scale= scale)))
 
                    # s1 <- n* log(shape * scale^(-shape) )
                    # s2 <- -(shape + 1) * sum(log(x))
@@ -344,20 +348,21 @@ register_loglik( "YNM", "all", "gumbel",
                    gamma <- as.numeric(params["gamma"])
                    loc <- as.numeric(params["loc"])
                    scale <- as.numeric(params["scale"])
+                   tvec = seq_len(n)
 
                    ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or loc <= 0, we return -Inf)
-                   if (scale <= 0) { ##
+                   if (scale <= 0 || gamma <= 0) { ##
                      return(-Inf)  # Invalid parameters, return a large negative value
                    }
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dgumbel(x, loc=par$loc, scale=par$scale)}
-                   cdf=function(x,par) {VGAM::pgumbel(x, loc=par$loc, scale=par$scale)}
+                   pdf=function(x,par) {VGAM::dgumbel(x, location=par$loc, scale=par$scale, log = TRUE)}
+                   cdf=function(x,par) {VGAM::pgumbel(x, location=par$loc, scale=par$scale, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(gamma^(1:n)))
-                   s2 = sum(log(cdf(x, par=list(loc= loc, scale= scale))^(-1+gamma^(1:n))))
-                   s3 = sum(log(pdf(x, par=list(loc= loc, scale= scale))))
+                   s1 = sum( tvec * log(gamma) )
+                   s2 = sum( (gamma^tvec - 1) * cdf(x, par=list(loc= loc, scale= scale) ) )
+                   s3 = sum(pdf(x, par=list(loc= loc, scale= scale)))
 
                    return(s1+s2+s3)
                  }
@@ -381,13 +386,13 @@ register_loglik( "YNM", "all", "norm",
                    }
 
                    ## pdf
-                   pdf=function(x,par) {dnorm(x, mean=par$mean, sd=par$sd)}
-                   cdf=function(x,par) {pnorm(x, mean=par$mean, sd=par$sd)}
+                   pdf=function(x,par) {dnorm(x, mean=par$mean, sd=par$sd, log = TRUE)}
+                   cdf=function(x,par) {pnorm(x, mean=par$mean, sd=par$sd, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(gamma^(1:n)))
-                   s2 = sum(log(cdf(x, par=list(mean= mean, sd= sd))^(-1+gamma^(1:n))))
-                   s3 = sum(log(pdf(x, par=list(mean= mean, sd= sd))))
+                   s1 = sum( (1:n) * log(gamma))
+                   s2 = sum((-1+gamma^(1:n)) * cdf(x, par=list(mean= mean, sd= sd)) )
+                   s3 = sum( pdf(x, par=list(mean= mean, sd= sd)) )
 
                    return(s1+s2+s3)
                  }
@@ -406,18 +411,19 @@ register_loglik( "YNM", "all", "weibull",
                    scale <- as.numeric(params["scale"])
 
                    ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
-                   if (shape <=0 | scale <= 0) { ##
+                   if (shape <=0 || scale <= 0) { ##
                      return(-Inf)  # Invalid parameters, return a large negative value
                    }
 
                    ## pdf
-                   pdf=function(x,par) {dweibull(x, shape=par$shape, scale=par$scale)}
-                   cdf=function(x,par) {pweibull(x, shape=par$shape, scale=par$scale)}
+                   pdf=function(x,par) {dweibull(x, shape=par$shape, scale=par$scale, log = TRUE)}
+                   cdf=function(x,par) {pweibull(x, shape=par$shape, scale=par$scale, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(gamma^(1:n)))
-                   s2 = sum(log(cdf(x, par=list(shape= shape, scale= scale))^(-1+gamma^(1:n))))
-                   s3 = sum(log(pdf(x, par=list(shape= shape, scale= scale))))
+                   tvec = seq_len(n)
+                   s1 = sum( tvec * log(gamma) )
+                   s2 = sum( (gamma^tvec - 1) * cdf(x, par=list(shape= shape, scale= scale) ) )
+                   s3 = sum(pdf(x, par=list(shape= shape, scale= scale)))
 
                    return(s1+s2+s3)
                  }
@@ -439,32 +445,33 @@ register_loglik( "YNM", "records", "frechet",
     shape <- as.numeric(params["shape"])
     scale <- as.numeric(params["scale"])
     m = length(Rn) #m= rec_counts(y)  ## number of records
+    location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(Rn)-1e-6))
 
     # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
-    if (scale <= 0 | shape<=0) {
+    if (scale <= 0 || shape<=0 || gamma <0) {
       return(-Inf)  # Invalid parameters, return a large negative value
     }
 
     ## pdf
-    pdf=function(x,par) {VGAM::dfrechet(x=x, shape=par$shape, scale=par$scale)}
+    pdf=function(x,par) {VGAM::dfrechet(x=x, location = par$location, shape=par$shape, scale=par$scale, log = TRUE)}
     ## cdf
-    cdf=function(x,par) {VGAM::pfrechet(q=x, shape= par$shape, scale=par$scale)}
+    cdf=function(x,par) {VGAM::pfrechet(q=x, location = par$location, shape= par$shape, scale=par$scale, log = TRUE)}
 
 
     # your exact YNM record-pair likelihood
-    s1 = log(gamma^(sum(Ln)))
-    s2 = sum(log(pdf(Rn, par = list(shape=shape, scale=scale)) * cdf(Rn, par = list(shape=shape, scale=scale))^(-1+gamma^Ln)))
+    s1 = sum(Ln) *log(gamma)
+    s2 = sum( pdf(Rn, par = list(location = location, shape=shape, scale=scale)) + (-1+gamma^Ln) * cdf(Rn, par = list(location = location, shape=shape, scale=scale)))
     s3b = 0
     for( i in 1:(m-1)  ){
       if((Ln[i]+1 <= Ln[i+1]) == TRUE){ ## we have non-records in between
-        s3b[i]= sum(log(cdf(Rn[i], par = list(shape=shape, scale=scale))^( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]))/(1-gamma)) ) )
+        s3b[i]= sum( ( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]))/(1-gamma)) * cdf(Rn[i], par = list(location = location, shape=shape, scale=scale)) )
       }
     }
     s3 = sum(na.omit(s3b))
 
     s4=0
     if (Ln[m] < n) {
-      s4 = sum(log(cdf(Rn[m], par = list(shape=shape, scale=scale))^((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
+      s4 = sum( ((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(location = location, shape=shape, scale=scale) ))
       }
      return(s1+s2+s3+s4)
     }
@@ -491,27 +498,27 @@ register_loglik( "YNM", "records", "gumbel",
                    }
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dgumbel(x=x, location=par$loc, scale=par$scale)}
+                   pdf=function(x,par) {VGAM::dgumbel(x=x, location=par$loc, scale=par$scale, log = TRUE)}
                    ## cdf
-                   cdf=function(x,par) {VGAM::pgumbel(q=x, location=par$loc, scale=par$scale)}
+                   cdf=function(x,par) {VGAM::pgumbel(q=x, location=par$loc, scale=par$scale, log = TRUE)}
 
 
                    # your exact YNM record-pair likelihood
-                   s1 = log(gamma^(sum(Ln)))
+                   s1 = sum(Ln) * log(gamma)
 
-                   s2 = sum(log(pdf(Rn, par = list(loc = loc, scale=scale)) * cdf(Rn, par = list(loc=loc, scale=scale))^(-1+gamma^Ln)))
+                   s2 = sum(pdf(Rn, par = list(loc = loc, scale=scale)) + (-1+gamma^Ln) * cdf(Rn, par = list(loc=loc, scale=scale)))
 
                    s3b = 0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
-                       s3b[i]= sum(log(cdf(Rn[i], par = list(loc = loc, scale=scale))^( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]))/(1-gamma)) ) )
+                       s3b[i]= sum(( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]))/(1-gamma)) * cdf(Rn[i], par = list(loc = loc, scale=scale)) )
                      }
                    }
                    s3 = sum(na.omit(s3b))
 
                    s4=0
                    if (Ln[m] < n) {
-                     s4 = sum(log(cdf(Rn[m], par = list(loc = loc, scale=scale))^( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
+                     s4 = sum( ( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(loc = loc, scale=scale)) )
                    }
                    return(s1+s2+s3+s4)
                  }
@@ -538,25 +545,25 @@ register_loglik( "YNM", "records", "norm",
                    }
 
                    ## pdf
-                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd)}
+                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd, log = TRUE)}
                    ## cdf
-                   cdf=function(x,par) {pnorm(q=x, mean=par$mean, sd=par$sd)}
+                   cdf=function(x,par) {pnorm(q=x, mean=par$mean, sd=par$sd, log = TRUE)}
 
 
                    # your exact YNM record-pair likelihood
-                   s1 = log(gamma^(sum(Ln)))
-                   s2 = sum(log(pdf(Rn, par = list(mean = mean, sd=sd)) * cdf(Rn, par = list(mean=mean, sd=sd))^(-1+gamma^Ln)))
+                   s1 = sum(Ln) * log(gamma)
+                   s2 = sum(pdf(Rn, par = list(mean = mean, sd=sd)) + (-1+gamma^Ln) *  cdf(Rn, par = list(mean=mean, sd=sd)))
                    s3b = 0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
-                       s3b[i]= sum(log(cdf(Rn[i], par = list(mean = mean, sd=sd))^( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]-1))/(1-gamma)) ) )
+                       s3b[i]= sum( ( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]-1))/(1-gamma)) * cdf(Rn[i], par = list(mean = mean, sd=sd)) )
                      }
                    }
                    s3 = sum(na.omit(s3b))
 
                    s4=0
                    if (Ln[m] < n) {
-                     s4 = sum(log(cdf(Rn[m], par = list(mean = mean, sd=sd))^( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
+                     s4 = sum(( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(mean = mean, sd=sd)) )
                    }
                    return(s1+s2+s3+s4)
                  }
@@ -583,25 +590,25 @@ register_loglik( "YNM", "records", "weibull",
                    }
 
                    ## pdf
-                   pdf=function(x,par) {dweibull(x=x, shape=par$shape, scale=par$scale)}
+                   pdf=function(x,par) {dweibull(x=x, shape=par$shape, scale=par$scale, log = TRUE)}
                    ## cdf
-                   cdf=function(x,par) {pweibull(q=x, shape= par$shape, scale=par$scale)}
+                   cdf=function(x,par) {pweibull(q=x, shape= par$shape, scale=par$scale, log = TRUE)}
 
 
                    # your exact YNM record-pair likelihood
                    s1 = log(gamma^(sum(Ln)))
-                   s2 = sum(log(pdf(Rn, par = list(shape=shape, scale=scale)) * cdf(Rn, par = list(shape=shape, scale=scale))^(-1+gamma^Ln)))
+                   s2 = sum((-1+gamma^Ln) * pdf(Rn, par = list(shape=shape, scale=scale)) * cdf(Rn, par = list(shape=shape, scale=scale)) )
                    s3b = 0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]) == TRUE){ ## we have non-records in between
-                       s3b[i]= sum(log(cdf(Rn[i], par = list(shape=shape, scale=scale))^( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]))/(1-gamma)) ) )
+                       s3b[i]= sum( ( (gamma^(Ln[i]+1) - gamma^(Ln[i+1]))/(1-gamma)) * cdf(Rn[i], par = list(shape=shape, scale=scale) ) )
                      }
                    }
                    s3 = sum(na.omit(s3b))
 
                    s4=0
                    if (Ln[m] < n) {
-                     s4 = sum(log(cdf(Rn[m], par = list(shape=shape, scale=scale))^((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) ))
+                     s4 = sum( ((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(shape=shape, scale=scale)) )
                    }
                    return(s1+s2+s3+s4)
                  }
@@ -614,7 +621,7 @@ register_loglik( "LDM", "all", "norm",
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
 
-                   if( all(c("theta", "mean", "sd") %in% names(params)) == FALSE ) stop("parameterstheta, mean, sd should be present.")
+                   if( all(c("theta", "mean", "sd") %in% names(params)) == FALSE ) stop("parameters theta, mean, sd should be present.")
 
                    theta <- as.numeric(params["theta"])
                    mean <- as.numeric(as.numeric(params["mean"]))
@@ -629,10 +636,10 @@ register_loglik( "LDM", "all", "norm",
                    x = y - theta * (1:length(y)) ## y-theta*t
 
                    ## pdf
-                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd)}
+                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(pdf(x=x, par=list(mean = mean, sd = sd))))
+                   s1 = sum(pdf(x=x, par=list(mean = mean, sd = sd)))
 
                    return(s1)
                  }
@@ -656,12 +663,13 @@ register_loglik( "LDM", "all", "frechet",
 
                    ## transform
                    x = y - theta * (1:length(y)) ## y-theta*t
+                   location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(x)-1e-6))
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dfrechet(x=x, shape=par$shape, scale=par$scale)}
+                   pdf=function(x,par) {VGAM::dfrechet(x=x, location = par$location, shape=par$shape, scale=par$scale, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(pdf(x=x, par=list(shape= shape, scale= scale))))
+                   s1 = sum(pdf(x=x, par=list(location = location, shape= shape, scale= scale)))
 
                    # scale = 1/params["scale"]
                    # if (any(x <= 0)) return(-1000)
@@ -694,14 +702,41 @@ register_loglik( "LDM", "all", "gumbel",
                    x = y - theta * (1:length(y)) ## y-theta*t
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dgumbel(x=x, location=par$loc, scale=par$scale)}
+                   pdf=function(x,par) {VGAM::dgumbel(x=x, location=par$loc, scale=par$scale ,log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(pdf(x=x, par=list(loc = loc, scale= scale))))
+                   s1 = sum(pdf(x=x, par=list(loc = loc, scale= scale)))
                    return(s1)
                  }
 )
 
+##weibull
+register_loglik( "LDM", "all", "weibull",
+                 fun = function(data, params) {
+                   y=data
+                   if(!is.numeric(y)) stop("data should be a numerical vector")
+
+                   if( all(c("theta", "shape", "scale") %in% names(params)) == FALSE ) stop("parameterstheta, shape, scale should be present.")
+                   theta <- as.numeric(params["theta"])
+                   shape <- as.numeric(params["shape"])
+                   scale <- as.numeric(params["scale"])
+
+                   ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
+                   if (scale <= 0) { ##
+                     return(-Inf)  # Invalid parameters, return a large negative value
+                   }
+
+                   ## transform
+                   x = y - theta * (1:length(y)) ## y-theta*t
+
+                   ## pdf
+                   pdf=function(x,par) {dweibull(x=x, shape=par$shape, scale=par$scale, log = TRUE)}
+
+                   # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
+                   s1 = sum(pdf(x=x, par=list(shape = shape, scale= scale)))
+                   return(s1)
+                 }
+)
 ## LDM, Rn -----------------------------------------
 
     ##Gumbel
@@ -729,18 +764,18 @@ register_loglik( "LDM", "records", "gumbel",
                    x = Rn - theta * Ln ## Rn-theta*ln
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dgumbel(x=x, loc=par$loc, scale=par$scale)}
+                   pdf=function(x,par) {VGAM::dgumbel(x=x, loc=par$loc, scale=par$scale , log = TRUE)}
                    ## cdf
-                   cdf=function(x,par) {VGAM::pgumbel(q=x, loc=par$loc, scale=par$scale)}
+                   cdf=function(x,par) {VGAM::pgumbel(q=x, loc=par$loc, scale=par$scale, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(pdf(x=x, par=list(loc = loc, scale = scale))))
+                   s1 = sum(pdf(x=x, par=list(loc = loc, scale = scale)))
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
                    s2b=0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
-                       s2b[i]=sum(log(cdf( Rn[i]-theta * (Ln[i]+1):(Ln[i+1]-1), par=list(loc = loc, scale = scale) )  ))
+                       s2b[i]=sum(cdf( Rn[i]-theta * (Ln[i]+1):(Ln[i+1]-1), par=list(loc = loc, scale = scale) )  )
                      }
                    }
                    s2 = sum(na.omit(s2b))
@@ -749,7 +784,7 @@ register_loglik( "LDM", "records", "gumbel",
                    ## case where last record is not last observation
                    s3=0
                    if( (Ln[m] < n) == TRUE  ) {
-                     s3a=log(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(loc = loc, scale = scale) )  )
+                     s3a=cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(loc = loc, scale = scale) )
                      s3 = sum(s3a[is.finite(s3a)])
                    }
                    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
@@ -766,7 +801,7 @@ register_loglik( "LDM", "records", "norm",
                    Ln <- data$rec_times
                    n <- data$time[1]
 
-                   if( all(c("theta", "mean", "sd") %in% names(params)) == FALSE ) stop("parameterstheta, mean, sd should be present.")
+                   if( all(c("theta", "mean", "sd") %in% names(params)) == FALSE ) stop("parameters theta, mean, sd should be present.")
                    theta <- as.numeric(params["theta"])
                    mean <- as.numeric(params["mean"])
                    sd <- as.numeric(params["sd"])
@@ -781,18 +816,18 @@ register_loglik( "LDM", "records", "norm",
                    x = Rn - theta * Ln ## Rn-theta*ln
 
                    ## pdf
-                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd)}
+                   pdf=function(x,par) {dnorm(x=x, mean=par$mean, sd=par$sd, log = TRUE)}
                    ## cdf
-                   cdf=function(x,par) {pnorm(q=x, mean=par$mean, sd=par$sd)}
+                   cdf=function(x,par) {pnorm(q=x, mean=par$mean, sd=par$sd, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(pdf(x=x, par=list(mean = mean, sd = sd))))
+                   s1 = sum(pdf(x=x, par=list(mean = mean, sd = sd)))
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
                    s2b=0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
-                       s2b[i]=sum(log(cdf( Rn[i]-theta * (Ln[i]+1):(Ln[i+1]-1), par=list(mean = mean, sd = sd) )  ))
+                       s2b[i]=sum(cdf( Rn[i]-theta * (Ln[i]+1):(Ln[i+1]-1), par=list(mean = mean, sd = sd) )  )
                      }
                    }
                    s2 = sum(na.omit(s2b))
@@ -801,7 +836,7 @@ register_loglik( "LDM", "records", "norm",
                    ## case where last record is not last observation
                    s3=0
                    if( (Ln[m] < n) == TRUE  ) {
-                     s3a= log(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(mean = mean, sd = sd) )  )
+                     s3a= cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(mean = mean, sd = sd) )
                      s3 = sum(s3a[is.finite(s3a)])
                      }
                    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
@@ -823,6 +858,65 @@ register_loglik( "LDM", "records", "frechet",
                    theta <- as.numeric(params["theta"])
                    shape <- as.numeric(params["shape"])
                    scale <- as.numeric(params["scale"])
+
+                   m = length(Rn)
+
+                   ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
+                   if ( shape <0 |scale <= 0) { ##
+                     return(-Inf)  # Invalid parameters, return a large negative value
+                   }
+
+                   ## transform
+                   x = Rn - theta * Ln ## Rn-theta*ln
+                   location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(x)-1e-6))
+
+                   ## pdf
+                   pdf=function(x,par) {VGAM::dfrechet(x=x, location = par$location, shape=par$shape, scale=par$scale, log = TRUE)}
+
+                   ## cdf
+                   cdf=function(x,par) {VGAM::pfrechet(q=x, location = par$location, shape=par$shape, scale=par$scale, log = TRUE)}
+
+                   # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
+                   s1 = sum((pdf(x=x, par=list(location = location, shape = shape, scale = scale))))
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
+                   s2b=0
+                   for( i in 1:(m-1)  ){
+                     if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
+                       s2b[i]=sum(  cdf( Rn[i]- theta * (Ln[i]+1):(Ln[i+1]-1), par=list(location= location, shape = shape, scale = scale) )  )
+                     }
+                   }
+                   s2b = s2b[is.finite(s2b)]
+                   s2 = sum(na.omit(s2b))
+
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
+                   ## case where last record is not last observation
+                   s3=0
+                   if( (Ln[m] < n) == TRUE  ) {
+                     s3a=(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(location = location , shape = shape, scale = scale) )  )
+                     s3 = sum(s3a[is.finite(s3a)])
+                   }
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
+
+                   return(s1+s2+s3)
+                 }
+)
+
+##Weibull
+register_loglik( "LDM", "records", "weibull",
+                 fun = function(data, params) {
+                   if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
+
+                   Rn <- data$rec_values
+                   Ln <- data$rec_times
+                   n <- data$time[1]
+
+                   if( all(c("theta", "shape", "scale") %in% names(params)) == FALSE ) stop("parameters theta, shape, scale should be present.")
+                   theta <- as.numeric(params["theta"])
+                   shape <- as.numeric(params["shape"])
+                   scale <- as.numeric(params["scale"])
+
                    m = length(Rn)
 
                    ## Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
@@ -834,27 +928,30 @@ register_loglik( "LDM", "records", "frechet",
                    x = Rn - theta * Ln ## Rn-theta*ln
 
                    ## pdf
-                   pdf=function(x,par) {VGAM::dfrechet(x=x, shape=par$shape, scale=par$scale)}
+                   pdf=function(x,par) {dweibull(x=x,  shape=par$shape, scale=par$scale, log = TRUE)}
+
                    ## cdf
-                   cdf=function(x,par) {VGAM::pfrechet(q=x, shape=par$shape, scale=par$scale)}
+                   cdf=function(x,par) {pweibull(q=x,  shape=par$shape, scale=par$scale, log = TRUE)}
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
-                   s1 = sum(log(pdf(x=x, par=list(shape = shape, scale = scale))))
+                   s1 = sum((pdf(x=x, par=list( shape = shape, scale = scale))))
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
                    s2b=0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
-                       s2b[i]=sum(log(cdf( Rn[i]-theta * (Ln[i]+1):(Ln[i+1]-1), par=list(shape = shape, scale = scale) )  ))
+                       s2b[i]=sum(  cdf( Rn[i]- theta * (Ln[i]+1):(Ln[i+1]-1), par=list( shape = shape, scale = scale) )  )
                      }
                    }
+                   s2b = s2b[is.finite(s2b)]
                    s2 = sum(na.omit(s2b))
+
                    if (is.nan(s2) || !is.finite(s2)) return(-Inf)
 
                    ## case where last record is not last observation
                    s3=0
                    if( (Ln[m] < n) == TRUE  ) {
-                     s3a=log(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list(shape = shape, scale = scale) )  )
+                     s3a=(cdf( Rn[m]-theta * (Ln[m]+1):n, par=list( shape = shape, scale = scale) )  )
                      s3 = sum(s3a[is.finite(s3a)])
                    }
                    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
