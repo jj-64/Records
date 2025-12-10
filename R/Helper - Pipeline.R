@@ -289,19 +289,209 @@ extract_tsfeatures <- function(x) {
   return(as.list(tsf[1, ]))
 }
 
+## Extract Likelihood features
+extract_LogLik_features <- function(series) {
+  series <- as.numeric(series)
+  n <- length(series)
+  if (n < 10) stop("Series too short for stable features")
+  if (length(rec_gaps(series)) <2) warning("No records found")
+
+  ## theta hat
+  time <- seq_len(length(series))
+  lmfit <- lm(series ~ time)
+  theta_hat = as.numeric(coef(lmfit)[2])
+
+  ## gamma hat
+  gamma_hat = estimate_model_param(series, method="mle_indicator", model = "YNM", min= 1, max=5, step = 0.001, approximate = FALSE)$param
+
+  ## record data
+  data_rec = data.frame(rec_values = rec_values(series),
+                        rec_times = rec_times(series),
+                        time = length(series),
+                        theta = theta_hat,
+                        gamma = gamma_hat)
+
+  ## measures
+  mean_all = mean(series)
+  var_all = var(series)
+  shape_all = abs(skewness(series))
+  mean_rec = mean(rec_values(series))
+  var_rec =  var(rec_values(series))
+  shape_rec = abs(skewness(rec_values(series)))
+
+  ## Classical -  all
+  logLik_all_iid_gumbel = logLik_records(model = "iid", obs_type = "all",
+                 dist = "gumbel", data = series,
+                 params = c(loc = mean_all, scale=var_all))
+
+  logLik_all_iid_norm = logLik_records(model = "iid", obs_type = "all",
+                                         dist = "norm", data = series,
+                                         params = c(mean = mean_all, sd=sqrt(var_all)) )
+
+  logLik_all_iid_frechet = logLik_records(model = "iid", obs_type = "all",
+                                       dist = "frechet", data = series,
+                                       params = c(shape = shape_all, scale=var_all))
+
+  logLik_all_iid_weibull = logLik_records(model = "iid", obs_type = "all",
+                                          dist = "weibull", data = series,
+                                          params = c(shape = shape_all, scale=var_all))
+
+  ## Classical - Rn
+  logLik_rec_iid_norm = logLik_records(model = "iid", obs_type = "records",
+                                   dist = "norm", data = data_rec,
+                                   params = c(mean = mean_rec, sd= sqrt(var_rec)) )
+
+  logLik_rec_iid_gumbel = logLik_records(model = "iid", obs_type = "records",
+                                       dist = "gumbel", data = data_rec,
+                                       params = c(loc = mean_rec, scale=var_rec))
+
+  logLik_rec_iid_frechet = logLik_records(model = "iid", obs_type = "records",
+                                         dist = "frechet", data = data_rec,
+                                         params = c(shape=shape_rec, scale=var_rec))
+
+  logLik_rec_iid_weibull = logLik_records(model = "iid", obs_type = "records",
+                                         dist = "weibull", data = data_rec,
+                                         params =  c(shape=shape_rec, scale=var_rec))
+
+  ## DTRW - all
+  logLik_all_DTRW_norm = logLik_records(model = "DTRW", obs_type = "all",
+                                          dist = "norm", data = series,
+                                          params = c(mean = mean_all, sd= sqrt(var_all)))
+
+  logLik_all_DTRW_cauchy = logLik_records(model = "DTRW", obs_type = "all",
+                                        dist = "cauchy", data = series,
+                                        params = c(loc = mean_all, scale=var_all))
+
+  ## DTRW - rec
+  logLik_rec_DTRW_norm = logLik_records(model = "DTRW", obs_type = "records",
+                                        dist = "norm", data = data_rec,
+                                        params = c(mean = mean_rec, sd= sqrt(var_all) ) )
+
+  logLik_rec_DTRW_cauchy = logLik_records(model = "DTRW", obs_type = "records",
+                                          dist = "cauchy", data = data_rec,
+                                          params = c(loc = mean_rec, scale=var_all ))
+
+  ## LDM - Xt
+  logLik_all_LDM_norm = logLik_records(model = "LDM", obs_type = "all",
+                                       dist = "norm", data = series,
+                                       params = c(theta = theta_hat, mean = mean_all, sd=sqrt(var_all)))
+
+  logLik_all_LDM_gumbel = logLik_records(model = "LDM", obs_type = "all",
+                                         dist = "gumbel", data = series,
+                                         params = c(theta = theta_hat, loc = mean_all, scale=var_all))
+
+  logLik_all_LDM_frechet = logLik_records(model = "LDM", obs_type = "all",
+                                          dist = "frechet", data = series,
+                                          params = c(theta = theta_hat, shape=shape_all, scale=var_all))
+
+  logLik_all_LDM_weibull = logLik_records(model = "LDM", obs_type = "all",
+                                          dist = "weibull", data = series,
+                                          params = c(theta = theta_hat, shape=shape_all, scale=var_all))
+
+  ## LDM - rec
+  logLik_rec_LDM_norm = logLik_records(model = "LDM", obs_type = "records",
+                                       dist = "norm", data = data_rec,
+                                       params = c(theta = theta_hat, mean = mean_rec, sd= sqrt(var_rec)))
+
+  logLik_rec_LDM_gumbel = logLik_records(model = "LDM", obs_type = "records",
+                                         dist = "gumbel", data = data_rec,
+                                         params = c(theta = theta_hat, loc = mean_rec, scale=var_rec))
+
+  logLik_rec_LDM_frechet = logLik_records(model = "LDM", obs_type = "records",
+                                          dist = "frechet", data = data_rec,
+                                          params = c(theta = theta_hat, shape=shape_rec, scale=var_rec))
+
+  logLik_rec_LDM_weibull = logLik_records(model = "LDM", obs_type = "records",
+                                          dist = "weibull", data = data_rec,
+                                          params = c(theta = theta_hat, shape = shape_rec, scale=var_rec))
+
+  ## YNM - Xt
+  logLik_all_YNM_norm = logLik_records(model = "YNM", obs_type = "all",
+                                       dist = "norm", data = series,
+                                       params = c(gamma = gamma_hat, mean = mean_all, sd=sqrt(var_all)))
+
+  logLik_all_YNM_gumbel = logLik_records(model = "YNM", obs_type = "all",
+                                         dist = "gumbel", data = series,
+                                         params = c(gamma = gamma_hat, loc = mean_all, scale=var_all))
+
+  logLik_all_YNM_frechet = logLik_records(model = "YNM", obs_type = "all",
+                                          dist = "frechet", data = series,
+                                          params = c(gamma = gamma_hat, shape=shape_all, scale=var_all))
+
+  logLik_all_YNM_weibull = logLik_records(model = "YNM", obs_type = "all",
+                                          dist = "weibull", data = series,
+                                          params = c(gamma = gamma_hat, shape =shape_all, scale=var_all))
+
+  ## YNM - rec
+  logLik_rec_YNM_norm = logLik_records(model = "YNM", obs_type = "records",
+                                       dist = "norm", data = data_rec,
+                                       params = c(gamma = gamma_hat, mean = mean_rec, sd= sqrt(var_rec)) )
+
+  logLik_rec_YNM_gumbel = logLik_records(model = "YNM", obs_type = "records",
+                                         dist = "gumbel", data = data_rec,
+                                         params = c(gamma = gamma_hat, loc = mean_rec, scale=var_rec))
+
+  logLik_rec_YNM_frechet = logLik_records(model = "YNM", obs_type = "records",
+                                          dist = "frechet", data = data_rec,
+                                          params = c(gamma = gamma_hat, shape=shape_rec, scale=var_rec))
+
+  logLik_rec_YNM_weibull = logLik_records(model = "YNM", obs_type = "records",
+                                          dist = "weibull", data = data_rec,
+                                          params = c(gamma = gamma_hat, shape=shape_rec, scale=var_rec))
+  Log_values = c(
+    logLik_all_iid_gumbel =   logLik_all_iid_gumbel,
+    logLik_all_iid_norm =   logLik_all_iid_norm,
+    logLik_all_iid_frechet = logLik_all_iid_frechet,
+    logLik_all_iid_weibull = logLik_all_iid_weibull,
+
+    logLik_rec_iid_gumbel =   logLik_rec_iid_gumbel,
+    logLik_rec_iid_norm =   logLik_rec_iid_norm,
+    logLik_rec_iid_frechet = logLik_rec_iid_frechet,
+    logLik_rec_iid_weibull = logLik_rec_iid_weibull,
+
+    logLik_all_DTRW_norm = logLik_all_DTRW_norm,
+    logLik_all_DTRW_cauchy = logLik_all_DTRW_cauchy,
+
+    logLik_rec_DTRW_norm = logLik_rec_DTRW_norm,
+    logLik_rec_DTRW_cauchy = logLik_rec_DTRW_cauchy,
+
+    logLik_all_LDM_norm = logLik_all_LDM_norm,
+    logLik_all_LDM_gumbel = logLik_all_LDM_gumbel,
+    logLik_all_LDM_frechet = logLik_all_LDM_frechet,
+    logLik_all_LDM_weibull = logLik_all_LDM_weibull,
+
+    logLik_rec_LDM_norm = logLik_rec_LDM_norm,
+    logLik_rec_LDM_gumbel = logLik_rec_LDM_gumbel,
+    logLik_rec_LDM_frechet = logLik_rec_LDM_frechet,
+    logLik_rec_LDM_weibull = logLik_rec_LDM_weibull,
+
+    logLik_all_YNM_norm = logLik_all_YNM_norm,
+    logLik_all_YNM_gumbel = logLik_all_YNM_gumbel,
+    logLik_all_YNM_frechet = logLik_all_YNM_frechet,
+    logLik_all_YNM_weibull = logLik_all_YNM_weibull,
+
+    logLik_rec_YNM_norm = logLik_rec_YNM_norm,
+    logLik_rec_YNM_gumbel = logLik_rec_YNM_gumbel,
+    logLik_rec_YNM_frechet = logLik_rec_YNM_frechet,
+    logLik_rec_YNM_weibull = logLik_rec_YNM_weibull
+  )
+
+  return(Log_values)
+  }
 
 ## extract all features
 extract_all_features <- function(x) {
   c(
     extract_custom_features(x),
-    extract_tsfeatures(x)
+    extract_tsfeatures(x),
+    extract_LogLik_features(x)
   )
 }
 
 # ----- 3. Build labeled feature_matrix of features ---------------------------------------
 
 ## --- Helper function
-create_feature_dataset <- function(n_per_model = 50,
+create_feature_dataset <- function(n_per_model = 10,
                                    T_vals = c(100, 200, 500)) {
 
   message("Generating series...")
