@@ -4,6 +4,7 @@
 lik <- function(model, obs_type, dist, data, params) {
   logLik_records(model, obs_type, dist, data, params)
 }
+
 #lik("LDM","records","gumbel",data = list(rec_values = c(0.1,0.2,0.3,0.4), rec_times = c(1,4,7,8), time = 10), params = list(theta=0.3, loc=1, scale=1))
 
 
