@@ -81,17 +81,21 @@ register_loglik("iid", "records", "norm",
     m = length(Rn) #m= rec_counts(y)
 
     ## sum of log(f_rn)
-    s1 <- sum(log(dnorm(Rn[-1], mean = mean, sd = sd)))
+    s1 <- sum(dnorm(Rn[-1], mean = mean, sd = sd, log = TRUE))
+    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
     #Compute s2 using vectorized approach
     intervals <- diff(Ln)-1
-    s2b <- intervals * log(pnorm(Rn[-m], mean = mean, sd = sd))
+    s2b <- intervals * pnorm(Rn[-m], mean = mean, sd = sd, log = TRUE)
     s2 <- sum(s2b)
+    if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
     ##Compute s3 only if needed
     s3 <- if (Ln[m] < n) {
-      (n - Ln[m]) * log(pnorm(Rn[m], mean = mean, sd = sd))
+      (n - Ln[m]) * pnorm(Rn[m], mean = mean, sd = sd, log = TRUE)
     } else {
       0
     }
+    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
     #Return total log-likelihood
     return(s1 + s2 + s3)
@@ -114,17 +118,22 @@ register_loglik("iid", "records", "frechet",
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
-                  s1 <- sum(log(VGAM::dfrechet(Rn[-1],  location = location, shape = shape, scale= scale)))
+                  s1 <- sum(VGAM::dfrechet(Rn[-1],  location = location, shape = shape, scale= scale, log = TRUE))
+                  if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
                   #Compute s2 using vectorized approach
                   intervals <- diff(Ln)-1
                   s2b <- intervals * VGAM::pfrechet(Rn[-m], location = location, shape = shape, scale= scale, log = TRUE)
                   s2 <- sum(s2b)
+                  if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                   ##Compute s3 only if needed
                   s3 <- if (Ln[m] < n) {
                     (n - Ln[m]) * VGAM::pfrechet(Rn[m], location = location,  shape = shape, scale= scale, log = TRUE)
                   } else {
                     0
                   }
+                  if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                   #Return total log-likelihood
                   return(s1 + s2 + s3)
@@ -146,17 +155,21 @@ register_loglik("iid", "records", "gumbel",
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
-                  s1 <- sum(log(VGAM::dgumbel(Rn[-1], loc, scale)))
+                  s1 <- sum(VGAM::dgumbel(Rn[-1], loc, scale, log = TRUE))
+                  if (is.nan(s1) || !is.finite(s1)) return(-Inf)
                   #Compute s2 using vectorized approach
                   intervals <- diff(Ln)-1
-                  s2b <- intervals * log(VGAM::pgumbel(Rn[-m], loc, scale))
+                  s2b <- intervals * VGAM::pgumbel(Rn[-m], loc, scale, log = TRUE)
                   s2 <- sum(s2b)
+                  if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                   ##Compute s3 only if needed
                   s3 <- if (Ln[m] < n) {
-                    (n - Ln[m]) * log(VGAM::pgumbel(Rn[m], loc, scale))
+                    (n - Ln[m]) * VGAM::pgumbel(Rn[m], loc, scale, log = TRUE)
                   } else {
                     0
                   }
+                  if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                   #Return total log-likelihood
                   return(s1 + s2 + s3)
@@ -178,17 +191,22 @@ register_loglik("iid", "records", "weibull",
                   m = length(Rn) #m= rec_counts(y)
 
                   ## sum of log(f_rn)
-                  s1 <- sum(log(dweibull(Rn[-1], shape, scale)))
+                  s1 <- sum(dweibull(Rn[-1], shape, scale, log = TRUE))
+                  if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
                   #Compute s2 using vectorized approach
                   intervals <- diff(Ln)-1
-                  s2b <- intervals * log(pweibull(Rn[-m], shape, scale))
+                  s2b <- intervals * pweibull(Rn[-m], shape, scale, log = TRUE)
                   s2 <- sum(s2b)
+                  if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                   ##Compute s3 only if needed
                   s3 <- if (Ln[m] < n) {
-                    (n - Ln[m]) * log(pweibull(Rn[m], shape, scale))
+                    (n - Ln[m]) * pweibull(Rn[m], shape, scale, log = TRUE)
                   } else {
                     0
                   }
+                  if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                   #Return total log-likelihood
                   return(s1 + s2 + s3)
@@ -208,7 +226,7 @@ register_loglik("DTRW", "all", "norm",
     mean <- as.numeric(params['mean'])
     sd <- as.numeric(params["sd"])
 
-    sum(log(dnorm(x = diff(data), mean =mean , sd = sd)))
+    sum(dnorm(x = diff(data), mean =mean , sd = sd, log = TRUE))
   }
 )
 
@@ -218,7 +236,7 @@ register_loglik("DTRW", "all", "cauchy",
                   if(!is.numeric(data)) stop("data should be a numerical vector")
                   if( all(c("loc", "scale") %in% names(params)) == FALSE ) stop("parameters loc, scale should be present in a list.")
 
-                  sum(log(dcauchy(x = diff(data), location =as.numeric(params["loc"]) , scale = as.numeric(params["scale"]))))
+                  sum(dcauchy(x = diff(data), location =as.numeric(params["loc"]) , scale = as.numeric(params["scale"]) , log = TRUE))
                 }
 )
 
@@ -253,9 +271,9 @@ register_loglik( "DTRW", "records", "norm",
       stop("The vector l must contain at least two indices.")
     }
 
-    s1b = log(dnorm(diff(Rn), mean = 0, sd = sqrt(diff(Ln)*sd) )  )
-
+    s1b = dnorm(diff(Rn), mean = 0, sd = sqrt(diff(Ln)*sd), log = TRUE )
     s1=sum(s1b)
+    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
     ## case where NT<T
     s2=0
@@ -263,6 +281,7 @@ register_loglik( "DTRW", "records", "norm",
       #s2=log(mvtnorm::pmvnorm(lower=-Inf, upper=rep(0,(n - Ln[m])), sigma = sigma_cov((n - Ln[m]),params))[1])
       s2 = -0.5*log(pi * (n - Ln[m]))
     }
+    if (is.nan(s2) || !is.finite(s2)) return(-Inf)
 
     return(s1+s2)
   }
@@ -287,12 +306,13 @@ register_loglik( "DTRW", "records", "cauchy",
                      stop("The vector l must contain at least two indices.")
                    }
 
-                   s1b = log(dcauchy(diff(Rn), location = 0, scale = sqrt(diff(Ln)*scale) )  )
+                   s1b = dcauchy(diff(Rn), location = 0, scale = sqrt(diff(Ln)*scale), log = TRUE)
                    s1=sum(s1b)
-
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
                    ## case where NT<T
                    s2=0
                    if (Ln[m] < n) { s2 = -0.5*log(pi * (n - Ln[m])) }
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
 
                   ## Return
                    return(s1+s2)
@@ -326,9 +346,13 @@ register_loglik( "YNM", "all", "frechet",
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
                    s1 =  sum( (1:n) * log(gamma))
-                   s2 = sum( (-1+gamma^(1:n))  * cdf(x, par=list(location = location, shape= shape, scale= scale))  )
-                   s3 = sum(pdf(x, par=list(location = location, shape= shape, scale= scale)))
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
+                   s2 = sum( (-1+gamma^(1:n))  * cdf(x, par=list(location = location, shape= shape, scale= scale))  )
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
+                   s3 = sum(pdf(x, par=list(location = location, shape= shape, scale= scale)))
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
                    # s1 <- n* log(shape * scale^(-shape) )
                    # s2 <- -(shape + 1) * sum(log(x))
                    # s3 <- (n* (n+ 1) / 2) * log(gamma)
@@ -361,8 +385,13 @@ register_loglik( "YNM", "all", "gumbel",
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
                    s1 = sum( tvec * log(gamma) )
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
                    s2 = sum( (gamma^tvec - 1) * cdf(x, par=list(loc= loc, scale= scale) ) )
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                    s3 = sum(pdf(x, par=list(loc= loc, scale= scale)))
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                    return(s1+s2+s3)
                  }
@@ -391,8 +420,14 @@ register_loglik( "YNM", "all", "norm",
 
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
                    s1 = sum( (1:n) * log(gamma))
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
                    s2 = sum((-1+gamma^(1:n)) * cdf(x, par=list(mean= mean, sd= sd)) )
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                    s3 = sum( pdf(x, par=list(mean= mean, sd= sd)) )
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
+
 
                    return(s1+s2+s3)
                  }
@@ -422,8 +457,13 @@ register_loglik( "YNM", "all", "weibull",
                    # Compute the terms of the likelihood function, while checking for potential issues like negative log arguments
                    tvec = seq_len(n)
                    s1 = sum( tvec * log(gamma) )
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
                    s2 = sum( (gamma^tvec - 1) * cdf(x, par=list(shape= shape, scale= scale) ) )
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                    s3 = sum(pdf(x, par=list(shape= shape, scale= scale)))
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                    return(s1+s2+s3)
                  }
@@ -460,7 +500,10 @@ register_loglik( "YNM", "records", "frechet",
 
     # your exact YNM record-pair likelihood
     s1 = sum(Ln) *log(gamma)
+    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
     s2 = sum( pdf(Rn, par = list(location = location, shape=shape, scale=scale)) + (-1+gamma^Ln) * cdf(Rn, par = list(location = location, shape=shape, scale=scale)))
+    if (is.nan(s2) || !is.finite(s2)) return(-Inf)
     s3b = 0
     for( i in 1:(m-1)  ){
       if((Ln[i]+1 <= Ln[i+1]) == TRUE){ ## we have non-records in between
@@ -468,11 +511,14 @@ register_loglik( "YNM", "records", "frechet",
       }
     }
     s3 = sum(na.omit(s3b))
+    if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
     s4=0
     if (Ln[m] < n) {
       s4 = sum( ((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(location = location, shape=shape, scale=scale) ))
-      }
+    }
+    if (is.nan(s4) || !is.finite(s4)) return(-Inf)
+
      return(s1+s2+s3+s4)
     }
 )
@@ -505,8 +551,10 @@ register_loglik( "YNM", "records", "gumbel",
 
                    # your exact YNM record-pair likelihood
                    s1 = sum(Ln) * log(gamma)
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
                    s2 = sum(pdf(Rn, par = list(loc = loc, scale=scale)) + (-1+gamma^Ln) * cdf(Rn, par = list(loc=loc, scale=scale)))
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
 
                    s3b = 0
                    for( i in 1:(m-1)  ){
@@ -515,11 +563,14 @@ register_loglik( "YNM", "records", "gumbel",
                      }
                    }
                    s3 = sum(na.omit(s3b))
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                    s4=0
                    if (Ln[m] < n) {
                      s4 = sum( ( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(loc = loc, scale=scale)) )
                    }
+                   if (is.nan(s4) || !is.finite(s4)) return(-Inf)
+
                    return(s1+s2+s3+s4)
                  }
 )
@@ -552,7 +603,11 @@ register_loglik( "YNM", "records", "norm",
 
                    # your exact YNM record-pair likelihood
                    s1 = sum(Ln) * log(gamma)
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
                    s2 = sum(pdf(Rn, par = list(mean = mean, sd=sd)) + (-1+gamma^Ln) *  cdf(Rn, par = list(mean=mean, sd=sd)))
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                    s3b = 0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]-1) == TRUE){ ## we have non-records in between
@@ -560,11 +615,14 @@ register_loglik( "YNM", "records", "norm",
                      }
                    }
                    s3 = sum(na.omit(s3b))
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                    s4=0
                    if (Ln[m] < n) {
                      s4 = sum(( (gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(mean = mean, sd=sd)) )
                    }
+                   if (is.nan(s4) || !is.finite(s4)) return(-Inf)
+
                    return(s1+s2+s3+s4)
                  }
 )
@@ -597,7 +655,11 @@ register_loglik( "YNM", "records", "weibull",
 
                    # your exact YNM record-pair likelihood
                    s1 = log(gamma^(sum(Ln)))
-                   s2 = sum((-1+gamma^Ln) * pdf(Rn, par = list(shape=shape, scale=scale)) * cdf(Rn, par = list(shape=shape, scale=scale)) )
+                   if (is.nan(s1) || !is.finite(s1)) return(-Inf)
+
+                   s2 = sum( pdf(Rn, par = list(shape=shape, scale=scale)) + (-1 + gamma^Ln) * cdf(Rn, par = list(shape=shape, scale=scale)) )
+                   if (is.nan(s2) || !is.finite(s2)) return(-Inf)
+
                    s3b = 0
                    for( i in 1:(m-1)  ){
                      if((Ln[i]+1 <= Ln[i+1]) == TRUE){ ## we have non-records in between
@@ -605,11 +667,14 @@ register_loglik( "YNM", "records", "weibull",
                      }
                    }
                    s3 = sum(na.omit(s3b))
+                   if (is.nan(s3) || !is.finite(s3)) return(-Inf)
 
                    s4=0
                    if (Ln[m] < n) {
                      s4 = sum( ((gamma^(Ln[m]+1) - gamma^(n+1))/(1-gamma) ) * cdf(Rn[m], par = list(shape=shape, scale=scale)) )
                    }
+                   if (is.nan(s4) || !is.finite(s4)) return(-Inf)
+
                    return(s1+s2+s3+s4)
                  }
 )
