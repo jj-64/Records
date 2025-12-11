@@ -99,7 +99,7 @@ generate_series_multiple <- function(
 # Helper: `%||%` operator - return left if not null else right
 `%||%` <- function(a, b) if (!is.null(a)) a else b
 
-# ----- 2. Feature extraction per series ---------------------------------------
+# ----- 2A. Feature extraction per series :Custom ---------------------------------------
 
 # We'll compute a rich feature vector for each series.
 # The feature extraction function returns a named list.
@@ -109,21 +109,37 @@ extract_custom_features <- function(series) {
   n <- length(s)
   if (n < 10) stop("Series too short for stable features")
   if (length(rec_gaps(s)) <2) warning("No records found")
-  # Basic stats
-  ave = mean(s)
-  cv <- sd(s)/mean(s)
-  std <- sd(s)
-  med <- median(s)
+
+  ## 1 - Basic stats of the series
+  ave  <- mean(s)
+  med  <- median(s)
+  std  <- sd(s)
   iqrv <- IQR(s)
+  minv <- min(s)
+  maxv <- max(s)
+  rng  <- maxv - minv
+  cv   <- sd(s)/mean(s)
   skew <- ifelse(length(na.omit(s))>2, moments::skewness(s), NA)
   kurt <- ifelse(length(na.omit(s))>3, moments::kurtosis(s), NA) # excess? moments::kurtosis returns fisher or pearson? okay
 
-  # extremes
-  minv <- min(s)
-  maxv <- max(s)
-  rng <- maxv - minv
+  ## 2 - trend: trend slope and R^2
+  lmfit <- lm(s ~ seq_len(n))
+  slope <- as.numeric(coef(lmfit)[2])
+  slope_pval <- summary(lmfit)$coefficients[2, 4]
+  slope_R2 <- summary(lmfit)$r.squared
+  kendall_tau <- cor(time, s, method = "kendall")  ##Mann-Kendall proxy: Kendall correlation between time and series
+
+  ## 3 - Increments stat: First-order difference
+  ds <- diff(s)
+  len_ds <- length(ds)
+  mean_diff <- mean(ds)
+  std_diff  <- sd(ds)
+  signs <- sign(ds)
+  sign_change_rate <- sum(signs[-1] * signs[-length(signs)] < 0) / (length(s) - 2)
+
 
   # record info
+  rec_nb = rec_count(s)
   rec_high_idx <- rec_times(s)   # Foreword record highs
   rec_high_values <- rec_values(s)
   rec_high_idx_back <- rec_times(rev(s))  # Backward record highs
@@ -163,19 +179,12 @@ extract_custom_features <- function(series) {
     0
   }
 
-  # trend: linear slope and p-value
-  time <- seq_len(n)
-  lmfit <- lm(s ~ time)
-  slope <- as.numeric(coef(lmfit)[2])
-  slope_pval <- summary(lmfit)$coefficients[2, 4]
 
-  # Mann-Kendall proxy: Kendall correlation between time and series
-  kendall_tau <- cor(time, s, method = "kendall")
 
   # autocorrelation
-  acf_vals <- acf(s, lag.max = 5, plot = FALSE)$acf
-  acf1 <- ifelse(length(acf_vals) >= 2, acf_vals[2], NA)
-  acf2 <- ifelse(length(acf_vals) >= 3, acf_vals[3], NA)
+  #acf_vals <- acf(s, lag.max = 5, plot = FALSE)$acf
+  #acf1 <- ifelse(length(acf_vals) >= 2, acf_vals[2], NA)
+  #acf2 <- ifelse(length(acf_vals) >= 3, acf_vals[3], NA)
 
 
   # spectral: dominant frequency via periodogram
@@ -206,11 +215,11 @@ extract_custom_features <- function(series) {
   ljung <- tryCatch(Box.test(s, lag = 10, type = "Ljung-Box"), error = function(e) list(statistic = NA, p.value = NA))
 
   # proportion of positive first differences
-  prop_inc <- mean(diffs > 0)
+  prop_inc <- mean(diffs > diff_mean)
 
   # Turning points
   diff_sign <- diff(sign(diff(s)))
-  turning_points <- sum(diff_sign != 0, na.rm = TRUE)
+  #turning_points <- sum(diff_sign != diff_mean, na.rm = TRUE)
 
   # Local extrema
   local_maxima <- length(which(diff_sign == -2))/n
@@ -220,6 +229,7 @@ extract_custom_features <- function(series) {
   features <- c(
     ave = ave,
     std = std,
+    cv = ave/std,
     median = med,
     iqr = iqrv,
     skewness = skew,
@@ -243,12 +253,12 @@ extract_custom_features <- function(series) {
     #rec_low_gap_back_sd = rec_high_gap_back_sd,
     entropy_c = entropy,
 
-    slope = slope,
-    slope_p = slope_pval,
+    slope = ifelse(slope_pval < 0.05, slope, 0),
+    slope_R2 = ifelse(slope_pval < 0.05, slope_R2, 0),
     kendall_tau = kendall_tau,
 
-    acf1 = acf1,
-    acf2 = acf2,
+    #acf1 = acf1,
+    #acf2 = acf2,
     #pacf1 = pacf1,
 
     dom_freq = dom_freq,
@@ -268,7 +278,7 @@ extract_custom_features <- function(series) {
 
     prop_inc = prop_inc,
 
-    turning_points = turning_points,
+    #turning_points = turning_points,
     local_minima = local_minima,
     local_maxima = local_maxima
   )
@@ -278,16 +288,62 @@ extract_custom_features <- function(series) {
   return(features)
 }
 
-## extract tsfeatures
+# ----- 2B. Feature extraction per series :tsfeatures ---------------------------------------
+
+## acf_features: autocorrelation function of the series, the differenced series,
+  ## and the twice-differenced series. It produces a vector comprising the first autocorrelation coefficient
+  ## in each case, and the sum of squares of the first 10 autocorrelation coefficients
+  ## "x_acf1, x_acf10, diff1_acf1, diff1_acf10, diff2_acf1, diff2_acf10"
+## We compute the partial autocorrelation function of the series, the differenced series, and the second-order
+  ## differenced series. Then pacf_features produces a vector comprising the sum of squares of the first 5
+  ## partial autocorrelation coefficients in each case.
+## arch_stat: Computes a statistic based on the Lagrange Multiplier (LM) test of Engle (1982)
+  ## for autoregressive conditional heteroscedasticity (ARCH). The statistic returned is the R2
+  ## value of an autoregressive model of order specified as lags applied to x2. "ARCH.LM"
+## entropy: The spectral entropy is the Shannon entropy
+## crossing_points defined as the number of times a time series crosses the median line.
+## flat_spots are computed by dividing the sample space of a time series into ten equal-sized
+  ##intervals, and computing the maximum run length within any single interval.
+## The heterogeneity features measure the heterogeneity of the time series. First, we pre-whiten
+  ## the time series to remove the mean, trend, and autoregressive (AR) information. Then we fit a GARCH(1,1)
+  ## model to the pre-whitened time series, xt to measure for autoregressive conditional heteroskedasticity (ARCH) effects.
+  ## The residuals from this model, zt are also measured for ARCH effects using a second GARCH(1,1)
+  ## arch_acf is the sum of squares of the first 12 autocorrelations of {x2t}
+  ## garch_acf is the sum of squares of the first 12 autocorrelations of {z2t}
+  ## arch_r2 is the R2 value of an AR model applied to {x2t}
+  ## garch_r2 is the R2 value of an AR model applied to {z2t}
+## holt_parameters Estimate the smoothing parameter for the level-alpha and the smoothing parameter
+  ## for the trend-beta of Holt’s linear trend method
+## We use a measure of the long-term memory of a time series (hurst), computed as 0.5
+  ## plus the maximum likelihood estimate of the fractional differencing order d
+  ## given by Haslett & Raftery (1989). We add 0.5 to make it consistent with the Hurst coefficient.
+## Stability and lumpiness are two time series features based on tiled (non-overlapping)
+  ## windows. Means or variances are produced for all tiled windows. stability is the variance
+  ## of the means, while lumpiness is the variance of the variances.
+## The nonlinearity coefficient is computed using a modification of the statistic used in Teräsvirta’s nonlinearity test.
+  ## Teräsvirta’s test uses a statistic X2=Tlog(SSE1/SSE0) where SSE1 and SSE0 are the sum of squared residuals
+  ## from a nonlinear and linear autoregression respectively. This is non-ergodic, so instead, we define it as 10X2/T
+  ## which will converge to a value indicating the extent of nonlinearity as T→∞
+  ## This takes large values when the series is linear, and values around 0 when the series is nonlinear.
+## station_features: std1st_der returns the standard deviation of the first derivative of the time series.
+## spreadrandomlocal_meantaul_50: 100 time-series segments of length l are selected at random from the time series
+    ## and the mean of the first zero-crossings of the autocorrelation function in each segment
 extract_tsfeatures <- function(x) {
   tsf <- tsfeatures::tsfeatures(
     x,
-    features = c("mean", "var", "acf_features", "entropy",
-                 "lumpiness", "stability", "heterogeneity",
-                 "flat_spots", "hurst")
+    features = c("acf_features","pacf_features",
+                 "arch_stat",
+                 "crossing_points","entropy","flat_spots",
+                 "heterogeneity", "hurst",
+                 "holt_parameters", "lumpiness", "stability",
+                 "nonlinearity", "station_features",
+                 "stl_features"
+                  )
   )
   return(as.list(tsf[1, ]))
 }
+
+# ----- 2C. Feature extraction per series : LogLik ---------------------------------------
 
 ## Extract Likelihood features
 extract_LogLik_features <- function(series) {
@@ -476,26 +532,34 @@ extract_LogLik_features <- function(series) {
     logLik_rec_YNM_weibull = logLik_rec_YNM_weibull
   )
 
-  return(Log_values)
+  Max_lik = which.max(Log_values)
+  return(Log_values )
   }
 
-## extract all features
+# ----- 2D. Feature extraction per series : All ---------------------------------------
+
 extract_all_features <- function(x) {
-  c(
-    extract_custom_features(x),
-    extract_tsfeatures(x),
-    extract_LogLik_features(x)
-  )
+  # print("Extract custom features ...")
+  a = extract_custom_features(x)
+
+  # message("Extract time series features ...")
+  b =  extract_tsfeatures(x)
+
+  # message("Extract LogLik features ...")
+  c = extract_LogLik_features(x)
+
+  Max_logLik = substr(names(which.max(c)[1]),start = 12, stop = 25)
+  return(c(a, b, c, Max_logLik = Max_logLik))
 }
 
 # ----- 3. Build labeled feature_matrix of features ---------------------------------------
 
 ## --- Helper function
-create_feature_dataset <- function(n_per_model = 10,
-                                   T_vals = c(100, 200, 500)) {
+generate_create_feature_dataset <- function(n_per_model = 10,
+                                   T_vals = c(100, 200, 500), normalized = TRUE) {
 
   message("Generating series...")
-  data <- generate_series_multiple(n_per_model, T_vals, normalized = TRUE)
+  data <- generate_series_multiple(n_per_model, T_vals, normalized = normalized)
 
   n <- length(data$series)
   feature_list <- vector("list", n)
@@ -519,8 +583,39 @@ create_feature_dataset <- function(n_per_model = 10,
   }
 
   features_df <- dplyr::bind_rows(feature_list)
+  features_df$label = as.factor(features_df$label)
   message("Done.")
-  return(features_df)
+  return(list(feature = features_df, data = data ))
+}
+
+## --- Helper function
+create_feature_dataset <- function(data) {
+
+  n <- length(data$series)
+  feature_list <- vector("list", n)
+
+  message("Extracting features...")
+  for (i in seq_len(n)) {
+
+    x <- data$series[[i]]
+
+    # extract all your features
+    f <- extract_all_features(x)
+
+    # add labels and ID
+    f$label <- data$labels[i]
+    f$series_id <- data$series_id[i]
+
+    # add T as a feature
+    f$T_length <- data$T_vals[i]
+
+    feature_list[[i]] <- f
+  }
+
+  features_df <- dplyr::bind_rows(feature_list)
+  features_df$label = as.factor(features_df$label)
+  message("Done.")
+  return(feature = features_df)
 }
 
 # ----- 6. Train different classification methods --------------------------------
