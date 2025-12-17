@@ -20,3 +20,23 @@ bounds = function(value,z,variance){
   lower = value- z*sqrt(variance)
   return(c(lower,upper))
 }
+
+############# Instal packages ###################
+# required_packages <- c(
+#   "tidyverse",
+#   "moments"
+# )
+# install_if_missing(required_packages)
+install_if_missing <- function(pkgs) {
+  for (p in pkgs) {
+    if (!suppressWarnings(require(p, character.only = TRUE))) {
+      install.packages(p, dependencies = TRUE)
+      library(p, character.only = TRUE)
+    }
+  }
+}
+
+##################### Load packages #################
+load_package = function(required_packages){
+lapply(required_packages, require, character.only = TRUE)
+}
