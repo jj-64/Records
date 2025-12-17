@@ -34,9 +34,9 @@ is_rec = function(X){
 #'
 #' @examples
 #' Xt = c(-0.5, -0.4,  0.2, 0.2, -1.0,  0.1,  0.8, -0.2, -0.9,  0.8)
-#' rec_counts(X=Xt)
+#' rec_count(X=Xt)
 #' # 4
-rec_counts = function(X){
+rec_count = function(X){
   sum(is_rec(X))
 }
 
