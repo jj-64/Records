@@ -1,3 +1,40 @@
+# | Feature block          | Detects              | Useful under          |
+#   | ---------------------- | -------------------- | --------------------- |
+#   | Record rates (fwd/bwd) | Drift direction      | RW vs drift           |
+#   | Log-record slope       | Record law deviation | Non-i.i.d.            |
+#   | Gap CV / max gap       | Burstiness           | Long memory           |
+#   | Entropy                | Regularity           | Deterministic trend   |
+#   | Spectral peak          | Cycles               | Periodic alternatives |
+#   | Rolling instability    | Local breaks         | Regime switching      |
+#   | Min/max symmetry       | Skewed innovation    | Non-Gaussian noise    |
+
+FEATURE_VERSION <- "v1.0-paper3b"
+FEATURE_DATE <- "2025-12-15"
+
+# ----- 0. Rolling instability & fast slope -----
+rolling_instability <- function(s, k = 20) {
+  n <- length(s)
+  if (n < 2 * k) return(c(NA, NA, NA))
+
+  rolls <- zoo::rollapply(
+    s, width = k,
+    FUN = function(x) c(mean(x), sd(x)),
+    by.column = FALSE, align = "right"
+  )
+
+  mean_sd_ratio <- sd(rolls[,1]) / mean(rolls[,2])
+  var_instab <- sd(rolls[,2])
+  mean_instab <- sd(rolls[,1])
+
+  c(mean_instab, var_instab, mean_sd_ratio)
+}
+
+fast_slope <- function(s) {
+  n <- length(s)
+  t <- seq_len(n)
+  return(cov(s, t) / var(t))
+}
+
 # ----- 1. Simulate time series under multiple record models --------------------
 
 ## ---- Helper function: Generate many series and keep labels, returns a numeric vector.
@@ -67,8 +104,8 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.1,1.5),
-                           dist = "frechet", shape=5, scale=5),
+        series_args = list(gamma = runif(1,1.1,1.3),
+                           dist = "frechet", shape=5, scale=1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
@@ -105,12 +142,17 @@ generate_series_multiple <- function(
 # The feature extraction function returns a named list.
 
 extract_custom_features <- function(series) {
+
+  ## --- Preliminaries --------------------------------------------------------
   s <- as.numeric(series)
   n <- length(s)
-  if (n < 10) stop("Series too short for stable features")
-  if (length(rec_gaps(s)) <2) warning("No records found")
 
-  ## 1 - Basic stats of the series
+  if (n < 10) stop("Series too short for stable feature extraction")
+
+  ## Record helpers exist:
+  ## is_rec(), rec_count(), rec_times(), rec_values(), rec_gaps()
+
+  ## --- 1. Basic distributional statistics ----------------------------------
   ave  <- mean(s)
   med  <- median(s)
   std  <- sd(s)
@@ -118,175 +160,205 @@ extract_custom_features <- function(series) {
   minv <- min(s)
   maxv <- max(s)
   rng  <- maxv - minv
-  cv   <- sd(s)/mean(s)
-  skew <- ifelse(length(na.omit(s))>2, moments::skewness(s), NA)
-  kurt <- ifelse(length(na.omit(s))>3, moments::kurtosis(s), NA) # excess? moments::kurtosis returns fisher or pearson? okay
+  cv   <- ifelse(ave != 0, std / ave, NA)
 
-  ## 2 - trend: trend slope and R^2
-  lmfit <- lm(s ~ seq_len(n))
-  slope <- as.numeric(coef(lmfit)[2])
-  slope_pval <- summary(lmfit)$coefficients[2, 4]
-  slope_R2 <- summary(lmfit)$r.squared
-  kendall_tau <- cor(time, s, method = "kendall")  ##Mann-Kendall proxy: Kendall correlation between time and series
+  skew <- if (n > 2) moments::skewness(s) else NA
+  kurt <- if (n > 3) moments::kurtosis(s) else NA
 
-  ## 3 - Increments stat: First-order difference
-  ds <- diff(s)
-  len_ds <- length(ds)
-  mean_diff <- mean(ds)
-  std_diff  <- sd(ds)
-  signs <- sign(ds)
-  sign_change_rate <- sum(signs[-1] * signs[-length(signs)] < 0) / (length(s) - 2)
+  ## --- 2. Trend features ----------------------------------------------------
+  t <- seq_len(n)
+  lmfit <- lm(s ~ t)
 
+  slope        <- coef(lmfit)[2]  #fast_slope(s) #
+  slope_pval   <- summary(lmfit)$coefficients[2, 4]
+  slope_R2     <- summary(lmfit)$r.squared
+  kendall_tau  <- cor(t, s, method = "kendall")
 
-  # record info
-  rec_nb = rec_count(s)
-  rec_high_idx <- rec_times(s)   # Foreword record highs
-  rec_high_values <- rec_values(s)
-  rec_high_idx_back <- rec_times(rev(s))  # Backward record highs
-  rec_high_values_back <- rec_values(rev(s))
-  #rec_low_idx <- rec_times(-s)   # Foreword record lows
-  #rec_low_values <- rec_values(-s)
-  #rec_low_idx_back <- rec_times(rev(-s))  # Backward record lows
-  #rec_low_values_back <- rec_values(rev(-s))
+  ## --- 3. Increment / difference features ----------------------------------
+  diffs <- diff(s)
+  mean_diff <- mean(diffs)
+  sd_diff   <- sd(diffs)
+  mad_diff  <- mean(abs(diffs))
 
-  rec_high_rate <- length(rec_high_idx)/n
-  rec_high_back_rate <- length(rec_high_idx_back)/n
-  #rec_low_rate <- length(rec_low_idx)/n
-  #rec_low_back_rate <- length(rec_low_idx_back)/n
+  diff_skew <- if (length(diffs) > 2)
+    moments::skewness(diffs) else NA
 
+  signs <- sign(diffs)
+  sign_change_rate <- if (length(signs) > 2)
+    mean(signs[-1] * signs[-length(signs)] < 0) else NA
 
-  # inter-record intervals (for highs and lows, forward and backward)
-  rec_high_gap <- if (length(rec_high_idx) >= 2) rec_gaps(series) else 0
-  #rec_low_gap <-  if (length(rec_low_idx) >= 2) rec_gaps(-series) else NA
-  rec_high_gap_back <- if (length(rec_high_idx_back) >= 2) rec_gaps(rev(series)) else 0
-  #rec_low_gap_back <-  if (length(rec_low_idx_back) >= 2) rec_gaps(-rev(series)) else NA
+  ## --- 4. Record counts and asymptotics ------------------------------------
+  rec_nb <- rec_count(s)
+  rec_rate <- rec_nb / n
 
-  rec_high_gap_median <- if (!all(is.na(rec_high_gap))) median(rec_high_gap, na.rm = TRUE) else 0
-  #rec_low_gap_median <-  if (!all(is.na(rec_low_gap))) median(rec_low_gap, na.rm = TRUE) else NA
-  rec_high_gap_back_median <- if (!all(is.na(rec_high_gap_back))) median(rec_high_gap_back, na.rm = TRUE) else 0
-  #rec_low_gap_back_median <-  if (!all(is.na(rec_low_gap_back))) median(rec_low_gap_back, na.rm = TRUE) else NA
+  R_cum <- cumsum(is_rec(s))
+  model_log <- lm(R_cum ~ log(t))
 
-  rec_high_gap_sd <- if (!all(is.na(rec_high_gap))) sd(rec_high_gap, na.rm = TRUE) else 0
-  #rec_low_gap_sd <-  if (!all(is.na(rec_low_gap))) sd(rec_low_gap, na.rm = TRUE) else NA
-  #rec_high_gap_back_sd <- if (!all(is.na(rec_high_gap_back))) sd(rec_high_gap_back, na.rm = TRUE) else 0
-  #rec_low_gap_back_sd <-  if (!all(is.na(rec_low_gap_back))) sd(rec_low_gap_back, na.rm = TRUE) else NA
+  beta_log      <- coef(model_log)[2]
+  beta_log_pval <- summary(model_log)$coefficients[2, 4]
+  beta_log_R2   <- summary(model_log)$r.squared
 
-  # Entropy of record indicator
-  p <- mean(is_rec(s))
-  entropy <- if (p > 0 && p < 1) {
-    - (p * log2(p) + (1 - p) * log2(1 - p))
+  ## --- 5. Forward / backward record rates ----------------------------------
+  rec_times_f <- rec_times(s)
+  rec_times_b <- rec_times(rev(s))
+
+  rec_high_rate      <- length(rec_times_f) / n
+  rec_high_back_rate <- length(rec_times_b) / n
+
+  rec_rate_ratio <- ifelse(rec_high_back_rate > 0,
+                           rec_high_rate / rec_high_back_rate, NA)
+
+  ## --- 6. Record timing and span -------------------------------------------
+  if (length(rec_times_f) >= 2) {
+    span_norm <- (tail(rec_times_f, 1) - head(rec_times_f, 1)) / n
   } else {
-    0
+    span_norm <- NA
   }
 
+  frac_rec_first_half  <- mean(rec_times_f <= n / 2)
+  frac_rec_last_quart  <- mean(rec_times_f > 3 * n / 4)
 
+  ## --- 7. Inter-record gap statistics --------------------------------------
+  rec_gap_f <- if (length(rec_times_f) >= 2) rec_gaps(s) else NA
+  rec_gap_b <- if (length(rec_times_b) >= 2) rec_gaps(rev(s)) else NA
 
-  # autocorrelation
-  #acf_vals <- acf(s, lag.max = 5, plot = FALSE)$acf
-  #acf1 <- ifelse(length(acf_vals) >= 2, acf_vals[2], NA)
-  #acf2 <- ifelse(length(acf_vals) >= 3, acf_vals[3], NA)
+  rec_gap_med_f <- median(rec_gap_f, na.rm = TRUE)
+  rec_gap_sd_f  <- sd(rec_gap_f, na.rm = TRUE)
+  rec_gap_cv_f  <- ifelse(rec_gap_med_f > 0,
+                          rec_gap_sd_f / mean(rec_gap_f, na.rm = TRUE), NA)
 
+  rec_gap_med_b <- if (length(rec_times_b) >= 2) median(rec_gap_b, na.rm = TRUE) else n
 
-  # spectral: dominant frequency via periodogram
+  max_gap_over_n <- if (!all(is.na(rec_gap_f)))
+    max(rec_gap_f, na.rm = TRUE) / n else NA
+
+  ## --- 8. Record entropy ----------------------------------------------------
+  p_rec <- mean(is_rec(s))
+  # entropy <- if (p_rec > 0 && p_rec < 1)
+  #   - (p_rec * log2(p_rec) + (1 - p_rec) * log2(1 - p_rec)) else 0
+
+  entropy <- ifelse(p_rec > 0 & p_rec < 1, -p_rec*log(p_rec) - (1-p_rec)*log(1-p_rec), 0)
+
+  ## --- 9. Spectral features -------------------------------------------------
   spec <- stats::spec.pgram(s, plot = FALSE, taper = 0)
+
   if (length(spec$spec) > 0) {
-    dom_idx <- which.max(spec$spec)
-    dom_freq <- spec$freq[dom_idx]
+    dom_idx   <- which.max(spec$spec)
+    dom_freq  <- 1/spec$freq[dom_idx]
     dom_power <- spec$spec[dom_idx]
   } else {
-    dom_freq <- NA; dom_power <- NA
+    dom_freq <- dom_power <- NA
   }
 
-  # crossing and peak counts
-  cross_mean <- sum(diff(s > ave) != 0)  # number of times series crosses its mean
-  prop_pos <- mean(s > mean(rec_values(s)))
+  ## --- 10. Crossing, extremes, dependence ---------------------------------
+  cross_mean <- sum(diff(s > ave) != 0)
 
-  extreme_2sd <- sum(abs(s - ave) > 2 * std) / n
-  extreme_3sd <- sum(abs(s - ave) > 3 * std) / n
+  extreme_2sd <- mean(abs(s - ave) > 2 * std)
+  extreme_3sd <- mean(abs(s - ave) > 3 * std)
 
-  # variability of first differences
-  diffs <- diff(s)
-  diff_mean <- mean(diffs)
-  diff_sd <- sd(diffs)
-  diff_skew <- ifelse(length(diffs) > 2, moments::skewness(diffs), NA)
+  #acf1 <- tryCatch(acf(s, plot = FALSE)$acf[2], error = function(e) NA)
 
-  # adf-like: use ndiffs from forecast to estimate number of differences needed (proxy for non-stationarity)
+  ## Stationarity proxies
   ndiff_needed <- tryCatch(forecast::ndiffs(s), error = function(e) NA)
-  ljung <- tryCatch(Box.test(s, lag = 10, type = "Ljung-Box"), error = function(e) list(statistic = NA, p.value = NA))
 
-  # proportion of positive first differences
-  prop_inc <- mean(diffs > diff_mean)
+  ljung_p <- tryCatch(
+    Box.test(s, lag = 10, type = "Ljung-Box")$p.value,
+    error = function(e) NA
+  )
 
-  # Turning points
-  diff_sign <- diff(sign(diff(s)))
-  #turning_points <- sum(diff_sign != diff_mean, na.rm = TRUE)
+  ## --- 11. Local extrema ----------------------------------------------------
+  diff_sign <- diff(sign(diffs))
+  local_maxima <- mean(diff_sign == -2, na.rm = TRUE)
+  local_minima <- mean(diff_sign ==  2, na.rm = TRUE)
 
-  # Local extrema
-  local_maxima <- length(which(diff_sign == -2))/n
-  local_minima <- length(which(diff_sign == 2))/n
+  ## --- 12. Low (minimum) records via symmetry -----------------------------------
+  s_low <- -s
 
-  # feature vector
+  rec_times_low_f <- rec_times(s_low)
+  rec_times_low_b <- rec_times(rev(s_low))
+
+  rec_low_rate      <- length(rec_times_low_f) / n
+  rec_low_back_rate <- length(rec_times_low_b) / n
+
+  rec_low_rate_ratio <- ifelse(rec_low_back_rate > 0,
+                               rec_low_rate / rec_low_back_rate, NA)
+
+  rec_gap_low <- if (length(rec_times_low_f) >= 2) rec_gaps(s_low) else NA
+  rec_gap_low_med <- if (length(rec_times_low_f) >= 2) median(rec_gap_low, na.rm = TRUE) else n
+
+  ## --- 13. Rolling instability ---
+  roll_feats <- rolling_instability(s)
+
+  rolling_mean_instab = roll_feats[1]
+  rolling_var_instab  = roll_feats[2]
+  rolling_mean_sd_ratio = roll_feats[3]
+
+  ## --- Feature vector -------------------------------------------------------
   features <- c(
-    ave = ave,
-    std = std,
-    cv = ave/std,
-    median = med,
-    iqr = iqrv,
-    skewness = skew,
-    kurtosis = kurt,
+    ave = ave, std = std, cv = cv,
+    median = med, iqr = iqrv,
+    skewness = skew, kurtosis = kurt,
     min = minv,
-    max = maxv,
+    #max = maxv,
     range = rng,
-    rec_high_rate = rec_high_rate,
-    #rec_low_rate = rec_low_rate,
-    rec_high_back_rate = rec_high_back_rate,
-    #rec_low_back_rate = rec_low_back_rate,
-
-    rec_high_gap_median = rec_high_gap_median,
-    #rec_low_gap_median = rec_low_gap_median,
-    rec_high_gap_back_median = rec_high_gap_back_median,
-    #rec_low_gap_back_median = rec_high_gap_back_median,
-
-    rec_high_gap_sd = rec_high_gap_sd,
-    #rec_low_gap_sd = rec_low_gap_sd,
-    #rec_high_gap_back_sd = rec_high_gap_back_sd,
-    #rec_low_gap_back_sd = rec_high_gap_back_sd,
-    entropy_c = entropy,
 
     slope = ifelse(slope_pval < 0.05, slope, 0),
     slope_R2 = ifelse(slope_pval < 0.05, slope_R2, 0),
     kendall_tau = kendall_tau,
 
-    #acf1 = acf1,
-    #acf2 = acf2,
-    #pacf1 = pacf1,
+    diff_mean = mean_diff,
+    diff_sd = sd_diff,
+    diff_mad = mad_diff,
+    diff_skew = diff_skew,
+    sign_change_rate = sign_change_rate,
 
-    dom_freq = dom_freq,
+    rec_rate = rec_rate,
+    rec_high_rate = rec_high_rate,
+    rec_high_back_rate = rec_high_back_rate,
+    rec_rate_ratio = rec_rate_ratio,
+
+    rec_gap_median = rec_gap_med_f,
+    rec_gap_sd = rec_gap_sd_f,
+    rec_gap_cv = rec_gap_cv_f,
+    rec_gap_back_median = rec_gap_med_b,
+    max_gap_over_n = max_gap_over_n,
+
+    frac_rec_first_half = frac_rec_first_half,
+    frac_rec_last_quarter = frac_rec_last_quart,
+    span_norm = span_norm,
+
+    entropy_shann = entropy,
+
+    dom_period = dom_freq,
     dom_power = dom_power,
 
-    cross_mean = cross_mean,
-    prop_pos = prop_pos,
+    #cross_mean = cross_mean, # we have crossing_points in ts
     extreme_2sd = extreme_2sd,
     extreme_3sd = extreme_3sd,
 
-    diff_mean = diff_mean,
-    diff_sd = diff_sd,
-    diff_skew = diff_skew,
-
+    #acf1 = acf1,
     ndiff_needed = ndiff_needed,
-    ljung = ljung$p.value,
+    ljung_pvalue = ljung_p,
 
-    prop_inc = prop_inc,
-
-    #turning_points = turning_points,
     local_minima = local_minima,
-    local_maxima = local_maxima
+    local_maxima = local_maxima,
+
+    rec_low_rate = rec_low_rate,
+    rec_low_back_rate = rec_low_back_rate,
+    rec_low_rate_ratio = rec_low_rate_ratio,
+    rec_low_gap_median = rec_gap_low_med,
+
+    rolling_mean_instab = rolling_mean_instab,
+    rolling_var_instab  = rolling_var_instab,
+    rolling_mean_sd_ratio = rolling_mean_sd_ratio
+
   )
 
-  # make numeric and named
-  #as.numeric(features) %>% setNames(names(features))
+  attr(features, "version") <- FEATURE_VERSION
+  attr(features, "date") <- FEATURE_DATE
   return(features)
 }
+
 
 # ----- 2B. Feature extraction per series :tsfeatures ---------------------------------------
 
@@ -370,10 +442,10 @@ extract_LogLik_features <- function(series) {
   ## measures
   mean_all = mean(series)
   var_all = var(series)
-  shape_all = abs(skewness(series))
+  shape_all = abs(moments::skewness(series))
   mean_rec = mean(rec_values(series))
   var_rec =  var(rec_values(series))
-  shape_rec = abs(skewness(rec_values(series)))
+  shape_rec = abs(moments::skewness(rec_values(series)))
 
   ## Classical -  all
   logLik_all_iid_gumbel = logLik_records(model = "iid", obs_type = "all",
@@ -549,6 +621,7 @@ extract_all_features <- function(x) {
   c = extract_LogLik_features(x)
 
   Max_logLik = substr(names(which.max(c)[1]),start = 12, stop = 25)
+
   return(c(a, b, c, Max_logLik = Max_logLik))
 }
 
