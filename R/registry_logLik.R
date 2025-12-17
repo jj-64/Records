@@ -78,7 +78,7 @@ register_loglik("iid", "records", "norm",
 
     mean <- as.numeric(params['mean'])
     sd <- as.numeric(params["sd"])
-    m = length(Rn) #m= rec_counts(y)
+    m = length(Rn) #m= rec_count(y)
 
     ## sum of log(f_rn)
     s1 <- sum(dnorm(Rn[-1], mean = mean, sd = sd, log = TRUE))
@@ -115,7 +115,7 @@ register_loglik("iid", "records", "frechet",
                   scale = as.numeric(params["scale"])
                   shape = as.numeric(params["shape"])
                   location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(Rn)-1e-6))
-                  m = length(Rn) #m= rec_counts(y)
+                  m = length(Rn) #m= rec_count(y)
 
                   ## sum of log(f_rn)
                   s1 <- sum(VGAM::dfrechet(Rn[-1],  location = location, shape = shape, scale= scale, log = TRUE))
@@ -152,7 +152,7 @@ register_loglik("iid", "records", "gumbel",
 
                   scale = as.numeric(params["scale"])
                   loc = as.numeric(params["loc"])
-                  m = length(Rn) #m= rec_counts(y)
+                  m = length(Rn) #m= rec_count(y)
 
                   ## sum of log(f_rn)
                   s1 <- sum(VGAM::dgumbel(Rn[-1], loc, scale, log = TRUE))
@@ -188,7 +188,7 @@ register_loglik("iid", "records", "weibull",
 
                   scale = as.numeric(params["scale"])
                   shape = as.numeric(params["shape"])
-                  m = length(Rn) #m= rec_counts(y)
+                  m = length(Rn) #m= rec_count(y)
 
                   ## sum of log(f_rn)
                   s1 <- sum(dweibull(Rn[-1], shape, scale, log = TRUE))
@@ -484,7 +484,7 @@ register_loglik( "YNM", "records", "frechet",
     gamma <- as.numeric(params["gamma"])
     shape <- as.numeric(params["shape"])
     scale <- as.numeric(params["scale"])
-    m = length(Rn) #m= rec_counts(y)  ## number of records
+    m = length(Rn) #m= rec_count(y)  ## number of records
     location = ifelse("location"  %in% names(params), as.numeric(params["location"]) ,(min(Rn)-1e-6))
 
     # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
@@ -536,7 +536,7 @@ register_loglik( "YNM", "records", "gumbel",
                    gamma <- as.numeric(params["gamma"])
                    loc <- as.numeric(params["loc"])
                    scale <- as.numeric(params["scale"])
-                   m = length(Rn) #m= rec_counts(y)  ## number of records
+                   m = length(Rn) #m= rec_count(y)  ## number of records
 
                    # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
                    if (scale <= 0) {
@@ -588,7 +588,7 @@ register_loglik( "YNM", "records", "norm",
                    gamma <- as.numeric(params["gamma"])
                    mean <- as.numeric(params["mean"])
                    sd <- as.numeric(params["sd"])
-                   m = length(Rn) #m= rec_counts(y)  ## number of records
+                   m = length(Rn) #m= rec_count(y)  ## number of records
 
                    # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
                    if (sd <= 0) {
@@ -640,7 +640,7 @@ register_loglik( "YNM", "records", "weibull",
                    gamma <- as.numeric(params["gamma"])
                    shape <- as.numeric(params["shape"])
                    scale <- as.numeric(params["scale"])
-                   m = length(Rn) #m= rec_counts(y)  ## number of records
+                   m = length(Rn) #m= rec_count(y)  ## number of records
 
                    # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or shape <= 0, we return -Inf)
                    if (scale <= 0 | shape<=0) {

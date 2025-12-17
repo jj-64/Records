@@ -32,7 +32,7 @@
 #' Test_iid_NT(x)
 Test_iid_NT <- function(X, alpha = 0.05) {
   T <- length(X)
-  obs_stat <- (rec_counts(X) - log(T)) / sqrt(log(T))
+  obs_stat <- (rec_count(X) - log(T)) / sqrt(log(T))
   p_value <- 1 - pnorm(obs_stat, 0, 1)
 
   decision <- ifelse(p_value > alpha, "Classical", "NO")

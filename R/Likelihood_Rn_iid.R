@@ -1,7 +1,7 @@
 # Define the function in R
 
 Likelihood_Rn_Frechet_iid= function(R,L,T,params){  ## Frechet parametrs 1/scale, shape
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
 
   ## sum of log(f_rn) expect first record
   s1 = sum(log( VGAM::dfrechet(R[-1],loc=0, scale=1/params[1], shape=params[2])  ) )
@@ -24,7 +24,7 @@ Likelihood_Rn_Frechet_iid= function(R,L,T,params){  ## Frechet parametrs 1/scale
 
 ## detailed
 Likelihood_Rn_Frechet2_iid = function(R,L,T,params){  ## Frechet parametrs 1/scale, shape
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
 
   ## sum of log(f_rn) expect first record
   s1a = (m-1) * log(params[1]*params[2])
@@ -49,7 +49,7 @@ Likelihood_Rn_Frechet2_iid = function(R,L,T,params){  ## Frechet parametrs 1/sca
 }
 
 Likelihood_Rn_Norm_iid = function(R,L,T,params){  ## mean, sd
-  m = length(R) #m= rec_counts(y)
+  m = length(R) #m= rec_count(y)
 
   ## sum of log(f_rn)
   s1 = sum(log( dnorm(R[-1],mean = params[1], sd=params[2])  ) )
@@ -70,7 +70,7 @@ Likelihood_Rn_Norm_iid = function(R,L,T,params){  ## mean, sd
 }
 
 Likelihood_Rn_Exp_iid = function(R,L,T,params){  ## mean, sd
-  m = length(R) #m= rec_counts(y)
+  m = length(R) #m= rec_count(y)
 
   ## sum of log(f_rn)
   s1 = sum(log( dexp(R[-1],rate=params)  ) )
@@ -91,7 +91,7 @@ Likelihood_Rn_Exp_iid = function(R,L,T,params){  ## mean, sd
 }
 
 Likelihood_Rn_Gumbel_iid = function(R,L,T,params){  ## mean, sd
-  m = length(R) #m= rec_counts(y)
+  m = length(R) #m= rec_count(y)
 
   ## sum of log(f_rn)
   s1 = sum(log( VGAM::dgumbel(R[-1],loc=params[1], scale=params[2])  ) )

@@ -1,6 +1,6 @@
 ## Likelihood function LDM
 Likelihood_Rn_Frechet_LDM = function(R,L,T,params){
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
   x = R - params[1]* L ## Rn-theta*ln
 
   # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or params[3] <= 0, we return -Inf)
@@ -37,7 +37,7 @@ Likelihood_Rn_Frechet_LDM = function(R,L,T,params){
 ################### Gumbel ##################
 ## Likelihood function LDM
 Likelihood_Rn_Gumbel_LDM = function(R,L,T,params){
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
   x = R - params[1]* L ## Rn-theta*ln
 
   ## pdf
@@ -79,7 +79,7 @@ Likelihood_Rn_Gumbel_LDM = function(R,L,T,params){
 
 ################### Weibull ##################
 Likelihood_Rn_Weibull_LDM = function(R,L,T,params){
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
   x = R - params[1]* L ## Rn-theta*ln
 
   ## pdf
@@ -122,7 +122,7 @@ Likelihood_Rn_Weibull_LDM = function(R,L,T,params){
 ################### Exp #########################
 
 Likelihood_Rn_Exp_LDM = function(R,L,T,params){  ## Theta and scale= 1/rate
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
   x = R - params[1]* L ## Rn-theta*ln
 
   ## pdf

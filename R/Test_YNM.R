@@ -219,7 +219,7 @@ Test_YNM_Smooth <- function(X, alpha = 0.05) {
     600*a^4*x - 120*a^5
 
   # record count and mean gap
-  m <- rec_counts(X)
+  m <- rec_count(X)
   gaps <- rec_gaps(X)
   dbar <- sum(gaps) / (m - 1)
 
@@ -323,7 +323,7 @@ Quantile_YNM=function(T,gamma, alpha= 0.05){
 #' Test_YNM_NT(y)
 Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
   T <- length(X)
-  obs <- rec_counts(X)
+  obs <- rec_count(X)
   v_gamma = NA_real_
 
   # --- Estimate gamma if not provided ---

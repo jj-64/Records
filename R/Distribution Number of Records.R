@@ -348,7 +348,7 @@ rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
     recs <- numeric(n_sim)
     for (i in 1:n_sim) {
       X <- LDM_series(T = T, theta = theta, dist = dist, ...)
-      recs[i] <- rec_counts(X)
+      recs[i] <- rec_count(X)
     }
     return(mean(recs))
   }
@@ -405,7 +405,7 @@ rec_count_var_LDM <- function(T,
     recs <- numeric(n_sim)
     for (i in 1:n_sim) {
       X <- LDM_series(T = T, theta = theta, dist = dist, ...)
-      recs[i] <- rec_counts(X)
+      recs[i] <- rec_count(X)
     }
     return(var(recs))
   }
@@ -417,7 +417,7 @@ rec_count_var_LDM <- function(T,
 #   theta = theta_estm2B(X)
 #   t=length(X)
 #   N = 1  ## first trivial record
-#   for(i in 2:t) {N[i] = rec_counts(X[1:i])}  ## observed number of records series
+#   for(i in 2:t) {N[i] = rec_count(X[1:i])}  ## observed number of records series
 #   E=1
 #   for(i in 2:t) {E[i] = rec_count_mean_LDM(T=i, theta=theta)}  ## expected number of records
 #   sigm=rec_count_var_LDM(T=1,theta=theta)

@@ -168,7 +168,7 @@ Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {
 #' X <- rnorm(50, mean = 0.2 * (1:50))  # Linear drift
 #' Test_LDM_NT(X, alpha = 0.05)
 Test_LDM_NT <- function(X, alpha = 0.05) {
-  obs <- rec_counts(X)
+  obs <- rec_count(X)
   scale <- 1
 
   # Estimate theta and variance

@@ -110,7 +110,7 @@ L_Rn_Exp_YNM = function(R,L,T, params){
 #' @examples
 #' Likelihood_Rn_Frechet_YNM(R = c(3.5, 2.1, 1.8), L = c(2, 4, 6), T = 10, params = c(0.9, 1, 2))
 Likelihood_Rn_Frechet_YNM = function(R,L,T,params){
-  m = length(R) #m= rec_counts(y)  ## number of records
+  m = length(R) #m= rec_count(y)  ## number of records
 
   # Check for invalid parameter values (e.g., if params[1] <= 0 or params[2] <= 0 or params[3] <= 0, we return -Inf)
   if (any(params <= 0)) {

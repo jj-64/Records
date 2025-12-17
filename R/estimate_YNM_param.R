@@ -53,7 +53,7 @@ estimate_YNM_moments <- function(X, variance = TRUE) {
     stop("X must be a numeric vector of length > 4.")
 
   # --- Compute number of records and sample size ---
-  N <- rec_counts(X)
+  N <- rec_count(X)
   T <- length(X)
 
   # --- Gamma estimator ---
@@ -328,7 +328,7 @@ estimate_YNM_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
   # --- Precompute quantities ---
   T <- length(X)
   delta <- is_rec(X)
-  N <- rec_counts(X)
+  N <- rec_count(X)
 
   # --- Derivative of log-likelihood wrt v ---
   dLog <- function(v) {
