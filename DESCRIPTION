@@ -1,5 +1,4 @@
 Config/testthat/edition: 3
-
 Package: Records
 Type: Package
 Title: Record-count Statistics for Multiple Stochastic Models
