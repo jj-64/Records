@@ -1,3 +1,5 @@
+Config/testthat/edition: 3
+
 Package: Records
 Type: Package
 Title: Record-count Statistics for Multiple Stochastic Models
@@ -13,3 +15,8 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 3.6)
 RoxygenNote: 7.3.3
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+
