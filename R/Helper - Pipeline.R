@@ -61,6 +61,7 @@ generate_series_multiple <- function(
     normalized = TRUE) {
   all_series <- list()
   labels <- c()
+  labels_m <- c()
   series_id <- c()
   Ts <- c()  # store T for each series
 
@@ -79,9 +80,25 @@ generate_series_multiple <- function(
       labels <- c(labels, "DTRW")
       series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "norm")
       i = i + 1
     }
 
+    i = 1
+    while(i <= n_per_model) {
+      s <- generate_series(
+        DTRW_series,
+        series_args = list(dist = "cauchy", mean = 0, scale = 1),
+        T_val = T_val
+      )
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "DTRW")
+      series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "cauchy")
+      i = i + 1
+    }
     ## ---- LDM
     i = 1
     while(i <= n_per_model) {
@@ -96,6 +113,24 @@ generate_series_multiple <- function(
       labels <- c(labels, "LDM")
       series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "frechet")
+      i = i + 1
+    }
+
+    i = 1
+    while(i <= n_per_model) {
+      s <- generate_series(
+        LDM_series,
+        series_args = list(theta = runif(1,0.1,0.3),
+                           dist = "weibull", shape = 2, scale=1),
+        T_val = T_val
+      )
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "LDM")
+      series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "weibull")
       i = i + 1
     }
 
@@ -113,9 +148,26 @@ generate_series_multiple <- function(
       labels <- c(labels, "YNM")
       series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "frechet")
       i=i+1
     }
 
+    i=1
+    while(i <= n_per_model) {
+      s <- generate_series(
+        YNM_series,
+        series_args = list(gamma = runif(1,1.1,1.3),
+                           dist = "norm", mean =0, sd =1),
+        T_val = T_val
+      )
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "YNM")
+      series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "norm")
+      i=i+1
+    }
     ## ---- iid (Classical)
     i=1
     while(i <= n_per_model) {
@@ -125,11 +177,26 @@ generate_series_multiple <- function(
       labels <- c(labels, "Classical")
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "norm")
       i=i+1
     }
+
+    i=1
+    while(i <= n_per_model) {
+      s <- VGAM::rgumbel(T_val, 0, 1)
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "Classical")
+      series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "gumbel")
+      i=i+1
+    }
+
+    ## end
   }
 
-  return(list(series = all_series, labels = labels, series_id = series_id, T_vals = Ts))
+  return(list(series = all_series, labels = labels, labels_m = labels_m, series_id = series_id, T_vals = Ts))
 }
 
 
@@ -334,7 +401,7 @@ extract_custom_features <- function(series) {
 
     #cross_mean = cross_mean, # we have crossing_points in ts
     extreme_2sd = extreme_2sd,
-    extreme_3sd = extreme_3sd,
+    #extreme_3sd = extreme_3sd,
 
     #acf1 = acf1,
     ndiff_needed = ndiff_needed,
@@ -648,6 +715,7 @@ generate_create_feature_dataset <- function(n_per_model = 10,
     # add labels and ID
     f$label <- data$labels[i]
     f$series_id <- data$series_id[i]
+    f$label_m = data$labels_m[i]
 
     # add T as a feature
     f$T_length <- data$T_vals[i]
@@ -678,6 +746,7 @@ create_feature_dataset <- function(data) {
     # add labels and ID
     f$label <- data$labels[i]
     f$series_id <- data$series_id[i]
+    f$label_m = data$labels_m[i]
 
     # add T as a feature
     f$T_length <- data$T_vals[i]

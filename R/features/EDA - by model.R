@@ -23,6 +23,7 @@ install_if_missing(required_packages)
 ## Load libraries
 load_package(required_packages = required_packages)
 
+options (scipen= 99999)
 ## ============================================================
 ## 1. Input validation
 ## ============================================================
@@ -30,7 +31,7 @@ load_package(required_packages = required_packages)
 load("data/feature_matrix.rda")
 
 ## get feature matrix (numerics only)
-feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "series"))
+feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
 feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
 # feature_only <- feature_matrix[, sapply(feature_matrix, is.numeric)]
 
@@ -64,7 +65,19 @@ group_desc <- feature_only %>%
     .names = "{.col}_{.fn}"
   ))
 
-print(group_desc)
+
+group_desc = as.data.frame(t(group_desc))
+colnames(group_desc) = c("Classical", "DTRW", "LDM", "YNM")
+#group_desc$feature = rownames(group_desc)
+group_desc = group_desc[-1,]
+group_desc[,1:4] = apply(group_desc[,1:4], 2, as.numeric)
+group_desc$variability = apply(group_desc[,1:4], 1, FUN = function(x) abs(sd(x)/mean(x)))
+View(group_desc)
+
+## recommended to remove
+group_desc[which(group_desc$variability ==0 ), ]
+
+group_desc[which(group_desc$variability <0.05 ), ]
 # Interpretation
 # Identical summaries across regimes → drop candidate
 # Large IQR shifts → tail-sensitive feature
@@ -79,7 +92,7 @@ eta2_summary <- lapply(
     fit <- aov(feature_only[[f]] ~ regime)
     data.frame(
       feature = f,
-      eta2 = round(eta_squared(fit, partial = FALSE)$Eta2,3)
+      eta2 = round(effectsize::eta_squared(fit, partial = FALSE)$Eta2,3)
     )
   }
 ) %>% bind_rows()
@@ -87,7 +100,8 @@ eta2_summary <- lapply(
 eta2_summary <- eta2_summary %>%
   arrange(desc(eta2))
 
-print(eta2_summary[eta2_summary$eta2 <0.06,])
+## recommended to remove
+print(eta2_summary[which(eta2_summary$eta2 <0.05 | is.na(eta2_summary$eta2)),])
 
 # η² < 0.01 → negligible
 # 0.01–0.06 → small
@@ -108,7 +122,8 @@ kw_summary <- lapply(
 ) %>% bind_rows() %>%
   arrange(p_value)
 
-print(kw_summary[kw_summary$p_value >0.05, ])
+## recommended to remove
+print(kw_summary[which(kw_summary$p_value >0.05 | is.na(kw_summary$p_value)) , ])
 
 ## ============================================================
 ## Quantile-level regime differentiation (very important for records)
@@ -138,11 +153,21 @@ quantile_range <- quantile_diff %>%
   ) %>%
   separate(name, into = c("feature", "quantile"), sep = "_q")
 
-print(quantile_range)
+# quantile_range = quantile_range %>% pivot_wider(id_cols = "feature",
+#                                names_from = "quantile",
+#                                values_from = "range_across_regimes"
+#                                )
+
+
+View(quantile_range)
+
+## recommended to remove
+quantile_range[which(quantile_range$range_across_regimes <0.05), ]
 
 # Interpretation
 # Large q95 separation → upper-record sensitivity
 # Large q05 separation → lower-record sensitivity
+
 ## ============================================================
 ## Regime-conditioned plots
 ## ============================================================
@@ -156,47 +181,37 @@ X_long <- cbind(feature_only,regime) %>%
 
 ##Get unique features and split into groups of, say, 16
 feature_list <- unique(X_long$feature)
-feature_chunks <- split(feature_list, ceiling(seq_along(feature_list) / 16))
-
-## Boxplots by regime
-ggplot(X_long[X_long$feature == "cv",], aes(x = regime, y = value)) +
-  geom_boxplot(outlier.alpha = 0.2) +
-  facet_wrap(~ feature, scales = "free", ncol = 4) +
-  theme_minimal()
-
+feature_chunks <- split(feature_list, ceiling(seq_along(feature_list) / 8))
 
 ## Density overlays
 plots <- map(feature_chunks, ~ {
   ggplot(filter(X_long, feature %in% .x), aes(x = value, fill = regime)) +
     geom_density(alpha = 0.3) +
-    facet_wrap(~ feature, scales = "free", ncol = 4) +
+    facet_wrap(~ feature, scales = "free", ncol = 2) +
+    theme_minimal()
+})
+
+## Boxplots by regime
+plotsb <- map(feature_chunks, ~ {
+  ggplot(filter(X_long, feature %in% .x), aes(x = regime, y = value)) +
+    geom_boxplot(outlier.alpha = 0.2) +
+    facet_wrap(~ feature, scales = "free", ncol = 2) +
     theme_minimal()
 })
 
 ## display the first plot
-plots[[1]]
-
+p=3
+plots[[p]]
+plotsb[[p]]
 
 ##ptional: Save each plot
 #walk2(plots, seq_along(plots), ~ ggsave(paste0("density_plot_", .y, ".png"), .x, width = 12, height = 8))
 
 
-## ============================================================
-## 9. Supervised PCA (sanity check)
-## ============================================================
 
-pca <- PCA(
-  feature_only,
-  scale.unit = TRUE,
-  graph = FALSE
-)
 
-fviz_pca_ind(pca,
-             habillage = regime,
-             addEllipses = TRUE,
-             ellipse.level = 0.95)
 ## ============================================================
-## 10. Decision rule for feature removal (explicit)
+## 9. Decision rule for feature removal (explicit)
 ## ============================================================
 
 # I recommend retaining features that satisfy at least one:
@@ -209,11 +224,29 @@ fviz_pca_ind(pca,
 ## ============================================================
 ## 11. Output: filtered feature set
 ## ============================================================
-selected_features <- eta2_summary %>%
-  filter(eta2 > 0.02) %>%
+    ##eta2 removal
+remove_features = eta2_summary %>%
+  filter(eta2 < 0.02)%>%
   pull(feature)
 
-X_reduced <- X %>%
-  select(all_of(selected_features), regime)
+remove_features = c(remove_features, kw_summary %>%
+  filter(p_value > 0.05) %>%
+  pull(feature)
+)
 
-saveRDS(X_reduced, "features_regime_discriminative.rds")
+remove_features = c(remove_features, quantile_range %>%
+                      filter(range_across_regimes == 0) %>%
+                      pull(feature)
+)
+
+
+# selected_features <- eta2_summary %>%
+#   filter(eta2 > 0.06) %>%
+#   pull(feature)
+
+selected_features <- setdiff(names(feature_matrix), unique(remove_features))
+
+feature_matrix_reduced <- feature_matrix %>%
+  select(all_of(selected_features))
+
+saveRDS(feature_matrix_reduced, "data/feature_matrix_reduced.rds")

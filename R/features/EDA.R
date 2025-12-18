@@ -26,19 +26,19 @@ library(factoextra)
 
 load("data/feature_matrix.rda")
 
-## get feature matrix (numerics only)
-feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "series"))
+    ## get feature matrix (numerics only)
+feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label","label_m", "series"))
 feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
 # feature_only <- feature_matrix[, sapply(feature_matrix, is.numeric)]
 
-##Convert to numeric if needed
+    ##Convert to numeric if needed
 feature_only <- feature_only %>% mutate_if(is.factor, as.character) %>% mutate_all(as.numeric)
 
-## Assume feature_only is your object
+    ## Assume feature_only is your object
 stopifnot(is.matrix(feature_only) || is.data.frame(feature_only))
 feature_only <- as.data.frame(feature_only)
 
-## Enforce numeric-only
+    ## Enforce numeric-only
 non_numeric <- names(feature_only)[!sapply(feature_only, is.numeric)]
 if (length(non_numeric) > 0) {
   stop("Non-numeric features detected: ", paste(non_numeric, collapse = ", "))
@@ -62,7 +62,7 @@ na_summary <- tibble(
   pct_na  = colMeans(is.na(feature_only))
 ) %>% arrange(desc(pct_na))
 
-print(na_summary)
+print(na_summary %>% filter(n_na > 0))
 
 ## Constant or near-constant features
 variance_summary <- tibble(
@@ -71,7 +71,7 @@ variance_summary <- tibble(
   unique_vals = apply(feature_only, 2, function(z) length(unique(z)))
 ) %>% arrange(variance)
 
-print(variance_summary)
+print(variance_summary %>% filter(variance == 0))
 
 ## Flag unusable features
 degenerate_features <- variance_summary %>%
@@ -92,9 +92,9 @@ feature_only = feature_only[, !(colnames(feature_only) %in%  degenerate_features
 ## 3. Univariate descriptive statistics
 ## ============================================================
 
-desc_stats <- describe(feature_only)
+desc_stats <- psych::describe(feature_only)
 
-print(desc_stats)
+View(desc_stats)
 # What to look for
 # Heavy skewness → log / rank transforms
 # Extreme kurtosis → tail-driven statistics (records, extremes)
@@ -108,17 +108,17 @@ X_long <- feature_only %>%
   mutate(id = row_number()) %>%
   pivot_longer(-id, names_to = "feature", values_to = "value")
 
-## Histograms
-ggplot(X_long, aes(x = value)) +
-  geom_histogram(bins = 50, fill = "grey70", color = "black") +
-  facet_wrap(~ feature, scales = "free", ncol = 4) +
-  theme_minimal()
+##Get unique features and split into groups of, say, 16
+feature_list <- unique(X_long$feature)
+feature_chunks <- split(feature_list, ceiling(seq_along(feature_list) / 8))
 
-## Boxplots
-ggplot(X_long, aes(y = value)) +
-  geom_boxplot(outlier.alpha = 0.3) +
-  facet_wrap(~ feature, scales = "free", ncol = 4) +
-  theme_minimal()
+## Histograms
+plots <- map(feature_chunks, ~ {
+  ggplot(filter(X_long, feature %in% .x), aes(x = value, fill = regime)) +
+    geom_histogram(bins = 50, fill = "grey70", color = "black") +
+    facet_wrap(~ feature, scales = "free", ncol = 2) +
+    theme_minimal()
+})
 
 # Interpretation
 # Outliers dominating boxplots → consider robust scaling
@@ -140,7 +140,7 @@ corrplot(cor_mat,
          order = "hclust")
 
 ## Identify highly correlated pairs
-high_corr <- which(abs(cor_mat) > 0.9 & abs(cor_mat) < 1, arr.ind = TRUE)
+high_corr <- which(abs(cor_mat) > 0.95 & abs(cor_mat) < 1, arr.ind = TRUE)
 
 high_corr_pairs <- tibble(
   feature_1 = rownames(cor_mat)[high_corr[,1]],
@@ -148,10 +148,10 @@ high_corr_pairs <- tibble(
   rho = cor_mat[high_corr]
 ) %>% filter(feature_1 != feature_2)
 
-print(high_corr_pairs)
+View(high_corr_pairs)
 # Decision rule
 #
-# |ρ| > 0.9 → keep one representative
+# |ρ| > 0.95 → keep one representative
 # Prefer:
 #   More interpretable
 # Lower variance inflation
@@ -167,7 +167,7 @@ scale_summary <- tibble(
   IQR = apply(feature_only, 2, IQR, na.rm = TRUE)
 ) %>% arrange(desc(sd))
 
-print(scale_summary)
+View(scale_summary)
 
 ## Z-score normalization preview
 X_scaled <- scale(feature_only)
@@ -176,7 +176,6 @@ summary(X_scaled)
 # Rule
 #
 # Always classify on scaled features
-#
 # Keep raw scale only for interpretability and plots
 
 ## ============================================================
@@ -185,7 +184,7 @@ summary(X_scaled)
 
 pca <- prcomp(X_scaled, center = TRUE, scale. = TRUE)
 
-## Variance explained
+## Variance explained Scree plot
 fviz_eig(pca, addlabels = TRUE)
 
 ## Feature loadings

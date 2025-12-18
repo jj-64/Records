@@ -1,0 +1,94 @@
+---
+title: "Generate data"
+author: "Jinane Jouni"
+date: "2025-12-18"
+output: html_document
+---
+# simulate series under different record models and save for later processing
+#
+# Requirements: R >= 4.0, packages: tidyverse, forecast, e1071, randomForest,
+# caret, xgboost, pROC, glmnet, nnet, kernlab, MASS, car
+
+# ----- 0. Setup ---------------------------------------------------
+Let numbers display in decimals and not scientific notation
+```{r}
+options(scipen = 999)
+```
+
+Set seed also
+```{r}
+set.seed(12345)
+```
+
+Check for required packages for install and loading
+```{r echo=FALSE, message=FALSE, warning=TRUE}
+required_packages <- c(
+  "tidyverse", "forecast", "e1071", "randomForest", "caret", "xgboost",
+  "pROC", "glmnet", "nnet", "kernlab", "MASS", "car", "signal", "moments",
+  "tsfeatures", "TSEntropies", "entropy",
+  "feasts", "fabletools", "dplyr", "tibble", "stats"
+)
+## install if missing
+install_if_missing(required_packages)
+
+## Load libraries
+load_package(required_packages = required_packages)
+
+## Set caret parallel if desired (commented out by default)
+library(doParallel)
+# cl <- makeCluster(detectCores() - 1); registerDoParallel(cl)
+```
+
+Library Records is essential to run most of the functions available on github.
+To install
+```{r}
+## library Records from Github
+devtools::install_github("jj-64/Records")
+```
+
+# ----- 1. Build labeled feature_matrix of features ----------------
+
+Option 1: Generate and create
+the first option is to generate dataset and create feature matrix in one step.
+We will save the simulated data (raw data) and feature matrix separately.
+```{r}
+# simulated_data = generate_create_feature_dataset(n_per_model = 150,
+#                                                  T_vals = c(100,150, 200),
+#                                                  normalized = TRUE)
+# raw_data = simulated_data$data
+# feature_matrix  = as.data.frame(simulated_data$feature)
+```
+
+Option 2: Generate separately then create
+
+The second option is to generate simulated data separately. "raw_data" is a large list file containing all series along with there identification labels.
+
+You must: 1 - Specify the number of series per each of the four models.
+
+          2 - Indicate the requested series length.
+
+          3 - Choose if the series generated are to be normalized when generated (divided by max of each series)
+```{r Generate data}
+raw_data = generate_series_multiple(n_per_model = 100, T_vals = c(100,150,200), normalized = FALSE)
+```
+
+We then execute the feature data set.
+
+This may take a while depending on the raw data size.
+```{r}
+feature_matrix  = as.data.frame(create_feature_dataset(raw_data))
+head(feature_matrix, 1)
+```
+
+# ----- 2. Save ---------------------------------------------------
+Save data in R project as database for ease of access later on.
+```{r}
+save(feature_matrix, file = "data/feature_matrix.rda")
+save(raw_data, file = "data/raw_data.rda")
+```
+
+you can access data by calling it directly as follows:
+```{r}
+data("feature_matrix")
+```
+
