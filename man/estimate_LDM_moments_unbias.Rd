@@ -59,7 +59,7 @@ where \eqn{P(\theta) = 1-e^{-\theta}}, \eqn{P_t(\theta) = \frac{1-e^{-\theta}}{1
 \dontrun{
 Yt <- rnorm(25)
 Xt <- Yt + 0.2 * (1:25)
-rec_counts(Xt)  # Number of records
+rec_count(Xt)  # Number of records
 res <- estimate_LDM_moments_unbias(Xt, variance = TRUE, scale = 1)
 res$theta; res$variance
 }

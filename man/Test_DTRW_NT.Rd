@@ -31,7 +31,7 @@ Discrete-Time Random Walk (DTRW) process.
 }
 \details{
 The test compares the observed number of records \eqn{N_T} in the series
-\eqn{X_1, X_2, \ldots, X_T}. (obtained via \code{rec_counts()}) against theoretical quantiles or
+\eqn{X_1, X_2, \ldots, X_T}. (obtained via \code{rec_count()}) against theoretical quantiles or
 normal approximations of the record count distribution.
 
 For very large T, under the DTRW null hypothesis, the expected number of records and its variance
@@ -72,6 +72,6 @@ Test_DTRW_NT(X, alpha = 0.05, approximate = TRUE)
 
 }
 \seealso{
-\code{\link{Quantile_DTRW}}, \code{\link{rec_counts}},
+\code{\link{Quantile_DTRW}}, \code{\link{rec_count}},
 \code{\link{ENT_DTRW_approx}}, \code{\link{rec_count_var_DTRW_approx}}
 }

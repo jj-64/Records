@@ -41,7 +41,7 @@ This estimator is known to be biased, and a bias-corrected version is provided i
 \examples{
 Yt <- rnorm(25)
 Xt <- Yt + 0.2 * (1:25)
-rec_counts(Xt)  # Number of records
+rec_count(Xt)  # Number of records
 estimate_LDM_moments(X = Xt)
 estimate_LDM_moments(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))

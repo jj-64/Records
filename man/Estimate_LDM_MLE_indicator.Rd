@@ -49,7 +49,7 @@ and \eqn{\delta_t} are the record indicator values.
 \examples{
 Yt <- rnorm(25)
 Xt <- Yt + 0.2 * (1:25)
-rec_counts(Xt)  # Number of records
+rec_count(Xt)  # Number of records
 res <- estimate_LDM_mle_indicator(Xt, variance = TRUE, scale = 1)
 res$theta; res$variance
 
