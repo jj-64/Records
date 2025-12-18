@@ -24,29 +24,6 @@ install_if_missing(required_packages)
 load_package(required_packages = required_packages)
 
 options (scipen= 99999)
-## ============================================================
-## 1. Input validation
-## ============================================================
-
-load("data/feature_matrix.rda")
-
-## get feature matrix (numerics only)
-feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
-feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
-# feature_only <- feature_matrix[, sapply(feature_matrix, is.numeric)]
-
-##Convert to numeric if needed
-feature_only <- feature_only %>% mutate_if(is.factor, as.character) %>% mutate_all(as.numeric)
-
-regime = feature_matrix$label
-
-#### 4.2  Replace -Inf with -1e5 ( only fix LogLik values)
-feature_only[grep("^logLik_", names(feature_only))] <-
-  lapply(feature_only[grep("^logLik_", names(feature_only))], function(x) {
-    x[x < -1e5] <- -1e5#Inf
-    x[!is.finite(x)] <- -1e5
-    x
-  })
 
 ## ============================================================
 ## Group-wise summaries

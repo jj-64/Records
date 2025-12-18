@@ -178,55 +178,6 @@ summary(X_scaled)
 # Always classify on scaled features
 # Keep raw scale only for interpretability and plots
 
-## ============================================================
-## 7. PCA
-## ============================================================
-
-pca <- prcomp(X_scaled, center = TRUE, scale. = TRUE)
-
-## Variance explained Scree plot
-fviz_eig(pca, addlabels = TRUE)
-
-## Feature loadings
-loadings <- pca$rotation %>%
-  as.data.frame() %>%
-  rownames_to_column("feature")
-
-print(head(loadings))
-
-## Contribution to first PCs
-fviz_pca_var(pca, col.var = "contrib")
-
-# Interpretation
-# Few PCs explaining most variance → redundancy
-# Record / extreme features often dominate first PCs
-# Later PCs may encode regime-specific structure
-
-## ============================================================
-## 8. Unsupervised structure
-## ============================================================
-
-## Distance matrix
-d <- dist(X_scaled)
-
-## Hierarchical clustering
-hc <- hclust(d, method = "ward.D2")
-
-plot(hc, labels = FALSE, main = "Feature-only clustering")
-
-## Optional k-means preview
-set.seed(123)
-fviz_nbclust(t(X_scaled), kmeans, method = "wss")
-km <- kmeans(t(X_scaled), centers = 5, nstart = 20)
-km$tot.withinss
-
-fviz_cluster(list(data = t(X_scaled), cluster = km$cluster))
-clusters = data.frame( features = names(feature_only), cluster = km$cluster)
-
-# Purpose
-# Check whether features contain structure before labels
-# If clusters align with known regimes → strong signal
-# If not → classification may rely on subtle margins
 
 ## ============================================================
 ## 9. Outliers

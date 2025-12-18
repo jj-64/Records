@@ -16,13 +16,28 @@ Set seed also
 set.seed(12345)
 ```
 
+Library Records is essential to run most of the functions available on github.
+
+To install
+```{r}
+## library Records from Github
+#devtools::install_github("jj-64/Records")
+```
+
+Load library
+```{r}
+#library(Records)
+devtools::load_all(".")
+```
+
+
 Check for required packages for install and loading
-```{r echo=FALSE, message=FALSE, warning=TRUE}
+```{r message=FALSE, warning=TRUE, include=FALSE}
 required_packages <- c(
   "tidyverse", "forecast", "e1071", "randomForest", "caret", "xgboost",
   "pROC", "glmnet", "nnet", "kernlab", "MASS", "car", "signal", "moments",
   "tsfeatures", "TSEntropies", "entropy",
-  "feasts", "fabletools", "dplyr", "tibble", "stats"
+  "feasts", "fabletools", "dplyr", "tibble", "stats", "factoextra", "FactoMineR"
 )
 ## install if missing
 install_if_missing(required_packages)
@@ -35,16 +50,54 @@ library(doParallel)
 # cl <- makeCluster(detectCores() - 1); registerDoParallel(cl)
 ```
 
-
 # ----- 1. Load data ---------------------------------------
+
 Load feature matrix
-We assume data is already cleaned and analyzed by EDA and EDA - by model Rfiles.
 ```{r}
-load("data/feature_matrix.rda")
+#data("feature_matrix", package = "Records")
 ```
 
+Promise data
+```{r}
+str(feature_matrix)
+```
+Basic dimensions
+```{r}
+n_obs  <- nrow(feature_matrix)
+n_feat <- ncol(feature_matrix)
+
+cat("Observations:", n_obs, "\n")
+cat("Features:", n_feat, "\n")
+```
+# ----- 2. Missingness and degeneracy --------------------------
+
+Check Missing values per feature
+```{r}
+na_summary <- tibble(
+  feature = names(feature_matrix),
+  n_na    = colSums(is.na(feature_matrix)),
+  pct_na  = colMeans(is.na(feature_matrix))
+) %>% arrange(desc(pct_na))
+
+if(sum (na_summary$n_na) >0 ) print(na_summary %>% filter(n_na > 0)) else print("no NA")
+```
+Remove NAs if needed. Note that database is large so removing few NAs won't bias the analysis.
+```{r}
+feature_matrix=feature_matrix[complete.cases(feature_matrix),]
+```
+
+new basic dimensions after NAs
+```{r}
+n_obs  <- nrow(feature_matrix)
+n_feat <- ncol(feature_matrix)
+
+cat("Observations:", n_obs, "\n")
+cat("Features:", n_feat, "\n")
+```
+
+# ----- 3. Feature_only data ----------------------------------
 Most of the analysis will be on the matrix containing only numeric values.
-We will exclude other indetification columns such as label, series_id, label_m (submodel), series, and series length.
+We will exclude other idetification columns such as label, series_id, label_m (submodel), series, and series length.
 We obtain the "feature_only" matrix.
 ```{r}
 feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
@@ -72,19 +125,7 @@ n_feat <- ncol(feature_only)
 cat("Observations:", n_obs, "\n")
 cat("Features:", n_feat, "\n")
 ```
-# ----- 2. Missingness and degeneracy --------------------------
-
-Check Missing values per feature
-```{r}
-na_summary <- tibble(
-  feature = names(feature_only),
-  n_na    = colSums(is.na(feature_only)),
-  pct_na  = colMeans(is.na(feature_only))
-) %>% arrange(desc(pct_na))
-
-if(sum (na_summary$n_na) >0 ) print(na_summary %>% filter(n_na > 0)) else print("no NA")
-```
-
+# ----- 4. Degeneracy ---------------------------------------
 Check for constant or near-constant features.
 ```{r}
 variance_summary <- tibble(
@@ -95,9 +136,13 @@ variance_summary <- tibble(
 ```
 
 These features will be removed immediately as they are obviously redundant and degenerate.
-Interpretation: 
+
+      Interpretation: 
+
       Zero variance → remove
+      
       Two unique values → possible indicator, verify meaning
+      
       High NA → consider imputation or exclusion
 ```{r}
 degenerate_features <- subset(variance_summary , variance == 0 | unique_vals <=2)
@@ -113,3 +158,111 @@ Remove degenerate features
 feature_only = feature_only[, !(colnames(feature_only) %in%  degenerate_features$feature)]
 ```
 
+For later processing, replace -Inf with -1e5 ( only fix LogLik values)
+```{r}
+feature_only[grep("^logLik_", names(feature_only))] <-
+  lapply(feature_only[grep("^logLik_", names(feature_only))], function(x) {
+    x[x < -1e5] <- -1e5#Inf
+    x[!is.finite(x)] <- -1e5
+    x
+  })
+```
+
+# ----- 5 . Supervised PCA (Sanity Check) -------------------------------
+
+The aim is to check if generated dataset is really separable and can be well identified. i.e if the four models are well identified.
+```{r}
+pca <- FactoMineR::PCA(
+  feature_only,
+  scale.unit = TRUE,
+  graph = FALSE
+)
+```
+
+Variance explained Scree plot
+
+Interpretation : Few PCs explaining most variance → redundancy
+We aim to have large number of PCs to explain more than 70% of the variance.
+
+Look for:  Sharp drop (elbow)
+          Flat tail → noise
+```{r scree plot}
+factoextra::fviz_eig(pca, addlabels = TRUE)
+```
+
+How many components should you keep?
+
+You should not keep components based on visualization alone.
+
+Explained variance criterion (baseline)
+      
+      Rules of thumb:
+
+      1 - Keep components explaining 70–90% of variance
+
+      2 - Typically yields 10–30 components from 100 variables
+```{r PC to keep}
+which(cumsum(pca$eig[,2]) >= 90)[1]
+```
+How to use PCA with known groups
+
+We have 4 known models, so PCA should be combined with a supervised method.
+
+Visual inspection only (exploratory)
+Plot individuals and should be clearly clustered into four distinct groups.
+```{r ind plot pca}
+factoextra::fviz_pca_ind(pca,
+             habillage = regime,
+             addEllipses = TRUE,
+             ellipse.level = 0.95
+)
+```
+
+
+Features (important for interpretation)
+
+Feature Contribution to first PCs
+```{r var plot pca}
+#loadings
+# print(pca$var$coord)
+
+factoextra::fviz_pca_var(pca, col.var = "contrib")
+
+```
+
+which variables define each PC
+```{r var contrib pca}
+head(pca$var$contrib, 10)
+```
+
+# ----- 6. k-means preview -----------------------
+The elbow Method helps determine the optimal number of clusters.
+There should be 4 clusters each for one model.
+```{r elbow method kmeans}
+factoextra::fviz_nbclust(scale(feature_only), kmeans, method = "wss")
+```
+Run k-means
+```{r kmeans model}
+k_means_result <- kmeans(scale(feature_only), centers = 4, nstart = 20)
+```
+
+Plot kmeans. They should be 4 distinct clusters
+
+```{r kmeans plot}
+factoextra::fviz_cluster(k_means_result, 
+             data = scale(feature_only),
+             geom = "point", # Use points to represent observations
+             ellipse.type = "convex", # Drawing a concentration ellipse around each cluster
+             palette = "jco", # Color palette
+             main = "K-Means Cluster Visualization (PCA-based)")
+
+```
+Clusters
+Check whether features contain structure before labels
+If clusters align with known regimes → strong signal
+If not → classification may rely on subtle margins
+```{r}
+clusters = data.frame( features = regime, cluster = k_means_result$cluster)
+table(clusters)
+```
+# ----- 7. 

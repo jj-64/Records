@@ -104,8 +104,8 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         LDM_series,
-        series_args = list(theta = runif(1,0.1,0.3),
-                           dist = "frechet", shape=1, scale=2),
+        series_args = list(theta = runif(1,0.02,0.1),
+                           dist = "frechet", shape=5, scale=1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
@@ -121,7 +121,7 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         LDM_series,
-        series_args = list(theta = runif(1,0.1,0.3),
+        series_args = list(theta = runif(1,0.02,0.1),
                            dist = "weibull", shape = 2, scale=1),
         T_val = T_val
       )
@@ -139,7 +139,7 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.1,1.3),
+        series_args = list(gamma = runif(1,1.1,1.4),
                            dist = "frechet", shape=5, scale=1),
         T_val = T_val
       )
@@ -156,8 +156,8 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.1,1.3),
-                           dist = "norm", mean =0, sd =1),
+        series_args = list(gamma = runif(1,1.2,1.5),
+                           dist = "weibull", shape= 5, scale =1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
