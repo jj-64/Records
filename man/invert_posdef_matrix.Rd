@@ -4,7 +4,7 @@
 \alias{invert_posdef_matrix}
 \title{Robust inversion of Hessian matrix}
 \usage{
-invert_posdef_matrix(M, ridge = 1e-08, max_attempts = 5)
+invert_posdef_matrix(M, ridge = 0.00000001, max_attempts = 5)
 }
 \description{
 Robust inversion of Hessian matrix
