@@ -21,12 +21,19 @@ bounds = function(value,z,variance){
   return(c(lower,upper))
 }
 
-############# Instal packages ###################
-# required_packages <- c(
-#   "tidyverse",
-#   "moments"
-# )
-# install_if_missing(required_packages)
+############# Install packages ###################
+## Install missing packages
+#'
+#' install missing packages if needed
+#' @param pkgs character vector, names of the packages
+#' @export
+#'
+#' @examples
+#' required_packages <- c(
+#'   "tidyverse",
+#'   "moments"
+#' )
+#' install_if_missing(required_packages)
 install_if_missing <- function(pkgs) {
   for (p in pkgs) {
     if (!suppressWarnings(require(p, character.only = TRUE))) {
@@ -37,6 +44,18 @@ install_if_missing <- function(pkgs) {
 }
 
 ##################### Load packages #################
+## Load needed packages
+#'
+#' load missing packages if needed
+#' @param required_packages character vector, names of the packages
+#' @export
+#'
+#' @examples
+#' required_packages <- c(
+#'   "tidyverse",
+#'   "moments"
+#' )
+#' load_package(required_packages)
 load_package = function(required_packages){
 lapply(required_packages, require, character.only = TRUE)
 }
