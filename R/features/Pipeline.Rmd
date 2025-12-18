@@ -1,0 +1,143 @@
+---
+title: "Pipeline"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+# Pipeline: simulate series under different record models -> features ->
+#           feature reduction -> classification -> assessment -> test
+#
+# Requirements: R >= 4.0, packages: tidyverse, forecast, e1071, randomForest,
+# caret, xgboost, pROC, glmnet, nnet, kernlab, MASS, car
+
+# ----- 0. Setup ----------------------------------------------------------------
+Let numbers display in decimals and not scientific notation
+```{r}
+options(scipen = 999)
+```
+
+Set seed also
+```{r}
+set.seed(12345)
+```
+
+Check for required packages for install and loading
+```{r}
+required_packages <- c(
+  "tidyverse", "forecast", "e1071", "randomForest", "caret", "xgboost",
+  "pROC", "glmnet", "nnet", "kernlab", "MASS", "car", "signal", "moments",
+  "tsfeatures", "TSEntropies", "entropy",
+  "feasts", "fabletools", "dplyr", "tibble", "stats"
+)
+## install if missing
+install_if_missing(required_packages)
+
+## Load libraries
+load_package(required_packages = required_packages)
+
+## Set caret parallel if desired (commented out by default)
+library(doParallel)  
+# cl <- makeCluster(detectCores() - 1); registerDoParallel(cl)
+```
+
+# ----- 1. Load data ---------------------------------------
+Load feature matrix
+We assume data is already cleaned and analyzed by EDA and EDA - by model Rfiles.
+```{r}
+load("data/feature_matrix.rda")
+```
+
+Most of the analysis will be on the matrix containing only numeric values.
+We will exclude other indetification columns such as label, series_id, label_m (submodel), series, and series length.
+We obtain the "feature_only" matrix.
+```{r}
+feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
+
+feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
+head(feature_only,1)
+# feature_only <- feature_matrix[, sapply(feature_matrix, is.numeric)]
+```
+
+In case there are any problems with the feature_only matrix, we will convert all columns to numerical
+```{r}
+feature_only <- feature_only %>% mutate_if(is.factor, as.character) %>% mutate_all(as.numeric)
+```
+
+For later use, we would need to keep the label of each series stored in "regime" vector.
+```{r}
+regime = feature_matrix$label
+```
+
+# ----- 4: Pre-Precessing -----------------------------------
+
+Check for columns 
+      #### 4.1. Quick NA summary
+  ## column number with NAs
+na_col_nb = which(colSums(is.na(feature_matrix)) >0 )
+na_col_nb
+  ## rows with NAs
+feature_matrix[!complete.cases(feature_matrix), na_col_nb ]
+  ## how much NAs per column
+na_summary <- sapply(feature_matrix, function(x) sum(is.na(x)))
+na_summary[na_summary > 0]
+
+  #### 4.2  Replace -Inf with -1e5 ( only fix LogLik values)
+feature_matrix[grep("^logLik_", names(feature_matrix))] <-
+  lapply(feature_matrix[grep("^logLik_", names(feature_matrix))], function(x) {
+    x[x < -1e5] <- -1e5#Inf
+    x[!is.finite(x)] <- -1e5
+    x
+  })
+
+  #### 4.4  Remove NAs
+# feature_matrix=feature_matrix[complete.cases(feature_matrix),]
+
+  #### 4.5 get feature matrix (numerics only)
+feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "series"))
+feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
+# feature_only <- feature_matrix[, sapply(feature_matrix, is.numeric)]
+
+  #### 4.6 Convert to numeric if needed
+feature_only <- feature_only %>% mutate_if(is.factor, as.character) %>% mutate_all(as.numeric)
+
+# Add label
+#X$label <- feature_matrix$label
+#X$series_id <- feature_matrix$series_id
+
+#--------------- 2. Supervised PCA (sanity check) --------------------------
+## the aim is to check if generated dataset is really sepearable and can be well identified
+## we will plot individuals and should be clearly clustered
+pca <- PCA(
+  feature_only,
+  scale.unit = TRUE,
+  graph = FALSE
+)
+
+fviz_pca_ind(pca,
+             habillage = regime,
+             addEllipses = TRUE,
+             ellipse.level = 0.95
+)
+
+pca$ind$coord
+pca$ind$cos2
+pca$ind$contrib
+
+
+## Optional k-means preview
+## There should be 5 clusters
+fviz_nbclust(scale(feature_only), kmeans, method = "wss")
+km <- kmeans(t(X_scaled), centers = 5, nstart = 20)
+km$tot.withinss
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.

@@ -1,0 +1,115 @@
+---
+title: "EDA"
+author: "Jinane Jouni"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+# ----- 0. Setup ---------------------------------------------------
+Let numbers display in decimals and not scientific notation
+```{r}
+options(scipen = 999)
+```
+
+Set seed also
+```{r}
+set.seed(12345)
+```
+
+Check for required packages for install and loading
+```{r echo=FALSE, message=FALSE, warning=TRUE}
+required_packages <- c(
+  "tidyverse", "forecast", "e1071", "randomForest", "caret", "xgboost",
+  "pROC", "glmnet", "nnet", "kernlab", "MASS", "car", "signal", "moments",
+  "tsfeatures", "TSEntropies", "entropy",
+  "feasts", "fabletools", "dplyr", "tibble", "stats"
+)
+## install if missing
+install_if_missing(required_packages)
+
+## Load libraries
+load_package(required_packages = required_packages)
+
+## Set caret parallel if desired (commented out by default)
+library(doParallel)
+# cl <- makeCluster(detectCores() - 1); registerDoParallel(cl)
+```
+
+
+# ----- 1. Load data ---------------------------------------
+Load feature matrix
+We assume data is already cleaned and analyzed by EDA and EDA - by model Rfiles.
+```{r}
+load("data/feature_matrix.rda")
+```
+
+Most of the analysis will be on the matrix containing only numeric values.
+We will exclude other indetification columns such as label, series_id, label_m (submodel), series, and series length.
+We obtain the "feature_only" matrix.
+```{r}
+feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
+
+feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
+head(feature_only,1)
+# feature_only <- feature_matrix[, sapply(feature_matrix, is.numeric)]
+```
+
+In case there are any problems with the feature_only matrix, we will convert all columns to numerical
+```{r}
+feature_only <- feature_only %>% mutate_if(is.factor, as.character) %>% mutate_all(as.numeric)
+```
+
+For later use, we would need to keep the label of each series stored in "regime" vector.
+```{r}
+regime = feature_matrix$label
+```
+
+Basic dimensions
+```{r}
+n_obs  <- nrow(feature_only)
+n_feat <- ncol(feature_only)
+
+cat("Observations:", n_obs, "\n")
+cat("Features:", n_feat, "\n")
+```
+# ----- 2. Missingness and degeneracy --------------------------
+
+Check Missing values per feature
+```{r}
+na_summary <- tibble(
+  feature = names(feature_only),
+  n_na    = colSums(is.na(feature_only)),
+  pct_na  = colMeans(is.na(feature_only))
+) %>% arrange(desc(pct_na))
+
+if(sum (na_summary$n_na) >0 ) print(na_summary %>% filter(n_na > 0)) else print("no NA")
+```
+
+Check for constant or near-constant features.
+```{r}
+variance_summary <- tibble(
+  feature = names(feature_only),
+  variance = apply(feature_only, 2, var, na.rm = TRUE),
+  unique_vals = apply(feature_only, 2, function(z) length(unique(z)))
+) %>% arrange(variance)
+```
+
+These features will be removed immediately as they are obviously redundant and degenerate.
+Interpretation: 
+      Zero variance → remove
+      Two unique values → possible indicator, verify meaning
+      High NA → consider imputation or exclusion
+```{r}
+degenerate_features <- subset(variance_summary , variance == 0 | unique_vals <=2)
+
+if (nrow(degenerate_features) > 0) {
+  warning("Degenerate or quasi-degenerate features detected")
+  print(degenerate_features)
+}
+```
+
+Remove degenerate features
+```{r}
+feature_only = feature_only[, !(colnames(feature_only) %in%  degenerate_features$feature)]
+```
+
