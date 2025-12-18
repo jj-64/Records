@@ -35,7 +35,7 @@ devtools::load_all(".")
 Check for required packages for install and loading
 ```{r install and load packages, message=FALSE, warning=TRUE, include=FALSE}
 required_packages <- c(
-  "tidyverse", "forecast", "e1071", "randomForest", "caret", "xgboost",
+  "tidyverse", "forecast", "e1071", "randomForest", "caret",
   "pROC", "glmnet", "nnet", "kernlab", "MASS", "car", "signal", "moments",
   "tsfeatures", "TSEntropies", "entropy",
   "feasts", "fabletools", "dplyr", "tibble", "stats"
@@ -76,7 +76,7 @@ The second option is to generate simulated data separately. "raw_data" is a larg
 
           3 - Choose if the series generated are to be normalized when generated (divided by max of each series)
 ```{r option 2 to generate data}
-raw_data = generate_series_multiple(n_per_model = 100, T_vals = c(100, 150, 200), normalized = FALSE)
+raw_data = generate_series_multiple(n_per_model = 10, T_vals = c(100, 150, 200), normalized = FALSE)
 ```
 
 We then execute the feature data set.

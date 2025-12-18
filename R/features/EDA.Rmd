@@ -32,12 +32,16 @@ devtools::load_all(".")
 
 
 Check for required packages for install and loading
-```{r message=FALSE, warning=TRUE, include=FALSE}
+```{r load, message=FALSE, warning=TRUE, include=FALSE}
 required_packages <- c(
-  "tidyverse", "forecast", "e1071", "randomForest", "caret", "xgboost",
-  "pROC", "glmnet", "nnet", "kernlab", "MASS", "car", "signal", "moments",
-  "tsfeatures", "TSEntropies", "entropy",
-  "feasts", "fabletools", "dplyr", "tibble", "stats", "factoextra", "FactoMineR"
+  "tidyverse", 
+  "moments", # skewness, kurtosis
+  "dplyr", "tibble", "stats", 
+  "factoextra", "FactoMineR",  ##PCA and visualization
+  "corrplot", # correlation visualization
+  "psych",        # describe()
+  "GGally",       # ggpairs
+  "matrixStats"  # fast row/column stats
 )
 ## install if missing
 install_if_missing(required_packages)
@@ -53,16 +57,17 @@ library(doParallel)
 # ----- 1. Load data ---------------------------------------
 
 Load feature matrix
-```{r}
+```{r load feature matrix}
 #data("feature_matrix", package = "Records")
+load("C:/Users/User/Documents/Records/data/feature_matrix.rda")
 ```
 
 Promise data
-```{r}
+```{r see data}
 str(feature_matrix)
 ```
 Basic dimensions
-```{r}
+```{r Basic dimensions}
 n_obs  <- nrow(feature_matrix)
 n_feat <- ncol(feature_matrix)
 
@@ -77,9 +82,9 @@ na_summary <- tibble(
   feature = names(feature_matrix),
   n_na    = colSums(is.na(feature_matrix)),
   pct_na  = colMeans(is.na(feature_matrix))
-) %>% arrange(desc(pct_na))
+) %>% dplyr::arrange(desc(pct_na))
 
-if(sum (na_summary$n_na) >0 ) print(na_summary %>% filter(n_na > 0)) else print("no NA")
+if(sum (na_summary$n_na) >0 ) print(na_summary %>% dplyr::filter(n_na > 0)) else print("no NA")
 ```
 Remove NAs if needed. Note that database is large so removing few NAs won't bias the analysis.
 ```{r}
@@ -100,7 +105,7 @@ Most of the analysis will be on the matrix containing only numeric values.
 We will exclude other idetification columns such as label, series_id, label_m (submodel), series, and series length.
 We obtain the "feature_only" matrix.
 ```{r}
-feature_names <- setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
+feature_names <- lubridate::setdiff(names(feature_matrix), c("Max_logLik","series_id", "label", "label_m", "series", "T_length"))
 
 feature_only <- feature_matrix[, colnames(feature_matrix) %in% (feature_names)]
 head(feature_only,1)
@@ -108,12 +113,12 @@ head(feature_only,1)
 ```
 
 In case there are any problems with the feature_only matrix, we will convert all columns to numerical
-```{r}
+```{r all numeric}
 feature_only <- feature_only %>% mutate_if(is.factor, as.character) %>% mutate_all(as.numeric)
 ```
 
 For later use, we would need to keep the label of each series stored in "regime" vector.
-```{r}
+```{r regime}
 regime = feature_matrix$label
 ```
 
@@ -132,7 +137,7 @@ variance_summary <- tibble(
   feature = names(feature_only),
   variance = apply(feature_only, 2, var, na.rm = TRUE),
   unique_vals = apply(feature_only, 2, function(z) length(unique(z)))
-) %>% arrange(variance)
+) %>% dplyr::arrange(variance)
 ```
 
 These features will be removed immediately as they are obviously redundant and degenerate.
@@ -144,7 +149,7 @@ These features will be removed immediately as they are obviously redundant and d
       Two unique values → possible indicator, verify meaning
       
       High NA → consider imputation or exclusion
-```{r}
+```{r degenrate features}
 degenerate_features <- subset(variance_summary , variance == 0 | unique_vals <=2)
 
 if (nrow(degenerate_features) > 0) {
@@ -154,12 +159,12 @@ if (nrow(degenerate_features) > 0) {
 ```
 
 Remove degenerate features
-```{r}
+```{r remove degenrate features}
 feature_only = feature_only[, !(colnames(feature_only) %in%  degenerate_features$feature)]
 ```
 
 For later processing, replace -Inf with -1e5 ( only fix LogLik values)
-```{r}
+```{r remove -Inf for logLik}
 feature_only[grep("^logLik_", names(feature_only))] <-
   lapply(feature_only[grep("^logLik_", names(feature_only))], function(x) {
     x[x < -1e5] <- -1e5#Inf
@@ -171,7 +176,7 @@ feature_only[grep("^logLik_", names(feature_only))] <-
 # ----- 5 . Supervised PCA (Sanity Check) -------------------------------
 
 The aim is to check if generated dataset is really separable and can be well identified. i.e if the four models are well identified.
-```{r}
+```{r PCA}
 pca <- FactoMineR::PCA(
   feature_only,
   scale.unit = TRUE,
@@ -182,10 +187,14 @@ pca <- FactoMineR::PCA(
 Variance explained Scree plot
 
 Interpretation : Few PCs explaining most variance → redundancy
-We aim to have large number of PCs to explain more than 70% of the variance.
 
-Look for:  Sharp drop (elbow)
-          Flat tail → noise
+We aim to have large number of PCs to explain more than 70-90% of the variance.
+
+    Look for: 
+    
+    Sharp drop (elbow)
+    
+    Flat tail → noise
 ```{r scree plot}
 factoextra::fviz_eig(pca, addlabels = TRUE)
 ```
@@ -219,8 +228,6 @@ factoextra::fviz_pca_ind(pca,
 ```
 
 
-Features (important for interpretation)
-
 Feature Contribution to first PCs
 ```{r var plot pca}
 #loadings
@@ -237,13 +244,15 @@ head(pca$var$contrib, 10)
 
 # ----- 6. k-means preview -----------------------
 The elbow Method helps determine the optimal number of clusters.
+
 There should be 4 clusters each for one model.
+
 ```{r elbow method kmeans}
 factoextra::fviz_nbclust(scale(feature_only), kmeans, method = "wss")
 ```
 Run k-means
 ```{r kmeans model}
-k_means_result <- kmeans(scale(feature_only), centers = 4, nstart = 20)
+k_means_result <- stats::kmeans(scale(feature_only), centers = 4, nstart = 20)
 ```
 
 Plot kmeans. They should be 4 distinct clusters
@@ -258,11 +267,88 @@ factoextra::fviz_cluster(k_means_result,
 
 ```
 Clusters
+
 Check whether features contain structure before labels
+
 If clusters align with known regimes → strong signal
+
 If not → classification may rely on subtle margins
 ```{r}
-clusters = data.frame( features = regime, cluster = k_means_result$cluster)
+clusters = data.frame( features = regime, submodel = feature_matrix$label_m, cluster = k_means_result$cluster)
 table(clusters)
 ```
-# ----- 7. 
+# ----- 7. Univariate Description ---------------------------
+Univariate summary statistics
+    
+    What to look for
+    
+    Heavy skewness → log / rank transforms
+    
+    Extreme kurtosis → tail-driven statistics (records, extremes)
+
+```{r describe stat}
+desc_stats <- psych::describe(feature_only)
+
+print(desc_stats)
+```
+
+# ----- 8.  Correlation analysis ----------------------------
+
+Pairwise correlation (Spearman recommended)
+```{r}
+cor_mat <- cor(feature_only, use = "pairwise.complete.obs", method = "spearman")
+
+```
+
+
+Visual inspection
+
+We aim to have only clear (low correlation) zones.
+```{r}
+corrplot::corrplot(cor_mat,
+         method = "color",
+         type = "upper",
+         tl.cex = 0.6,
+         order = "hclust")
+```
+
+Identify highly correlated pairs
+
+    Decision rule
+
+    |ρ| > 0.95 → keep one representative
+    Prefer:
+    More interpretable
+    Lower variance inflation
+    Better downstream SHAP signal
+
+```{r high corr}
+high_corr <- which(abs(cor_mat) > 0.95 & abs(cor_mat) < 1, arr.ind = TRUE) 
+
+high_corr_pairs <- tibble(
+  feature_1 = rownames(cor_mat)[high_corr[,1]],
+  feature_2 = colnames(cor_mat)[high_corr[,2]],
+  rho = cor_mat[high_corr]
+   ) %>% dplyr::filter(feature_1 != feature_2)
+
+print(high_corr_pairs)
+```
+
+
+# ----- 9. Outputs ------------------------------------------
+
+Save output to R data
+
+```{r save output EDA}
+eda_output <- list(
+  desc_stats = desc_stats,
+  na_summary = na_summary,
+  variance_summary = variance_summary,
+  correlation_matrix = cor_mat,
+  pca = pca,
+  kmeans = k_means_result
+)
+
+saveRDS(eda_output, "C:/Users/User/Documents/Records/data/feature_EDA_summary.rds")
+```
+

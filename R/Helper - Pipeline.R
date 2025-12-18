@@ -157,7 +157,7 @@ generate_series_multiple <- function(
       s <- generate_series(
         YNM_series,
         series_args = list(gamma = runif(1,1.2,1.5),
-                           dist = "weibull", shape= 5, scale =1),
+                           dist = "weibull", shape= 10, scale =1/2),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
@@ -165,7 +165,7 @@ generate_series_multiple <- function(
       labels <- c(labels, "YNM")
       series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
-      labels_m = c(labels_m, "norm")
+      labels_m = c(labels_m, "weibull")
       i=i+1
     }
     ## ---- iid (Classical)
@@ -671,7 +671,6 @@ extract_LogLik_features <- function(series) {
     logLik_rec_YNM_weibull = logLik_rec_YNM_weibull
   )
 
-  Max_lik = which.max(Log_values)
   return(Log_values )
   }
 
