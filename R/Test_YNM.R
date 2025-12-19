@@ -62,7 +62,7 @@ partition_OLD <- function(X, min_expected = 1, warmup = 2, K = NULL) {
 #' @param min_expected Minimum expected count per bin (default = 1).
 #' @param warmup Number of initial gaps to drop (default = 2).
 #' @param K Optional. If given, force exactly K partitions using quantiles.
-#' @param estimated. Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
+#' @param estimated Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
 #' @return A list with:
 #'   \item{j}{Partition start points}
 #'   \item{nk}{Frequencies in each partition}
@@ -297,8 +297,8 @@ Quantile_YNM=function(T,gamma, alpha= 0.05){
 #' The test uses the number of observed records \eqn{N_T} and compares it against
 #' the theoretical distribution under the null hypothesis.
 #'
-#' If \eqn{\gamma} is unknown, it is estimated using \code{\link{Estim_gamma_indicator}}.
-#' Its variance is computed via \code{\link{Estim_gamma_indicator_Variance}}.
+#' If \eqn{\gamma} is unknown, it is estimated using \code{\link{estimate_YNM_mle_indicator}}
+#' with its variance.
 #'
 #' The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
 #' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_YNM}}
