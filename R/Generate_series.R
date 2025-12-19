@@ -14,7 +14,8 @@
 #' @param T Integer. The length of the series.
 #' @param theta Numeric. The linear drift coefficient \eqn{\theta > 0}.
 #' @param dist Character, distribution name. One of:
-#'   "beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "exp", "pareto", "uniform".
+#'   "beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "exp",
+#'    "pareto", "uniform".
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
 #'     \item{beta}{`shape1`, `shape2`}
@@ -40,7 +41,8 @@
 #'
 #' #Normal
 #'LDM_series(100, theta = 0.1, dist = "norm", mean = 0, sd = 1)
-LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), ...) {
+LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet",
+                                    "norm", "exp", "pareto", "uniform"), ...) {
   dist <- match.arg(dist)   # enforce valid choice
   args <- list(...)
 
@@ -93,7 +95,7 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
       scale <- args$scale %||% 1
       shape <- args$shape %||% 2
       if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-      rpareto(T * 1.5, scale, shape)
+      VGAM::rpareto(T * 1.5, scale, shape)
     },
 
     uniform ={
@@ -211,7 +213,7 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 # #' @return A numeric vector representing the LDM series.
 # LDM_series_Pareto <- function(T, theta, scale = 0.5, shape = 4) {
 # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-# y <- rpareto(T * 1.5, scale, shape)
+# y <- VGAM::rpareto(T * 1.5, scale, shape)
 # y <- y[y <= quantile(y, 0.9)] # Remove top 10% of extreme values
 # x <- theta * (1:T) + y[1:T]
 # return(x)
@@ -277,7 +279,9 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' YNM_series(100, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
 #' YNM_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
 #' @export
-YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "pareto_trunc"), ...) {
+YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
+                                          "frechet", "exp", "pareto",
+                                          "norm", "pareto_trunc"), ...) {
   dist <- match.arg(dist)
   args <- list(...)
   X <- numeric(T)
@@ -362,7 +366,8 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet"
 # #'
 # #' @details
 # #' The series is generated as:
-# #' \deqn{X_k = \max(Y_k), \quad Y_k \sim \text{Beta}(\text{shape1}, \text{shape2}), \quad \text{length}(Y_k) = \gamma^k}
+# #' \deqn{X_k = \max(Y_k), \quad Y_k \sim \text{Beta}(\text{shape1},
+# #' \text{shape2}), \quad \text{length}(Y_k) = \gamma^k}
 # #' where:
 # #' - \eqn{\gamma} controls the sample size growth.
 # #' - \eqn{X_k} represents the maximum value of the Beta-distributed sample.
@@ -521,9 +526,11 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet"
 ##  DTRW -----------------------
 #' Generate a DTRW Process
 #'
-#' Simulates a discrete-time random Walk process of length T under different underlying distributions.
+#' Simulates a discrete-time random Walk process of length T under different
+#' underlying distributions.
 #'
-#' For DTRW without a drift, the distribution of the errors shall be continuous and symmetric.
+#' For DTRW without a drift, the distribution of the errors shall be continuous
+#' and symmetric.
 #'
 #' @param T Integer, length of the series.
 #' @param dist Character, distribution name. One of:
@@ -538,7 +545,8 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet"
 #' @return A numeric vector of length T, the simulated DTRW process.
 #' @examples
 #' DTRW_series(10,  dist = "cauchy", loc = 0, scale = 1)
-#' # [1] -0.6905644  2.1214308  2.7874249  4.1135190  3.3054300  2.6729198  2.5556620  1.6442579 15.6275793 15.4525462
+#' # [1] -0.6905644  2.1214308  2.7874249  4.1135190  3.3054300  2.6729198
+#' # 2.5556620  1.6442579 15.6275793 15.4525462
 #'
 #' DTRW_series(100,  dist = "uniform", min = -1, max = 1)
 #' DTRW_series(100,  dist = "norm", loc = 0, sd = 1)

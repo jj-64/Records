@@ -268,6 +268,7 @@ Test_LDM_Sequential <- function(X, time = NA,alpha = 0.05) {
 }
 
 #' @rdname Test_LDM_Sequential
+#' @param pooled boolean (Default = FALSE), if variance is assumed pooled
 #' @export
 Test_LDM_Sen_stage1 <- function(X, time=NA, alpha = 0.05, pooled = FALSE) {
 
@@ -348,6 +349,7 @@ Test_LDM_Sen_stage1 <- function(X, time=NA, alpha = 0.05, pooled = FALSE) {
 }
 
 #' @rdname Test_LDM_Sequential
+#' @param stage1 output of \code{\link{Test_LDM_Sen_stage1}}
 #' @export
 Test_LDM_Sen_stage2 <- function(stage1, alpha = 0.05) {
   m <- stage1$block_size

@@ -33,8 +33,9 @@
 #' Xt <- Yt + 0.2 * (1:25)
 #' rec_count(Xt)  # Number of records
 #' estimate_LDM_moments(X = Xt)
-#' estimate_LDM_moments(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
-#' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
+#' estimate_LDM_moments(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,
+#' 1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492,
+#' 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #' $theta
 #' [1] 0.4462871
 #'
@@ -93,10 +94,11 @@ estimate_LDM_moments <- function(X, variance = TRUE, scale=1) {
 #'
 #' \deqn{+ 2 \left( \frac{1}{T} \sum_{t=1}^{T} P_t(\theta) - P(\theta) \right) \left( \frac{1}{T} \sum_{t=1}^{T} \frac{d P_t(\theta)}{d \theta} - \frac{d P(\theta)}{d \theta} \right)}
 #'
-#'where \eqn{P(\theta) = 1-e^{-\theta}}, \eqn{P_t(\theta) = \frac{1-e^{-\theta}}{1-e^{-\theta t}}}, and \eqn{\lambda(\theta)} is the variance of the estimated paramter with bias in \code{\link{Estimate_LDM_NT_Variance}}
+#'where \eqn{P(\theta) = 1-e^{-\theta}}, \eqn{P_t(\theta) = \frac{1-e^{-\theta}}{1-e^{-\theta t}}}, and \eqn{\lambda(\theta)} is the variance of the estimated paramter with bias in \code{\link{estimate_LDM_moments}}
 #'
 #' @param X Numeric vector. Observed series.
-#' @param variance Logical. If TRUE (default) compute and return variance; otherwise skip heavy computation.
+#' @param variance Logical. If TRUE (default) compute and return variance;
+#' otherwise skip heavy computation.
 #' @param scale Numeric. Scale parameter for the LDM (defualt = 1. theta is assumed to be in units such that
 #'              the user may pass scaled theta; internally we treat theta/scale).
 #' @return A list with elements:
@@ -111,8 +113,9 @@ estimate_LDM_moments <- function(X, variance = TRUE, scale=1) {
 #' res <- estimate_LDM_moments_unbias(Xt, variance = TRUE, scale = 1)
 #' res$theta; res$variance
 #' }
-#' estimate_LDM_moments_unbias(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
-#' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
+#' estimate_LDM_moments_unbias(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,
+#' 1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492, 4.639,
+#'  1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #' $theta
 #' [1] 0.3601306
 #'
@@ -270,15 +273,17 @@ estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
 #' res <- estimate_LDM_mle_indicator(Xt, variance = TRUE, scale = 1)
 #' res$theta; res$variance
 #'
-#' estimate_LDM_mle_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
-#' 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
+#' estimate_LDM_mle_indicator (X = c(0.428,1.311,2.023,2.882,2.096,-0.197,
+#' 1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043,
+#' 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #'
 #' $theta
 #' # [1] 0.3301
 #'
 #' $variance
 #' # [1] 0.02139224
-estimate_LDM_mle_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001, max = 5, step = 0.01) {
+estimate_LDM_mle_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001,
+                                       max = 5, step = 0.01) {
   if (!is.numeric(X) || length(X) < 4)
     stop("X must be a numeric vector with length > 4.")
   if (scale <= 0)

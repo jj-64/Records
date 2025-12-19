@@ -1,5 +1,7 @@
 #' Maximize LogLikelihood function to estimate model parameters
 #' @param data numeric vector, observed series or list
+#' @param logLik_fun function, loglikelihood function stored in the registry with embeded model,
+#' obs_type, data and dist
 #' @param obs_type character "all" or "records" depending on the data used
 #' @param lower_bounds named numeric vector, lower bound of the model parameters
 #' @param upper_bounds named numeric vector, upper bound of the model parameters
