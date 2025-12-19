@@ -12,9 +12,9 @@ rec_rate_LDM(theta, t = Inf, loc = 0, scale = 1)
 \item{t}{Time index (integer). If \code{t = Inf} or \code{NULL},
 the asymptotic record rate \eqn{P(R_\infty)} is returned.}
 
-\item{scale}{Scale parameter of the Gumbel distribution (default = 1).}
+\item{loc}{Optional location parameter (not used in the probability formula, included for consistency).}
 
-\item{location}{Optional location parameter (not used in the probability formula, included for consistency).}
+\item{scale}{Scale parameter of the Gumbel distribution (default = 1).}
 }
 \value{
 A numeric value representing the record rate probability.
@@ -40,13 +40,16 @@ is drawn from a Gumbel distribution shifted by a constant drift \eqn{\theta}.
 }
 \examples{
 # Finite-time record rate
-rec_rate_LDM(theta = 0.5, t = 10, scale = 1)
+rec_rate_LDM(theta = 0.5, t = 10, scale = 1, loc = 0)
+# [1] 0.3961385
 
 # Asymptotic record rate (t -> infinity)
-rec_rate_LDM(theta = 0.5, t = Inf, scale = 1)
+rec_rate_LDM(theta = 0.5, t = Inf, scale = 1, loc =0)
+# [1] 0.3934693
 
 # Default behavior returns asymptotic rate
-rec_rate_LDM(theta = 0.3, scale = 1)
+rec_rate_LDM(theta = 0.5, scale = 1, loc = 0)
+ # [1] 0.3934693
 
 # Compare convergence
 t_seq <- 1:100
