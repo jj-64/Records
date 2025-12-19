@@ -258,7 +258,7 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' @param T Integer, length of the series.
 #' @param gamma Numeric > 0, YNM process parameter.
 #' @param dist Character, distribution name. One of:
-#'   "beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm".
+#'   "beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "pareto_trunc".
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
 #'     \item{beta}{`shape1`, `shape2`}
@@ -268,6 +268,7 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #'     \item{exp}{`rate`}
 #'     \item{pareto}{`scale`, `shape`}
 #'     \item{norm}{`mean`, `sd`}
+#'     \item{pareto_trunc}{`scale`, `shape`, `xmax`}
 #'   }
 #'
 #' @return A numeric vector of length T, the simulated YNM process.
@@ -276,7 +277,7 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' YNM_series(100, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
 #' YNM_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
 #' @export
-YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm"), ...) {
+YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "pareto_trunc"), ...) {
   dist <- match.arg(dist)
   args <- list(...)
   X <- numeric(T)
@@ -334,6 +335,19 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull", "frechet"
         sd  <- args$sd  %||% 1
         if (sd <= 0) stop("Enter positive value for sd")
         qnorm(u^(1/m), mean = loc, sd = sd)
+      },
+
+      pareto_trunc = {
+        scale <- args$scale
+        shape <- args$shape
+        xmax  <- args$xmax
+
+        if (scale <= 0 || shape <= 0 || xmax <= scale)
+          stop("Invalid parameters")
+
+        # truncated Pareto inverse CDF for the maximum
+        a <- (scale / xmax)^shape
+        scale * (1 - u^(1/m) * (1 - a))^(-1/shape)
       }
     )
   }
