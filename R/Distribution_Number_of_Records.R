@@ -21,6 +21,7 @@
 #'   \code{"iid"}, \code{"DTRW"}, \code{"LDM"}, \code{"YNM"}.
 #' @param stat Either \code{"mean"} or \code{"var"} or \code{"dist"}.
 #' @param T Integer. Length of the time series.
+#' @param m Integer. Number < T for which we compute the probability distribution
 #' @param ... Additional arguments passed to model-specific functions.
 #'
 #' @return A numeric value, representing either the expected number
@@ -113,14 +114,18 @@ rec_count_mean_iid = function(T, approx = FALSE){
 #'@details It is computed as
 #'\eqn{V(N_T) = \sum_{1}^{T} 1/t - \sum_{1}^{T} 1/t^2}
 #'where T is the length of series
+#' @param T integer. length of the time series.
 #' @returns a value of the variance of number of records
 #' @export
 #'
 #' @examples rec_count_var_iid(T=25)
 #' # [1] 2.210235
+#'
 #' rec_count_mean_iid(T=25)
 #' # [1] 3.815958
-#' # For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
+#'
+#' # For a series of length 25 and following a classical model, we expect to
+#' # observe around 3.81 records with a variance of 2.21
 #' rec_count_dist_iid(m=1,T=25)
 rec_count_var_iid = function(T){
   sum( 1/(1:T) ) -  sum( 1/(1:T)^2 )
@@ -129,17 +134,20 @@ rec_count_var_iid = function(T){
 
 #' Distribution of number of records in Classical Model
 #'
-#'Exact distribution of the number of records in classical model. The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
+#' Exact distribution of the number of records in classical model. The function
+#' computes the probability of observing \eqn{m} records in a process of length
+#' \eqn{T}.
 #' @details
-#' Computes the exact probability of observing \eqn{m} records in a process of length \eqn{T},
+#' Computes the exact probability of observing \eqn{m} records in a process of
+#' length \eqn{T},
 #' given by:
 #' \deqn{ P(N_T = m) = \frac{s(T, m)}{T!} }
 #' where \eqn{s(T, m)} is the unsigned Stirling number of the first kind.
 #'
 #' @param m Integer. The number of records whose probability is to be computed.
 #' @param T Integer. The length of the series.
-#' @param s Optional. The Stirling number of the first kind, \eqn{s(T,m)}. If not provided,
-#' it will be computed internally.
+#' @param s Optional. The Stirling number of the first kind, \eqn{s(T,m)}.
+#' If not provided, it will be computed internally.
 #'
 #' @return A probability value (numeric) less than or equal to 1.
 #'
@@ -154,7 +162,8 @@ rec_count_var_iid = function(T){
 #' # [1] 0.1510383
 #'
 #' @references
-#' Nevzorov, V. B. (2001). *Records: Mathematical Theory*. American Mathematical Society.
+#' Nevzorov, V. B. (2001). *Records: Mathematical Theory*. American Mathematical
+#'  Society.
 #' \doi{10.1090/surv/172}
 #'
 #' @export
@@ -167,10 +176,13 @@ rec_count_dist_iid = function(m,T,s=NA){
 ## DTRW ----------------------
 #' Exact Expected number of records in DTRW Model
 #'
-#' The average exact expected number of records in a DTRW process. It is distribution-free, i.e. independent from the process underlying distribution.
+#' The average exact expected number of records in a DTRW process.
+#' It is distribution-free, i.e. independent from the process underlying distribution.
 #' It only depends from the length of the series.
-#' @details It is computed as \eqn{E(N_T) = (2T +1) \times 2^{-2T} \times C_{T}^{2T}} where \eqn{T} is the length of the process
-#' If approximated, it is computed as \eqn{E(N_T) = \sqrt(4T/\pi)} where \eqn{T} is the length of the process
+#' @details It is computed as \eqn{E(N_T) = (2T +1) \times 2^{-2T}
+#' \times C_{T}^{2T}} where \eqn{T} is the length of the process
+#' If approximated, it is computed as \eqn{E(N_T) = \sqrt(4T/\pi)} where \eqn{T}
+#'  is the length of the process
 #'
 #' @param T numeric, the length of the series
 #' @param approx logical, if approximated value. default = FALSE
@@ -181,6 +193,7 @@ rec_count_dist_iid = function(m,T,s=NA){
 #' @examples
 #' rec_count_mean_DTRW(T=25)
 #' # [1] 5.726034
+#'
 #' rec_count_mean_DTRW(T=25, approx = TRUE)
 #' # [1] 5.641896
 rec_count_mean_DTRW <- function(T, approx = FALSE) {
@@ -199,7 +212,8 @@ rec_count_mean_DTRW <- function(T, approx = FALSE) {
 #'
 #'@details Exact variance is computed as
 #'\eqn{V(N_T)= 2T+2-E(N_T)-E(N_T)^2}
-#'where \eqn{T} is the length of series and \eqn{E(N_T)} is the expected number of records in DTRW process
+#'where \eqn{T} is the length of series and \eqn{E(N_T)} is the expected number
+#'of records in DTRW process
 #'
 #' Approximated variance is computed as
 #'\eqn{V(N_T)_approx = 2T \times (1-\frac{2}{\pi})}
@@ -210,13 +224,18 @@ rec_count_mean_DTRW <- function(T, approx = FALSE) {
 #' @examples
 #' rec_count_var_DTRW(T=25, approx = TRUE)
 #' # [1] 18.16901
+#'
 #' rec_count_mean_DTRW(T=25, approx = TRUE)
 #' # [1] 5.641896
+#'
 #' rec_count_var_DTRW(T=25, approx = FALSE)
 #' # [1] 13.4865
+#'
 #' rec_count_mean_DTRW(T=25, approx = FALSE)
 #' # [1] 5.726034
-#' # For a series of length 25 and following a DTRW model, we expect to observe around 5.62 records with an approximated variance of 18.169
+#'
+#' # For a series of length 25 and following a DTRW model, we expect to observe
+#' # around 5.62 records with an approximated variance of 18.169
 rec_count_var_DTRW = function(T, approx = FALSE){
   if (approx){
   return(2*(1-2/pi)*T)
@@ -231,9 +250,11 @@ rec_count_var_DTRW = function(T, approx = FALSE){
 #' Approximated Distribution of number of records in DTRW Model
 #'
 #'Exact and approximate distribution of the number of records in DTRW model.
-#' The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
+#' The function computes the probability of observing \eqn{m} records in a
+#' process of length \eqn{T}.
 #' #' @details
-#' The Exact probability of observing \eqn{m} records in a process of length \eqn{T} is given by:
+#' The Exact probability of observing \eqn{m} records in a process of length
+#' \eqn{T} is given by:
 #' \deqn{ P(N_T = m) = 2^{-2T+m-1} \times C_{T}^{2T-m+1} }
 #' where  \eqn{T} is the length of the process
 #'
@@ -251,10 +272,13 @@ rec_count_var_DTRW = function(T, approx = FALSE){
 #' @examples
 #' rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
 #' # [1]  0.1117152
+#'
 #' rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
 #' # [1] 0.1122752
+#'
 #' rec_count_dist_DTRW(m=1,T=25)
 #' # [1] 0.1122752
+#'
 #' rec_count_dist_DTRW(m=5,T=25)
 #' # [1] 0.09867345
 rec_count_dist_DTRW=function(m,T, approx = FALSE){
@@ -277,7 +301,7 @@ rec_count_dist_DTRW=function(m,T, approx = FALSE){
 #' @examples
 #' Survival(10)
 #' # [1] 0.1761971
-Survival=function(n){2^(-2*n) * choose(2*n,n)}
+Survival = function(n){ 2^(-2*n) * choose(2*n,n)}
 
 #' First Pass probability
 #'
@@ -330,8 +354,10 @@ FirstPass=function(n){Survival(n-1)-Survival(n)}
 #' @examples
 #' rec_count_mean_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
 #' # [1] 10.93343
+#'
 #' rec_count_mean_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=2)
 #' # [1] 7.320699
+#'
 #' rec_count_mean_LDM(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
 #' # [1] 13.18
 rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), n_sim = 1000, ...) {
@@ -340,7 +366,7 @@ rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 
   if (dist == "gumbel") {
     ## Explicit formula: sum of record probabilities
-    s <- rec_rate_LDM(t = 1:T, theta=theta, location = args$location, scale = args$scale)
+    s <- rec_rate_LDM(t = 1:T, theta=theta, loc = 0, scale = args$scale)
     return(sum(s))
 
   } else {
@@ -383,8 +409,10 @@ rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 #' @examples
 #' rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
 #' # [1] 5.761166
+#'
 #' rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
 #' # [1] 4.509757
+#'
 #' rec_count_var_LDM(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
 #' # [1] 4.492424
 rec_count_var_LDM <- function(T,
@@ -397,7 +425,7 @@ rec_count_var_LDM <- function(T,
 
   if (dist == "gumbel") {
     ## Explicit formula
-    s <- rec_rate_LDM(t = 1:T, theta = theta, location = args$location, scale = args$scale)
+    s <- rec_rate_LDM(t = 1:T, theta = theta, loc = args$location, scale = args$scale)
     return(sum(s * (1 - s)))
 
   } else {
@@ -449,13 +477,14 @@ rec_count_var_LDM <- function(T,
 #' @returns a lower triangular \eqn{T \times T} matrix of all combinations of Stirling number.
 #' @export
 #'
-#' @examples Stirling_2nd_LDM(T=5, theta=0.5)
-#'           [,1]     [,2]     [,3]     [,4] [,5]
-#'[1,] 1.0000000 0.000000 0.000000 0.000000    0
-#'[2,] 0.6065307 1.000000 0.000000 0.000000    0
-#'[3,] 0.5910096 1.580941 1.000000 0.000000    0
-#'[4,] 0.7077578 2.484250 2.778481 1.000000    0
-#'[5,] 0.9433531 4.018954 6.187619 4.111357    1
+#' @examples
+#' Stirling_2nd_LDM(T=5, theta=0.5)
+#' #       [,1]     [,2]     [,3]     [,4] [,5]
+#' # [1,] 1.0000000 0.000000 0.000000 0.000000    0
+#' # [2,] 0.6065307 1.000000 0.000000 0.000000    0
+#' # [3,] 0.5910096 1.580941 1.000000 0.000000    0
+#' # [4,] 0.7077578 2.484250 2.778481 1.000000    0
+#' # [5,] 0.9433531 4.018954 6.187619 4.111357    1
 Stirling_2nd_LDM = function(T,theta,scale=1){  ## compute stirling number of second kind
 
    u_t_LDM=function(t,theta,scale=1){
@@ -500,10 +529,12 @@ Stirling_2nd_LDM = function(T,theta,scale=1){  ## compute stirling number of sec
 #' @returns a probability less than one
 #' @export
 #'
-#' @examples rec_count_dist_LDM(m=5,T=25, theta=0.5)
-#' 0.006915892
+#' @examples
+#' rec_count_dist_LDM(m=5,T=25, theta=0.5)
+#' # 0.006915892
+#'
 #' rec_count_dist_LDM(m=5,T=25, theta=0.5, s = Stirling_2nd_LDM(T=25,theta=0.5,scale=1))
-#' 0.006915892
+#' # 0.006915892
 rec_count_dist_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirling matrix
 
   u_t_LDM=function(t,theta,scale=1){
@@ -536,8 +567,9 @@ rec_count_dist_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta
 #' @returns a value for the expected number of records
 #' @export
 #'
-#' @examples rec_count_mean_YNM (T=25, gamma=1.1)
-#' [1] 5.000207
+#' @examples
+#' rec_count_mean_YNM (T=25, gamma=1.1)
+#' # [1] 5.000207
 rec_count_mean_YNM = function(T,gamma){
   s=0
   for(k in 1:T){
@@ -568,8 +600,9 @@ rec_count_mean_YNM = function(T,gamma){
 #' @returns a single value of the variance of number of records
 #' @export
 #'
-#' @examples rec_count_var_YNM(T=25, gamma=1.1)
-#' [1] 3.10049
+#' @examples
+#' rec_count_var_YNM(T=25, gamma=1.1)
+#' # [1] 3.10049
 rec_count_var_YNM = function(T, gamma){
   s=0; s2=0
   for(k in 1:T){
@@ -611,13 +644,14 @@ rec_count_var_YNM = function(T, gamma){
 #' @returns  A \eqn{T \times T} lower triangular matrix of all combinations of Stirling number.
 #' @export
 #'
-#' @examples Stirling_2nd_YNM(T=5, gamma=1.1)
-#'           [,1]      [,2]     [,3]     [,4]   [,5]
-#' [1,]  1.0000000  0.000000  0.00000 0.000000    0
-#' [2,]  0.9090909  1.000000  0.00000 0.000000    0
-#' [3,]  1.5777611  2.644628  1.00000 0.000000    0
-#' [4,]  3.9236583  8.154560  5.13148 1.000000    0
-#' [5,] 12.4374688 29.772515 24.42066 8.301346    1
+#' @examples
+#' Stirling_2nd_YNM(T=5, gamma=1.1)
+#' #          [,1]      [,2]     [,3]     [,4]   [,5]
+#' # [1,]  1.0000000  0.000000  0.00000 0.000000    0
+#' # [2,]  0.9090909  1.000000  0.00000 0.000000    0
+#' # [3,]  1.5777611  2.644628  1.00000 0.000000    0
+#' # [4,]  3.9236583  8.154560  5.13148 1.000000    0
+#' # [5,] 12.4374688 29.772515 24.42066 8.301346    1
 Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
   # Precompute u_t for efficiency
   u <- u_t_YNM(t = 1:T, gamma = gamma)
@@ -666,10 +700,11 @@ Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
 #' @returns Probability value \eqn{P(N_T = m)} less than one
 #' @export
 #'
-#' @examples rec_count_dist_YNM(m=5,T=25, gamma=1.1)
-#'  0.2223667
+#' @examples
+#' rec_count_dist_YNM(m=5,T=25, gamma=1.1)
+#'  # 0.2223667
 #' rec_count_dist_YNM(m=5,T=25, gamma=1.1, s = Stirling_2nd_YNM(T=25,gamma=1.1))
-#'  0.2223667
+#'  # 0.2223667
 rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
   if (is.null(s)) {
     s <- Stirling_2nd_YNM(T = T, gamma = gamma)
