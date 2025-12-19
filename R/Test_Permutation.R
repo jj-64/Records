@@ -464,7 +464,7 @@ Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA,
   results$"YNM_Pearson" = Test_YNM_Pearson(X=X, Partition = NA, gamma = NULL, K=K, estimated = estimate_gamma, alpha = alpha)
 
   ##YNM_Geom
-  results$"YNM_Geom" = Test_YNM_Geom(X = X, alpha=alpha, K=K, warmup=warmup)
+  results$"YNM_Geom" = Test_YNM_Geom(X = X, alpha=alpha, K=K, warmup=warmup, record_times= record_times)
 
   ##  LDM_NT
   results$"LDM_NT" = Test_LDM_NT(X = X, alpha = alpha)
