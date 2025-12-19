@@ -36,11 +36,11 @@
 #' estimate_LDM_moments(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,
 #' 1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492,
 #' 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
-#' $theta
-#' [1] 0.4462871
+#' # $theta
+#' # [1] 0.4462871
 #'
-#' $variance
-#' [1] 0.5625
+#' # $variance
+#' # [1] 0.5625
 estimate_LDM_moments <- function(X, variance = TRUE, scale=1) {
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
   # stopifnot(is.numeric(X), length(X) >= 4)
@@ -116,11 +116,12 @@ estimate_LDM_moments <- function(X, variance = TRUE, scale=1) {
 #' estimate_LDM_moments_unbias(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,
 #' 1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492, 4.639,
 #'  1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
-#' $theta
-#' [1] 0.3601306
 #'
-#' $variance
-#' [1] 0.3116952
+#' # $theta
+#' # [1] 0.3601306
+#'
+#' # $variance
+#' # [1] 0.3116952
 estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
 
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
@@ -277,10 +278,10 @@ estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
 #' 1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043,
 #' 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 #'
-#' $theta
+#' # $theta
 #' # [1] 0.3301
 #'
-#' $variance
+#' # $variance
 #' # [1] 0.02139224
 estimate_LDM_mle_indicator <- function(X, variance = TRUE, scale = 1, min = 0.0001,
                                        max = 5, step = 0.01) {
