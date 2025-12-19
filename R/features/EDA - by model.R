@@ -26,38 +26,6 @@ load_package(required_packages = required_packages)
 options (scipen= 99999)
 
 ## ============================================================
-## Group-wise summaries
-## ============================================================
-
-group_desc <- feature_only %>%
-  group_by(feature_matrix$label) %>%
-  summarise(across(
-    .cols = where(is.numeric),
-    .fns = list(
-      mean = ~ mean(.x, na.rm = TRUE),
-      sd   = ~ sd(.x, na.rm = TRUE),
-      med  = ~ median(.x, na.rm = TRUE),
-      IQR  = ~ IQR(.x, na.rm = TRUE)
-    ),
-    .names = "{.col}_{.fn}"
-  ))
-
-
-group_desc = as.data.frame(t(group_desc))
-colnames(group_desc) = c("Classical", "DTRW", "LDM", "YNM")
-#group_desc$feature = rownames(group_desc)
-group_desc = group_desc[-1,]
-group_desc[,1:4] = apply(group_desc[,1:4], 2, as.numeric)
-group_desc$variability = apply(group_desc[,1:4], 1, FUN = function(x) abs(sd(x)/mean(x)))
-View(group_desc)
-
-## recommended to remove
-group_desc[which(group_desc$variability ==0 ), ]
-
-group_desc[which(group_desc$variability <0.05 ), ]
-# Interpretation
-# Identical summaries across regimes → drop candidate
-# Large IQR shifts → tail-sensitive feature
 
 ## ============================================================
 ## Effect size screening (preferred over p-values)
