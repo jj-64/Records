@@ -213,7 +213,7 @@ Quantile_DTRW <- function(alpha = 0.05, T) {
 #' \itemize{
 #'   \item \strong{Exact test:} (\code{approximate = FALSE}) Uses empirical quantiles from \code{Quantile_DTRW()}.
 #'   \item \strong{Approximate test:} (\code{approximate = TRUE}) Uses asymptotic normal approximation
-#'         with mean \code{ENT_DTRW_approx(T)} and variance \code{rec_count_var_DTRW_approx(T)}.
+#'         with mean \code{rec_count_mean_DTRW(T)} and variance \code{rec_count_var_DTRW(T)}.
 #' }
 #'
 #' Decision rule:
@@ -237,7 +237,7 @@ Quantile_DTRW <- function(alpha = 0.05, T) {
 #' \item{decision}{Character, "DTRW" if consistent with DTRW hypothesis, otherwise "NO".}
 #'
 #' @seealso \code{\link{Quantile_DTRW}}, \code{\link{rec_count}},
-#'   \code{\link{ENT_DTRW_approx}}, \code{\link{rec_count_var_DTRW_approx}}
+#'   \code{\link{rec_count_dist_DTRW}}, \code{\link{rec_count_mean_DTRW}}
 #'
 #' @examples
 #' set.seed(123)
@@ -268,7 +268,7 @@ Test_DTRW_NT <- function(X, alpha = 0.05, approximate = FALSE, one.sided = FALSE
 
   } else {
 
-    z_obs <- (obs - ENT_DTRW_approx(length(X))) / sqrt(rec_count_var_DTRW_approx(length(X)))
+    z_obs <- (obs - rec_count_mean_DTRW(length(X), approx = TRUE)) / sqrt(rec_count_var_DTRW(length(X), approx = TRUE))
 
     if (!one.sided) {
       decision <- ifelse(abs(z_obs) <= qnorm(1 - alpha / 2), "DTRW", "NO")
