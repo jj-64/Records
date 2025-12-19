@@ -11,6 +11,10 @@ rec_rate(model = c("iid", "DTRW", "YNM", "LDM"), t, approximate = FALSE, ...)
 
 \item{t}{Time index (integer). If \code{t = Inf} or \code{NULL},
 the asymptotic record rate \eqn{P(R_\infty)} is returned.}
+
+\item{approximate}{boolean (Default = FALSE).}
+
+\item{...}{additional arguments specific for each model}
 }
 \value{
 A numeric value representing the record rate probability.
