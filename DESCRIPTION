@@ -14,8 +14,28 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 3.6)
 RoxygenNote: 7.3.3
+Imports:
+    stats,
+    utils,
+    dplyr,
+    tidyr,
+    magrittr,
+    caret,
+    maxLik,
+    VGAM,
+    combinat,
+    gmp,
+    moments,
+    numDeriv,
+    forecast,
+    pROC,
+    robustbase,
+    tsfeatures,
+    zoo,
 Suggests:
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    devtools
+VignetteBuilder: knitr
 
