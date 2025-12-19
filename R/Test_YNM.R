@@ -329,7 +329,7 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
   # --- Estimate gamma if not provided ---
   if (is.na(gamma)) {
     estimated =  estimate_YNM_mle_indicator(X, variance = TRUE, approximate=FALSE, min = 1.01, max=5, step=0.01)
-    gamma <- estimated$gamma
+    gamma <- estimated$param
     v_gamma = estimated$variance
   }
 
@@ -478,13 +478,14 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' # [1] "YNM"
 Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("all", "records"), record_times=NA) {
 
-    ##Force to provide record times in case only records are used
-  if (obs_type == "records" & length(record_times) != length(X) ){
-    stop("Number of records is not the same as record times (Or not provided)")
-  } else  if (obs_type == "records" & is.numeric(record_times[1])){
-    gaps = diff(record_times)
-  }
+  obs_type <- match.arg(obs_type)
 
+  ## Force record times if only records are used
+  if (obs_type == "records" && length(record_times) != length(X)) {
+    stop("Number of records is not the same as record times (or not provided)")
+  } else if (obs_type == "records" && is.numeric(record_times[1])) {
+    gaps <- diff(record_times)
+  }
 
   if (sum(is_rec(X)) <=4) {
     return(list(decision = "NO"))}
