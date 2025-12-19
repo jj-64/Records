@@ -173,14 +173,14 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #'   (default = \code{FALSE} for the exact quantile test).
 #' @param one.sided Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
 #'   (default = \code{FALSE} for two-sided).
-#'@return A list containing:
+#' @return A list containing:
 #' \describe{
 #'   \item{results_all}{Data frame of all simulation × permutation outcomes}
 #'   \item{summary_total}{Frequency of accepted decisions across all runs}
 #'   \item{perm_dec_table}{Contingency Table of waht each permutation returns}
 #'   \item{accuracy_by_perm}{How often each permutation recovered the true H0}
 #' }
-#'@examples
+#' @examples
 #'
 #' # sim_results <- Simulation_Permutation_Analysis(n_sim=2,
 #' # T=50,generator = DTRW_series, series_args =list(dist="cauchy",
