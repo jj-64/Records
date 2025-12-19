@@ -12,12 +12,24 @@ FEATURE_VERSION <- "v1.0-paper3b"
 FEATURE_DATE <- "2025-12-15"
 
 # ----- 0. Rolling instability & fast slope -----
-rolling_instability <- function(s, k = 20) {
-  n <- length(s)
-  if (n < 2 * k) return(c(NA, NA, NA))
+#' Rolling Instability
+#'
+#' A generic function for applying a series of functions to rolling margins
+#' of a vector. The functions are mean, variance, and sd-to-mean ratio.
+#'
+#' @param x the data to be used (representing a series of observations).
+#' @param width numeric value, an integer specifying the window width (in numbers of observations).
+#' @return A named vector the results of the rolling functions.
+#' @examples
+#' rolling_instability(x=c(1,2,3,4,5) , width = 2)
+#' #     mean_instab    var_instab mean_sd_ratio
+#' #      1.290994      0.000000      1.825742
+rolling_instability <- function(x, width = 20) {
+  n <- length(x)
+  if (n < 2 * width) return(c(NA, NA, NA))
 
   rolls <- zoo::rollapply(
-    s, width = k,
+    x, width = width,
     FUN = function(x) c(mean(x), sd(x)),
     by.column = FALSE, align = "right"
   )
@@ -26,7 +38,7 @@ rolling_instability <- function(s, k = 20) {
   var_instab <- sd(rolls[,2])
   mean_instab <- sd(rolls[,1])
 
-  c(mean_instab, var_instab, mean_sd_ratio)
+  c(mean_instab = mean_instab, var_instab = var_instab, mean_sd_ratio = mean_sd_ratio)
 }
 
 fast_slope <- function(s) {
@@ -99,7 +111,25 @@ generate_series_multiple <- function(
       labels_m = c(labels_m, "cauchy")
       i = i + 1
     }
+
+    i = 1
+    while(i <= n_per_model) {
+      s <- generate_series(
+        DTRW_series,
+        series_args = list(dist = "uniform", min = -1, scale = 1),
+        T_val = T_val
+      )
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "DTRW")
+      series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "uniform")
+      i = i + 1
+    }
+
     ## ---- LDM
+        ## Frechet
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
@@ -116,7 +146,7 @@ generate_series_multiple <- function(
       labels_m = c(labels_m, "frechet")
       i = i + 1
     }
-
+        ## Weibull
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
@@ -133,14 +163,31 @@ generate_series_multiple <- function(
       labels_m = c(labels_m, "weibull")
       i = i + 1
     }
-
+        ## Normal
+    i = 1
+    while(i <= n_per_model) {
+      s <- generate_series(
+        LDM_series,
+        series_args = list(theta = runif(1,0.02,0.1),
+                           dist = "norm", mean =0 , sd =1),
+        T_val = T_val
+      )
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "LDM")
+      series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "norm")
+      i = i + 1
+    }
     ## ---- YNM
+        ## Frechet
     i=1
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.1,1.4),
-                           dist = "frechet", shape=5, scale=1),
+        series_args = list(gamma = runif(1,1.1,1.2),
+                           dist = "frechet", shape=3, scale=1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
@@ -151,13 +198,13 @@ generate_series_multiple <- function(
       labels_m = c(labels_m, "frechet")
       i=i+1
     }
-
+        ## Weibull
     i=1
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
         series_args = list(gamma = runif(1,1.2,1.5),
-                           dist = "weibull", shape= 10, scale =1/2),
+                           dist = "weibull", shape= 1/2, scale =0.1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
@@ -168,16 +215,34 @@ generate_series_multiple <- function(
       labels_m = c(labels_m, "weibull")
       i=i+1
     }
+        ## Pareto truncated
+    i=1
+    while(i <= n_per_model) {
+      s <- generate_series(
+        YNM_series,
+        series_args = list(gamma = runif(1,1.2,1.5),
+                           dist = "pareto_trunc", shape= 2.8, scale =1, xmax = 1000),
+        T_val = T_val
+      )
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "YNM")
+      series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "pareto")
+      i=i+1
+    }
+
     ## ---- iid (Classical)
     i=1
     while(i <= n_per_model) {
-      s <- rnorm(T_val)
+      s <- VGAM::rfrechet(T_val, shape = 4, scale=1)
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
       labels <- c(labels, "Classical")
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
-      labels_m = c(labels_m, "norm")
+      labels_m = c(labels_m, "frechet")
       i=i+1
     }
 
@@ -190,6 +255,18 @@ generate_series_multiple <- function(
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "gumbel")
+      i=i+1
+    }
+
+    i=1
+    while(i <= n_per_model) {
+      s <- rweibull(T_val, shape = 2, scale=1)
+      if(length(rec_gaps(s)) <2 ) next;
+      all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
+      labels <- c(labels, "Classical")
+      series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
+      Ts <- c(Ts, T_val)
+      labels_m = c(labels_m, "weibull")
       i=i+1
     }
 
