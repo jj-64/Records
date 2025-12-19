@@ -76,7 +76,13 @@ The second option is to generate simulated data separately. "raw_data" is a larg
 
           3 - Choose if the series generated are to be normalized when generated (divided by max of each series)
 ```{r option 2 to generate data}
-raw_data = generate_series_multiple(n_per_model = 10, T_vals = c(100, 150, 200), normalized = FALSE)
+raw_data = generate_series_multiple(n_per_model = 100, T_vals = c(75, 100, 150), normalized = FALSE)
+```
+
+View data composition of underlying distribution:
+
+```{r Raw data composition}
+table(raw_data$labels, raw_data$labels_m)
 ```
 
 We then execute the feature data set.
