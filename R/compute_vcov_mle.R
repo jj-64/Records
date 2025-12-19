@@ -1,6 +1,9 @@
-##1) Recommended (proper) method — observed information / Hessian-------------
+##1) Recommended (proper) method  - observed information / Hessian-------------
 
 #' Robust inversion of Hessian matrix
+#' @param M matrix object
+#' @param ridge very small error number, default = 1e-8
+#' @param max_attempts integer, maximum number of attempts, default = 5
 invert_posdef_matrix <- function(M, ridge = 1e-8, max_attempts = 5) {
   if (!is.matrix(M)) stop("M must be a matrix")
   n <- nrow(M)
@@ -28,7 +31,7 @@ invert_posdef_matrix <- function(M, ridge = 1e-8, max_attempts = 5) {
 #' This is a numerical computation of the variance of MLE estimated paraemters.
 #' For computations assuming independence, see \code{\link{compute_vcov_marginal}}
 #'
-#' @param LogLik_fun function, loglikelihood function stored in the registry with embeded model,
+#' @param logLik_fun function, loglikelihood function stored in the registry with embeded model,
 #' obs_type, data and dist
 #' @param params list or named vector, parameters of the likelihood function
 #' @param method character "numDeriv" or "fd" for the hessian matrix derivation
@@ -112,13 +115,14 @@ compute_vcov_loglik <- function(logLik_fun, params, method = c("numDeriv", "fd")
 #' obs_type, dist and param_name
 #' @param data list or dataframe, named with "rec_values", "rec_times" and "time"
 #' @param params list or named vector, parameters of the likelihood function
+#' @param param_names default takes the names of input vector params
 #' @return variance-coavriance matrix
 #' @examples
 #' \dontrun{
-#' # data = list(rec_values = c(1,2,4,6),
-#' #             rec_times =  c(1,3,6,7),
-#' #               time = 7)
-#' # params = list(theta= 0.3, scale=2, shape=2)
+#'  data = list(rec_values = c(1,2,4,6),
+#'              rec_times =  c(1,3,6,7),
+#'                time = 7)
+#'  params = list(theta= 0.3, scale=2, shape=2)
 #' var_funs <- list(
 #'   theta = var_logLik_records("LDM","records","frechet","theta"),
 #'   scale = var_logLik_records("LDM","records","frechet","scale"),
@@ -140,7 +144,7 @@ compute_vcov_marginal <- function(var_fun, data, params, param_names = names(par
     if (!is.null(var_fun[[nm]])) {
       vcov[i,i] <- var_fun[[nm]](data = data, params = params)
     } else {
-      warning("No variance function for ", nm, " — leaving NA")
+      warning("No variance function for ", nm, " leaving NA")
       vcov[i,i] <- NA_real_
     }
   }
@@ -173,13 +177,22 @@ se_delta <- function(g_fun, par, vcov, method = c("numDeriv", "fd")) {
 
 # # compute vcov (numeric) ----------------------
 #' master helper: try Hessian-based vcov, fallback to diag of provided var_fun
+#'
+#' @param logLik_fun function, loglikelihood function stored in the registry with embeded model,
+#' obs_type, data and dist
+#' @param var_fun list of functions, each function stored in the registry for a defined model,
+#' obs_type, dist and param_name
+#' @param data list or dataframe, named with "rec_values", "rec_times" and "time"
+#' @param params list or named vector, parameters of the likelihood function
+#' @param quiet default is FALSE, for quiet computation
 #' @examples
 #' \dontrun{
 #'  data = list(rec_values = c(1,2,4,6),
 #'              rec_times =  c(1,3,6,7),
 #'                time = 7)
 #'  params = list(theta= 0.3, scale=2, shape=2)
-#' logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",data=data, params)
+#' logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",
+#' data=data, params)
 #' var_funs <- list(
 #'   theta = var_logLik_records("LDM","records","frechet","theta"),
 #'   scale = var_logLik_records("LDM","records","frechet","scale"),
