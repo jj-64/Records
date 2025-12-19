@@ -34,10 +34,13 @@ where  \eqn{T} is the length of the process
 \examples{
 rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
 # [1]  0.1117152
+
 rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
 # [1] 0.1122752
+
 rec_count_dist_DTRW(m=1,T=25)
 # [1] 0.1122752
+
 rec_count_dist_DTRW(m=5,T=25)
 # [1] 0.09867345
 }

@@ -70,7 +70,7 @@ tests$decision
 # "Classical"                  "DTRW"
 # YNM_NT.decision       YNM_Pearson.decision
 #           "NO"                      NA
-#YNM_Geom.decision         LDM_NT.decision
+# YNM_Geom.decision         LDM_NT.decision
 #            "NO"                    "NO"
 # LDM_Sequential.decision     LDM_Regression.decision
 #     "NO"                           "NO"

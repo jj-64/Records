@@ -37,6 +37,7 @@ where \eqn{u_t = e^{-\theta/\beta} \times \frac{(1-e^{-\theta t/\beta})}{(1-e^{-
 \examples{
 rec_count_dist_LDM(m=5,T=25, theta=0.5)
 # 0.006915892
+
 rec_count_dist_LDM(m=5,T=25, theta=0.5, s = Stirling_2nd_LDM(T=25,theta=0.5,scale=1))
 # 0.006915892
 }

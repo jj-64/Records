@@ -446,36 +446,36 @@ Test_YNM_NT <- function(X, gamma = NA, alpha = 0.05) {
 #' X <- YNM_series(T = 50, dist = "gumbel", gamma = 1.2, loc = 0, scale= 1)
 #' Test_YNM_Geom(X, alpha = 0.05, K = 4, warmup=2)
 #'
-#'# $obs_counts
-#'# [1] 3 3 1 4
+#' # $obs_counts
+#' # [1] 3 3 1 4
 #'
-#'# $exp_counts
+#' # $exp_counts
 #'
-#'# [1] 2.69 2.03 1.53 4.74
+#' # [1] 2.69 2.03 1.53 4.74
 #'
-#'# $stat
-#'# [1] 0.8008871
+#' # $stat
+#' # [1] 0.8008871
 #'
-#'# $df
-#'# [1] 2
+#' # $df
+#' # [1] 2
 #'
-#'# $p_value
-#'# [1] 0.6700228
+#' # $p_value
+#' # [1] 0.6700228
 #'
-#'# $p_hat
-#'# [1] 0.2444444
+#' # $p_hat
+#' # [1] 0.2444444
 #'
-#'# $gamma_hat
-#'# [1] 1.323529
+#' # $gamma_hat
+#' # [1] 1.323529
 #'
-#'# $v_gamma_hat
-#'# [1] 0.01259414
+#' # $v_gamma_hat
+#' # [1] 0.01259414
 #'
-#'# $CL
-#'# [1] 1.138938 1.508121
+#' # $CL
+#' # [1] 1.138938 1.508121
 #'
-#'# $decision
-#'# [1] "YNM"
+#' # $decision
+#' # [1] "YNM"
 Test_YNM_Geom <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("all", "records"), record_times=NA) {
 
     ##Force to provide record times in case only records are used

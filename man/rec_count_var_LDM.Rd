@@ -57,8 +57,10 @@ For other increment distributions, the variance is estimated by simulation.
 \examples{
 rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
 # [1] 5.761166
+
 rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
 # [1] 4.509757
+
 rec_count_var_LDM(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
 # [1] 4.492424
 }

@@ -29,12 +29,16 @@ Approximated variance is computed as
 \examples{
 rec_count_var_DTRW(T=25, approx = TRUE)
 # [1] 18.16901
+
 rec_count_mean_DTRW(T=25, approx = TRUE)
 # [1] 5.641896
+
 rec_count_var_DTRW(T=25, approx = FALSE)
 # [1] 13.4865
+
 rec_count_mean_DTRW(T=25, approx = FALSE)
 # [1] 5.726034
+
 # For a series of length 25 and following a DTRW model, we expect to observe
 # around 5.62 records with an approximated variance of 18.169
 }

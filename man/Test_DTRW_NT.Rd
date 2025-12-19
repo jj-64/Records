@@ -50,7 +50,7 @@ Two testing modes are available:
 \itemize{
 \item \strong{Exact test:} (\code{approximate = FALSE}) Uses empirical quantiles from \code{Quantile_DTRW()}.
 \item \strong{Approximate test:} (\code{approximate = TRUE}) Uses asymptotic normal approximation
-with mean \code{rec_count_mean_DTRW_approx(T)} and variance \code{rec_count_var_DTRW_approx(T)}.
+with mean \code{rec_count_mean_DTRW(T)} and variance \code{rec_count_var_DTRW(T)}.
 }
 
 Decision rule:

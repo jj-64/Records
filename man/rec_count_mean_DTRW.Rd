@@ -28,6 +28,7 @@ is the length of the process
 \examples{
 rec_count_mean_DTRW(T=25)
 # [1] 5.726034
+
 rec_count_mean_DTRW(T=25, approx = TRUE)
 # [1] 5.641896
 }
