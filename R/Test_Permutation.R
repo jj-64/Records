@@ -21,6 +21,7 @@
 #'   (default = \code{FALSE} for the exact quantile test). Forced when obs_type = "records".
 #' @param one.sided Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
 #'   (default = \code{FALSE} for two-sided). Forced when obs_type = "records".
+#' @param print logical default is FALSE, summary is not printed
 #' @return A list containing:
 #'
 #' 1 - decision: A data frame with 24 rows:
@@ -81,7 +82,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
     res <- switch(test_id,
                   D = tryCatch(Test_DTRW_Indep(X, alpha = alpha)$decision, error = function(e) NA),
                   L = tryCatch(Test_LDM_Sequential(X, alpha = alpha)$decision, error = function(e) NA),
-                  C = tryCatch(Test_iid_BoxJenkins(X, alpha = alpha, lag = lag)$decision, error = function(e) NA),
+                  C = tryCatch(Test_iid_BoxJenkins(X, alpha = alpha, lags = lag)$decision, error = function(e) NA),
                   Y = tryCatch(Test_YNM_Geom(X, alpha = alpha, warmup = warmup, obs_type = "all")$decision, error = function(e) NA),
                   NA)
     if (is.null(res) || length(res) == 0) res <- NA
@@ -92,7 +93,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
     res <- switch(test_id,
                   D = tryCatch(Test_DTRW_NT(X, alpha = alpha)$decision, error = function(e) NA),
                   L = tryCatch(Test_LDM_Sequential(X, alpha = alpha)$decision, error = function(e) NA),
-                  C = tryCatch(Test_iid_NT(X, alpha = alpha, approximate = approximate, one.sided = one.sided)$decision, error = function(e) NA),
+                  C = tryCatch(Test_iid_NT(X, alpha = alpha)$decision, error = function(e) NA),
                   Y = tryCatch(Test_YNM_NT(X, alpha = alpha)$decision, error = function(e) NA),
                   NA)
     if (is.null(res) || length(res) == 0) res <- NA
@@ -172,16 +173,18 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #'   (default = \code{FALSE} for the exact quantile test).
 #' @param one.sided Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
 #'   (default = \code{FALSE} for two-sided).
-#' @return A list containing:
+#'@return A list containing:
 #' \describe{
 #'   \item{results_all}{Data frame of all simulation × permutation outcomes}
 #'   \item{summary_total}{Frequency of accepted decisions across all runs}
 #'   \item{perm_dec_table}{Contingency Table of waht each permutation returns}
 #'   \item{accuracy_by_perm}{How often each permutation recovered the true H0}
 #' }
-#' @examples
+#'@examples
 #'
-#' # sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", obs_type = "all)
+#' # sim_results <- Simulation_Permutation_Analysis(n_sim=2,
+#' # T=50,generator = DTRW_series, series_args =list(dist="cauchy",
+#' #  loc=0, scale=1),H0 = "DTRW", obs_type = "all)
 #'
 #' ### 75% of the permutations trees return "DTRW" and 25% return "YNM".
 #' ### On average, one simulation will return the following:
@@ -220,7 +223,8 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #' #  24        YLDC  1.0 0.0
 #'
 #'
-#'  ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW" across all simulations
+#'  ## Under HO: "DTRW", those permutations having accuracy 1.0 returned
+#'  # "DTRW" across all simulations
 #' #     Permutation Success_Rate
 #' #     1         CDLY          1.0
 #' #     2         CDYL          1.0
@@ -415,10 +419,11 @@ Test_Permutation_OLD = function(x, sig=0.05){
 #'   \code{"Bonf"}, \code{"Holm"}, \code{"Sidak"}, or \code{"Chisq"} (default = "Bonf").
 #' @param K Optional. Number of partitions in Test_YNM_Pearson test.
 #'    If given, force exactly K partitions using quantiles.
-#' @param estimated_gamma Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
+#' @param estimate_gamma Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
 #' @param gamma Numeric. Optional. Force if estimated_gamma = FALSE.
 #' @param RSq Numeric, minimum adjusted R-squared required to accept the LDM
 #'   hypothesis (default = 0.8).
+#' @param record_times (Default = NA) record times in case obs_type = "records"
 #' @return A list containing all:
 #' \describe{
 #'   \item{results}{List of all Test outcomes}
@@ -428,11 +433,19 @@ Test_Permutation_OLD = function(x, sig=0.05){
 #' @examples
 #' tests = Test_Parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
 #' tests$decision
-#' # iid_NT.decision        DTRW_NT.decision         YNM_NT.decision       YNM_Pearson.decision       YNM_Geom.decision         LDM_NT.decision
-#' # "Classical"                  "DTRW"                    "NO"                      NA                    "NO"                    "NO"
-#' # LDM_Sequential.decision     LDM_Regression.decision        iid_Box.decision     DTRW_Indep.decision
-#' #     "NO"                           "NO"                       "Classical"             "NO"
-Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA, alpha = 0.05, lag = 10, warmup = 2, approximate = FALSE, one.sided = FALSE, method="Bonf",
+#' # iid_NT.decision        DTRW_NT.decision
+#' # "Classical"                  "DTRW"
+#' # YNM_NT.decision       YNM_Pearson.decision
+#' #           "NO"                      NA
+#' #YNM_Geom.decision         LDM_NT.decision
+#' #            "NO"                    "NO"
+#' # LDM_Sequential.decision     LDM_Regression.decision
+#' #     "NO"                           "NO"
+#' # iid_Box.decision     DTRW_Indep.decision
+#' #  "Classical"             "NO"
+Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA,
+                          alpha = 0.05, lag = 10, warmup = 2, approximate = FALSE,
+                          one.sided = FALSE, method="Bonf",
                           K= NULL, estimate_gamma = TRUE, gamma = NULL, RSq = 0.8) {
   results = list()
   obs_type <- match.arg(obs_type)
@@ -490,6 +503,7 @@ Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA, 
 #'
 #' @param X Numeric vector. The observed series.
 #' @param alpha Numeric. Significance level for all tests (default = 0.05).
+#' @param print logical default is FALSE, summary is not printed
 #' @return A list containing:
 #'
 #' 1 - decision: A data frame with 24 rows:
@@ -605,8 +619,10 @@ Test_Permutation_limited <- function(X, alpha = 0.05, print = TRUE) {
 #########------------------Monte Carlo Simulation Limited ---------------######################
 #' Monte Carlo Simulation of Record Model Identification via Test Permutations
 #'
-#' Runs multiple simulations of time series generated under a specified null model (e.g. DTRW, LDM, iid, YNM),
-#' applies all 24 possible permutations of four record-based tests (DTRW, LDM, Classical, YNM),
+#' Runs multiple simulations of time series generated under a specified null
+#' model (e.g. DTRW, LDM, iid, YNM),
+#' applies all 24 possible permutations of four record-based tests (DTRW, LDM,
+#' Classical, YNM),
 #' and records which test (if any) is accepted by each permutation.
 #'
 #' @param n_sim Number of simulated series (default = 1000)
@@ -618,8 +634,6 @@ Test_Permutation_limited <- function(X, alpha = 0.05, print = TRUE) {
 #' @param H0 Character. The true generating process: "DTRW", "LDM",
 #' "Classical", or "YNM"
 #' @param alpha Numeric. Significance level for all tests (default = 0.05)
-#' @param lag Integer. Lag parameter for Box-Jenkins test (default = 10)
-#' @param warmup Integer. Warm-up parameter for YNM test (default = 2)
 #' @param print logical default is FALSE, summary is not printed
 #' @return A list containing:
 #' \describe{
@@ -672,7 +686,8 @@ Test_Permutation_limited <- function(X, alpha = 0.05, print = TRUE) {
 #' #  24        YLDC  1.0 0.0
 #'
 #'
-#'  ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW" across all simulations
+#'  ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW"
+#'  ##  across all simulations
 #' #     Permutation Success_Rate
 #' #     1         CDLY          1.0
 #' #     2         CDYL          1.0
