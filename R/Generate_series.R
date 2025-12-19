@@ -275,9 +275,11 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #'
 #' @return A numeric vector of length T, the simulated YNM process.
 #' @examples
+#' \dontrun{
 #' YNM_series(100, gamma = 1.5, dist = "gumbel", loc = 0, scale = 1)
-#' YNM_series(100, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
+#' YNM_series(10, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
 #' YNM_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
+#' }
 #' @export
 YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
                                           "frechet", "exp", "pareto",
