@@ -541,8 +541,11 @@ rec_count_dist_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta
     exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
 
   ## compute stirling matrix
-  if(is.na(s)[1] == TRUE) {s=Stirling_2nd_LDM(T=T,theta=theta,scale=scale)}
+  if(is.na(s)[1] == TRUE) {
+    s=Stirling_2nd_LDM(T=T,theta=theta,scale=scale)}
+
   p=(prod(u_t_LDM(t=1:T,theta=theta,scale=scale)))
+
   return(exp(-theta*T/scale) * s[T,m]/ p)
 }
 
@@ -612,6 +615,8 @@ rec_count_var_YNM = function(T, gamma){
    return(sum(s)-sum(s2))
 }
 
+## helper function for computing
+u_t_YNM = function(t, gamma) {(1-gamma^t)/(gamma^t * (1- gamma))}
 
 # 'Weighted Stirling Numbers of the Second Kind (YANG-Nevzorov version)
 #'
@@ -653,8 +658,10 @@ rec_count_var_YNM = function(T, gamma){
 #' # [4,]  3.9236583  8.154560  5.13148 1.000000    0
 #' # [5,] 12.4374688 29.772515 24.42066 8.301346    1
 Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
+
   # Precompute u_t for efficiency
-  u <- u_t_YNM(t = 1:T, gamma = gamma)
+  t = 1:T
+  u <- (1-gamma^t)/(gamma^t * (1- gamma))  #u_t_YNM
 
   # Initialize triangular matrix
   s <- matrix(0, nrow = T, ncol = T) ##S(T,m)= 0 for m>T upper diagonal
@@ -711,7 +718,9 @@ rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
   }
 
   # Precompute product of u_t
-  p <- prod(u_t_YNM(t = 1:T, gamma = gamma))
+  t = 1:T
+  u <- (1-gamma^t)/(gamma^t * (1- gamma))  #u_t_YNM
+  p <- prod(u)
 
   return(s[T, m] / ((gamma^T) * p))
 }
