@@ -28,8 +28,8 @@ of the number of records.
 The test uses the number of observed records \eqn{N_T} and compares it against
 the theoretical distribution under the null hypothesis.
 
-If \eqn{\gamma} is unknown, it is estimated using \code{\link{Estim_gamma_indicator}}.
-Its variance is computed via \code{\link{Estim_gamma_indicator_Variance}}.
+If \eqn{\gamma} is unknown, it is estimated using \code{\link{estimate_YNM_mle_indicator}}
+with its variance.
 
 The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
 \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_YNM}}

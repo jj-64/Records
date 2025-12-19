@@ -25,6 +25,8 @@ Test_Parallel(
 
 \item{obs_type}{String. "all" or "records" depending on the series provided.}
 
+\item{record_times}{(Default = NA) record times in case obs_type = "records"}
+
 \item{alpha}{Numeric. Significance level for all tests (default = 0.05).}
 
 \item{lag}{Integer. Lag parameter for Box-Jenkins test (default = 10).}
@@ -43,12 +45,12 @@ Test_Parallel(
 \item{K}{Optional. Number of partitions in Test_YNM_Pearson test.
 If given, force exactly K partitions using quantiles.}
 
+\item{estimate_gamma}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
+
 \item{gamma}{Numeric. Optional. Force if estimated_gamma = FALSE.}
 
 \item{RSq}{Numeric, minimum adjusted R-squared required to accept the LDM
 hypothesis (default = 0.8).}
-
-\item{estimated_gamma}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
 }
 \value{
 A list containing all:
@@ -64,8 +66,14 @@ on the same series \code{X} independently.
 \examples{
 tests = Test_Parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
 tests$decision
-# iid_NT.decision        DTRW_NT.decision         YNM_NT.decision       YNM_Pearson.decision       YNM_Geom.decision         LDM_NT.decision
-# "Classical"                  "DTRW"                    "NO"                      NA                    "NO"                    "NO"
-# LDM_Sequential.decision     LDM_Regression.decision        iid_Box.decision     DTRW_Indep.decision
-#     "NO"                           "NO"                       "Classical"             "NO"
+# iid_NT.decision        DTRW_NT.decision
+# "Classical"                  "DTRW"
+# YNM_NT.decision       YNM_Pearson.decision
+#           "NO"                      NA
+#YNM_Geom.decision         LDM_NT.decision
+#            "NO"                    "NO"
+# LDM_Sequential.decision     LDM_Regression.decision
+#     "NO"                           "NO"
+# iid_Box.decision     DTRW_Indep.decision
+#  "Classical"             "NO"
 }

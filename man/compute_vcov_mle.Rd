@@ -12,6 +12,19 @@ compute_vcov_mle(
   quiet = FALSE
 )
 }
+\arguments{
+\item{logLik_fun}{function, loglikelihood function stored in the registry with embeded model,
+obs_type, data and dist}
+
+\item{params}{list or named vector, parameters of the likelihood function}
+
+\item{var_fun}{list of functions, each function stored in the registry for a defined model,
+obs_type, dist and param_name}
+
+\item{data}{list or dataframe, named with "rec_values", "rec_times" and "time"}
+
+\item{quiet}{default is FALSE, for quiet computation}
+}
 \description{
 master helper: try Hessian-based vcov, fallback to diag of provided var_fun
 }
@@ -21,7 +34,8 @@ master helper: try Hessian-based vcov, fallback to diag of provided var_fun
              rec_times =  c(1,3,6,7),
                time = 7)
  params = list(theta= 0.3, scale=2, shape=2)
-logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",data=data, params)
+logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",
+data=data, params)
 var_funs <- list(
   theta = var_logLik_records("LDM","records","frechet","theta"),
   scale = var_logLik_records("LDM","records","frechet","scale"),

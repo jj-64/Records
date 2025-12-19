@@ -15,12 +15,15 @@ rec_count_mean_DTRW(T, approx = FALSE)
 a single value of the expected number of records
 }
 \description{
-The average exact expected number of records in a DTRW process. It is distribution-free, i.e. independent from the process underlying distribution.
+The average exact expected number of records in a DTRW process.
+It is distribution-free, i.e. independent from the process underlying distribution.
 It only depends from the length of the series.
 }
 \details{
-It is computed as \eqn{E(N_T) = (2T +1) \times 2^{-2T} \times C_{T}^{2T}} where \eqn{T} is the length of the process
-If approximated, it is computed as \eqn{E(N_T) = \sqrt(4T/\pi)} where \eqn{T} is the length of the process
+It is computed as \eqn{E(N_T) = (2T +1) \times 2^{-2T}
+\times C_{T}^{2T}} where \eqn{T} is the length of the process
+If approximated, it is computed as \eqn{E(N_T) = \sqrt(4T/\pi)} where \eqn{T}
+is the length of the process
 }
 \examples{
 rec_count_mean_DTRW(T=25)

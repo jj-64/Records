@@ -70,7 +70,9 @@ and records which test (if any) is accepted by each permutation.
 }
 \examples{
 
-# sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),H0 = "DTRW", obs_type = "all)
+# sim_results <- Simulation_Permutation_Analysis(n_sim=2,
+# T=50,generator = DTRW_series, series_args =list(dist="cauchy",
+#  loc=0, scale=1),H0 = "DTRW", obs_type = "all)
 
 ### 75\% of the permutations trees return "DTRW" and 25\% return "YNM".
 ### On average, one simulation will return the following:
@@ -109,7 +111,8 @@ and records which test (if any) is accepted by each permutation.
 #  24        YLDC  1.0 0.0
 
 
- ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW" across all simulations
+ ## Under HO: "DTRW", those permutations having accuracy 1.0 returned
+ # "DTRW" across all simulations
 #     Permutation Success_Rate
 #     1         CDLY          1.0
 #     2         CDYL          1.0

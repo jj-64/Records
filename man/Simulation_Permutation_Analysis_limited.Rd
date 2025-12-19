@@ -33,10 +33,6 @@ argument "T" is not included}
 \item{alpha}{Numeric. Significance level for all tests (default = 0.05)}
 
 \item{print}{logical default is FALSE, summary is not printed}
-
-\item{lag}{Integer. Lag parameter for Box-Jenkins test (default = 10)}
-
-\item{warmup}{Integer. Warm-up parameter for YNM test (default = 2)}
 }
 \value{
 A list containing:
@@ -48,8 +44,10 @@ A list containing:
 }
 }
 \description{
-Runs multiple simulations of time series generated under a specified null model (e.g. DTRW, LDM, iid, YNM),
-applies all 24 possible permutations of four record-based tests (DTRW, LDM, Classical, YNM),
+Runs multiple simulations of time series generated under a specified null
+model (e.g. DTRW, LDM, iid, YNM),
+applies all 24 possible permutations of four record-based tests (DTRW, LDM,
+Classical, YNM),
 and records which test (if any) is accepted by each permutation.
 }
 \examples{
@@ -96,7 +94,8 @@ H0 = "DTRW")
 #  24        YLDC  1.0 0.0
 
 
- ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW" across all simulations
+ ## Under HO: "DTRW", those permutations having accuracy 1.0 returned "DTRW"
+ ##  across all simulations
 #     Permutation Success_Rate
 #     1         CDLY          1.0
 #     2         CDYL          1.0

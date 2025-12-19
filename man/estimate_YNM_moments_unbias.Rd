@@ -17,7 +17,8 @@ A list with:
 \item{variance}{Analytical variance of the unbiased estimator (if computed).}
 }
 \description{
-Computes \strong{bias-corrected} estimator of the (\eqn{\gamma}) parameter using a bias correction, correcting
+Computes \strong{bias-corrected} estimator of the (\eqn{\gamma}) parameter using a
+bias correction, correcting
 \code{\link{estimate_YNM_moments}}, and
 optionally computes its analytical variance.
 }
@@ -36,9 +37,11 @@ The bias term is approximated as:
 }
 where:
 \itemize{
-\item \eqn{P_t = P_t(\gamma)} - record rate at time finite \eqn{t} \code{\link{rec_rate_YNM}},
+\item \eqn{P_t = P_t(\gamma)} - record rate at time finite \eqn{t}
+\code{\link{rec_rate_YNM}},
 \item \eqn{h_T = \frac{1}{T}\sum_{t=1}^T P_t},
-\item \eqn{P = \lim_{t\to\infty} P_t(\gamma)} - record rate at time infinite \eqn{t} \code{\link{rec_rate_YNM}}.
+\item \eqn{P = \lim_{t\to\infty} P_t(\gamma)} - record rate at time infinite
+\eqn{t} \code{\link{rec_rate_YNM}}.
 }
 \subsection{Variance Approximation}{
 
@@ -90,10 +93,14 @@ and the derivative term is expanded as:
 set.seed(123)
 X=YNM_series(T=50, gamma=1.2, dist="weibull", shape=2, scale=1)
 X
-[1] 0.3984360 0.9623867 1.5793358 0.5810157 1.1990188 1.1023248 0.7779932 1.7265598 1.6089237 1.8683241 1.9077715 1.1938959 2.1730424 1.8272045
-[15] 1.7397198 1.5702099 2.1379330 1.8103224 1.9107890 2.0386229 1.9813020 2.6492839 2.3424281 2.4793168 2.4569918 2.0060300 2.2629934 2.3609622
-[29] 2.1392445 2.1252441 3.2127646 2.2451416 2.6506264 2.7209208 2.5084019 2.8734849 3.1062846 2.5480120 2.6141440 2.5286307 2.5044793 2.8896440
-[43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067 3.1171138
+[1] 0.3984360 0.9623867 1.5793358 0.5810157 1.1990188 1.1023248 0.7779932
+[8] 1.7265598 1.6089237 1.8683241 1.9077715 1.1938959 2.1730424 1.8272045
+[15] 1.7397198 1.5702099 2.1379330 1.8103224 1.9107890 2.0386229 1.9813020
+[22] 2.6492839 2.3424281 2.4793168 2.4569918 2.0060300 2.2629934 2.3609622
+[29] 2.1392445 2.1252441 3.2127646 2.2451416 2.6506264 2.7209208 2.5084019
+[36] 2.8734849 3.1062846 2.5480120 2.6141440 2.5286307 2.5044793 2.8896440
+[43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067
+[50] 3.1171138
 
 estimate_YNM_moments_unbias(X)
 # $gamma

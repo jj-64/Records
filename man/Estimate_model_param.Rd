@@ -25,9 +25,9 @@ estimate_model_param(
 
 \item{variance}{logical to return variance or nor (default = TRUE)}
 
-\item{scale}{Scale parameter of the underlying Gumbel distribution (default = 1).}
+\item{obs_type}{string, one of "records" or "all" (Default = "records")}
 
-\item{min, max}{Search bounds for MLE method.}
+\item{...}{additional arguments specific for each model}
 }
 \value{
 Numeric estimate of theta and variance (if TRUE)
@@ -41,12 +41,13 @@ using different methods: "moments", or "MLE" using indicator series
 choosing the "mle_indicator" should provide additional arguments of
 min, max, step for the parameter grid search
 approximate : Logical for variance.
-scale in case of LDM
+scale in case of LDM Gumbel
 For more info, see \code{\link{estimate_YNM_mle_indicator}} and \code{\link{estimate_LDM_mle_indicator}}
 }
 \examples{
-X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
-3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729)
+X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,
+3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,
+3.719, 3.741, 4.729)
 
 estimate_model_param(X, method="moments", bias = TRUE, model = "LDM", scale=1)
 #  $param
@@ -61,7 +62,8 @@ estimate_model_param(X, method="moments", bias = TRUE, model = "LDM", scale=1)
 #  $variance
 #  [1] 0.3116952
 
-estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1, min= 0.01, max=2, step = 0.001, approximate = FALSE)
+estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1,
+min= 0.01, max=2, step = 0.001, approximate = FALSE)
 # $param
 # [1] 0.328
 
@@ -83,7 +85,8 @@ estimate_model_param(X, method="moments", bias = FALSE, model = "YNM")
 # $variance
 # [1] 0.7497066
 
-estimate_model_param(X, method="mle_indicator", model = "YNM", min= 1, max=5, step = 0.001, approximate = FALSE)
+estimate_model_param(X, method="mle_indicator", model = "YNM", min= 1,
+ max=5, step = 0.001, approximate = FALSE)
 # $param
 # [1] 1.388
 

@@ -14,6 +14,8 @@ rec_count_stats(model, stat = c("mean", "var", "dist"), T, m = NULL, ...)
 
 \item{T}{Integer. Length of the time series.}
 
+\item{m}{Integer. Number < T for which we compute the probability distribution}
+
 \item{...}{Additional arguments passed to model-specific functions.}
 }
 \value{

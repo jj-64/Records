@@ -25,6 +25,8 @@ Test_Permutation(
 
 \item{warmup}{Integer. Warm-up parameter for YNM test (default = 2).}
 
+\item{print}{logical default is FALSE, summary is not printed}
+
 \item{obs_type}{String. "all" if data provided is the whole series \eqn{X_t} or
 "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}

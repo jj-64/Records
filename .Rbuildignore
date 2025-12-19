@@ -1,2 +1,6 @@
 ^Records\.Rproj$
 ^\.Rproj\.user$
+^doc$
+^Meta$
+^\.github$
+

@@ -12,14 +12,14 @@ compute_vcov_loglik(
 )
 }
 \arguments{
+\item{logLik_fun}{function, loglikelihood function stored in the registry with embeded model,
+obs_type, data and dist}
+
 \item{params}{list or named vector, parameters of the likelihood function}
 
 \item{method}{character "numDeriv" or "fd" for the hessian matrix derivation}
 
 \item{eps}{numeric, epsilon very small number}
-
-\item{LogLik_fun}{function, loglikelihood function stored in the registry with embeded model,
-obs_type, data and dist}
 }
 \value{
 variance-coavriance matrix

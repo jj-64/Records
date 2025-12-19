@@ -13,6 +13,8 @@ obs_type, dist and param_name}
 \item{data}{list or dataframe, named with "rec_values", "rec_times" and "time"}
 
 \item{params}{list or named vector, parameters of the likelihood function}
+
+\item{param_names}{default takes the names of input vector params}
 }
 \value{
 variance-coavriance matrix
@@ -26,10 +28,10 @@ For numerical computations, see \code{\link{compute_vcov_loglik}}
 }
 \examples{
 \dontrun{
-# data = list(rec_values = c(1,2,4,6),
-#             rec_times =  c(1,3,6,7),
-#               time = 7)
-# params = list(theta= 0.3, scale=2, shape=2)
+ data = list(rec_values = c(1,2,4,6),
+             rec_times =  c(1,3,6,7),
+               time = 7)
+ params = list(theta= 0.3, scale=2, shape=2)
 var_funs <- list(
   theta = var_logLik_records("LDM","records","frechet","theta"),
   scale = var_logLik_records("LDM","records","frechet","scale"),

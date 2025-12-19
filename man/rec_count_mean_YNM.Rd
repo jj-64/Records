@@ -29,5 +29,5 @@ The expected number is computed as
 }
 \examples{
 rec_count_mean_YNM (T=25, gamma=1.1)
-[1] 5.000207
+# [1] 5.000207
 }

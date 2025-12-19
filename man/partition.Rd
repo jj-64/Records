@@ -15,7 +15,7 @@ partition(X, min_expected = 1, warmup = NULL, K = NULL, estimated = TRUE)
 
 \item{K}{Optional. If given, force exactly K partitions using quantiles.}
 
-\item{estimated.}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
+\item{estimated}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
 }
 \value{
 A list with:

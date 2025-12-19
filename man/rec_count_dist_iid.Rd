@@ -11,17 +11,20 @@ rec_count_dist_iid(m, T, s = NA)
 
 \item{T}{Integer. The length of the series.}
 
-\item{s}{Optional. The Stirling number of the first kind, \eqn{s(T,m)}. If not provided,
-it will be computed internally.}
+\item{s}{Optional. The Stirling number of the first kind, \eqn{s(T,m)}.
+If not provided, it will be computed internally.}
 }
 \value{
 A probability value (numeric) less than or equal to 1.
 }
 \description{
-Exact distribution of the number of records in classical model. The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
+Exact distribution of the number of records in classical model. The function
+computes the probability of observing \eqn{m} records in a process of length
+\eqn{T}.
 }
 \details{
-Computes the exact probability of observing \eqn{m} records in a process of length \eqn{T},
+Computes the exact probability of observing \eqn{m} records in a process of
+length \eqn{T},
 given by:
 \deqn{ P(N_T = m) = \frac{s(T, m)}{T!} }
 where \eqn{s(T, m)} is the unsigned Stirling number of the first kind.
@@ -38,6 +41,7 @@ rec_count_dist_iid(m = 2, T = 25, s = Stirling_first_kind(n = 25, k = 2))
 
 }
 \references{
-Nevzorov, V. B. (2001). \emph{Records: Mathematical Theory}. American Mathematical Society.
+Nevzorov, V. B. (2001). \emph{Records: Mathematical Theory}. American Mathematical
+Society.
 \doi{10.1090/surv/172}
 }

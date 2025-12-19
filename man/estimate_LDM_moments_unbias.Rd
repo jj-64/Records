@@ -9,7 +9,8 @@ estimate_LDM_moments_unbias(X, variance = TRUE, scale = 1)
 \arguments{
 \item{X}{Numeric vector. Observed series.}
 
-\item{variance}{Logical. If TRUE (default) compute and return variance; otherwise skip heavy computation.}
+\item{variance}{Logical. If TRUE (default) compute and return variance;
+otherwise skip heavy computation.}
 
 \item{scale}{Numeric. Scale parameter for the LDM (defualt = 1. theta is assumed to be in units such that
 the user may pass scaled theta; internally we treat theta/scale).}
@@ -53,7 +54,7 @@ where:
 
 \deqn{+ 2 \left( \frac{1}{T} \sum_{t=1}^{T} P_t(\theta) - P(\theta) \right) \left( \frac{1}{T} \sum_{t=1}^{T} \frac{d P_t(\theta)}{d \theta} - \frac{d P(\theta)}{d \theta} \right)}
 
-where \eqn{P(\theta) = 1-e^{-\theta}}, \eqn{P_t(\theta) = \frac{1-e^{-\theta}}{1-e^{-\theta t}}}, and \eqn{\lambda(\theta)} is the variance of the estimated paramter with bias in \code{\link{Estimate_LDM_NT_Variance}}
+where \eqn{P(\theta) = 1-e^{-\theta}}, \eqn{P_t(\theta) = \frac{1-e^{-\theta}}{1-e^{-\theta t}}}, and \eqn{\lambda(\theta)} is the variance of the estimated paramter with bias in \code{\link{estimate_LDM_moments}}
 }
 \examples{
 \dontrun{
@@ -63,8 +64,9 @@ rec_count(Xt)  # Number of records
 res <- estimate_LDM_moments_unbias(Xt, variance = TRUE, scale = 1)
 res$theta; res$variance
 }
-estimate_LDM_moments_unbias(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,3.598, 3.308,
-3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
+estimate_LDM_moments_unbias(X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,
+1.748,1.418, 0.711, 1.999,3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492, 4.639,
+ 1.408, 3.525, 5.398,  3.719, 3.741, 4.729))
 $theta
 [1] 0.3601306
 

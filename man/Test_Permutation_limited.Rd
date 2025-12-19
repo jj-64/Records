@@ -10,6 +10,8 @@ Test_Permutation_limited(X, alpha = 0.05, print = TRUE)
 \item{X}{Numeric vector. The observed series.}
 
 \item{alpha}{Numeric. Significance level for all tests (default = 0.05).}
+
+\item{print}{logical default is FALSE, summary is not printed}
 }
 \value{
 A list containing:

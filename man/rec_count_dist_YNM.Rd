@@ -37,7 +37,7 @@ where \eqn{u_t = \frac{1-\gamma^t}{\gamma^t (1-\gamma)}}
 }
 \examples{
 rec_count_dist_YNM(m=5,T=25, gamma=1.1)
- 0.2223667
+ # 0.2223667
 rec_count_dist_YNM(m=5,T=25, gamma=1.1, s = Stirling_2nd_YNM(T=25,gamma=1.1))
- 0.2223667
+ # 0.2223667
 }

@@ -19,9 +19,9 @@ Test_LDM_Sen_stage2(stage1, alpha = 0.05)
 
 \item{alpha}{Numeric, significance level (default = 0.05).}
 
-\item{pooled}{Logical, if \code{TRUE}, pooled variance across blocks is used
-in stage 1 for the noise variance estimation. Otherwise, variance is estimated directly
-from residuals (default = \code{FALSE}).}
+\item{pooled}{boolean (Default = FALSE), if variance is assumed pooled}
+
+\item{stage1}{output of \code{\link{Test_LDM_Sen_stage1}}}
 }
 \value{
 A list with results from both stages:

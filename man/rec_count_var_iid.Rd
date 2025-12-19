@@ -6,6 +6,9 @@
 \usage{
 rec_count_var_iid(T)
 }
+\arguments{
+\item{T}{integer. length of the time series.}
+}
 \value{
 a value of the variance of number of records
 }
@@ -22,6 +25,7 @@ rec_count_var_iid(T=25)
 # [1] 2.210235
 rec_count_mean_iid(T=25)
 # [1] 3.815958
-# For a series of length 25 and following a classical model, we expect to observe around 3.81 records with a variance of 2.21
+# For a series of length 25 and following a classical model, we expect to
+observe around 3.81 records with a variance of 2.21
 rec_count_dist_iid(m=1,T=25)
 }

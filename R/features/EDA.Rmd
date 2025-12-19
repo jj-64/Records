@@ -357,7 +357,7 @@ eda_output <- list(
   kmeans = k_means_result
 )
 
-saveRDS(eda_output, "C:/Users/User/Documents/Records/data/feature_EDA_summary.rds")
+saveRDS(eda_output, "C:/Users/User/Documents/Records/inst/extdata/feature_EDA_summary.rds")
 ```
 
 # ------ Group-wise summaries -----------------------

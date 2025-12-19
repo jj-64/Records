@@ -17,7 +17,8 @@ LDM_series(
 \item{theta}{Numeric. The linear drift coefficient \eqn{\theta > 0}.}
 
 \item{dist}{Character, distribution name. One of:
-"beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "exp", "pareto", "uniform".}
+"beta", "gumbel", "weibull", "frechet", "exp", "pareto", "norm", "exp",
+"pareto", "uniform".}
 
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{

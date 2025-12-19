@@ -20,7 +20,8 @@ The approximated variance of number of records in DTRW model.
 \details{
 Exact variance is computed as
 \eqn{V(N_T)= 2T+2-E(N_T)-E(N_T)^2}
-where \eqn{T} is the length of series and \eqn{E(N_T)} is the expected number of records in DTRW process
+where \eqn{T} is the length of series and \eqn{E(N_T)} is the expected number
+of records in DTRW process
 
 Approximated variance is computed as
 \eqn{V(N_T)_approx = 2T \times (1-\frac{2}{\pi})}
@@ -34,5 +35,6 @@ rec_count_var_DTRW(T=25, approx = FALSE)
 # [1] 13.4865
 rec_count_mean_DTRW(T=25, approx = FALSE)
 # [1] 5.726034
-# For a series of length 25 and following a DTRW model, we expect to observe around 5.62 records with an approximated variance of 18.169
+# For a series of length 25 and following a DTRW model, we expect to observe
+# around 5.62 records with an approximated variance of 18.169
 }

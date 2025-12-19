@@ -31,5 +31,5 @@ where \eqn{P_t =  \frac{\gamma^t (\gamma -1)}{\gamma  (\gamma^t -1)}}
 }
 \examples{
 rec_count_var_YNM(T=25, gamma=1.1)
-[1] 3.10049
+# [1] 3.10049
 }

@@ -18,9 +18,11 @@ a probability less than one
 }
 \description{
 Exact and approximate distribution of the number of records in DTRW model.
-The function computes the probability of observing \eqn{m} records in a process of length \eqn{T}.
+The function computes the probability of observing \eqn{m} records in a
+process of length \eqn{T}.
 #' @details
-The Exact probability of observing \eqn{m} records in a process of length \eqn{T} is given by:
+The Exact probability of observing \eqn{m} records in a process of length
+\eqn{T} is given by:
 \deqn{ P(N_T = m) = 2^{-2T+m-1} \times C_{T}^{2T-m+1} }
 where  \eqn{T} is the length of the process
 }

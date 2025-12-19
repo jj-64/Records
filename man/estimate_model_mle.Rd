@@ -16,6 +16,9 @@ estimate_model_mle(
 \arguments{
 \item{data}{numeric vector, observed series or list}
 
+\item{logLik_fun}{function, loglikelihood function stored in the registry with embeded model,
+obs_type, data and dist}
+
 \item{obs_type}{character "all" or "records" depending on the data used}
 
 \item{lower_bounds}{named numeric vector, lower bound of the model parameters}
