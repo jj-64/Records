@@ -173,7 +173,7 @@ Test_LDM_NT <- function(X, alpha = 0.05) {
 
   # Estimate theta and variance
   estimated = estimate_LDM_mle_indicator(X=X, variance = TRUE, scale=1, min = 0.0001, max = 5, step = 0.01)
-  theta <- estimated$theta
+  theta <- estimated$param
   v_theta <- estimated$variance
   z_theo <- theta / sqrt(v_theta)
 
