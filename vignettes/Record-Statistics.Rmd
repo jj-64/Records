@@ -9,8 +9,8 @@ vignette: >
 
 
 ```{r setup, include=FALSE}
-# library(records)
-devtools::load_all(".")
+library(Records)
+#devtools::load_all(".")
 ```
 
 ## Introduction
