@@ -1,6 +1,6 @@
 #' @importFrom stats Box.test IQR aggregate coef cor cov lm median
 #'   na.omit nlminb optim pchisq pnorm predict pt qchisq qnorm quantile
-#'   rbeta rcauchy rexp rnorm runif rweibull sd var wilcox.test
+#'   rbeta rcauchy rexp rnorm runif rweibull sd var mad wilcox.test
 #'
 #' @importFrom utils head tail install.packages setTxtProgressBar txtProgressBar
 #'
@@ -19,4 +19,5 @@
 #' @importFrom robustbase lmrob
 #' @importFrom tsfeatures tsfeatures
 #' @importFrom zoo rollapply
+#' @importFrom psych ICC describe
 NULL
