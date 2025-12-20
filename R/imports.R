@@ -20,4 +20,5 @@
 #' @importFrom tsfeatures tsfeatures
 #' @importFrom zoo rollapply
 #' @importFrom psych ICC describe
+#' @importFrom randomForest varImpPlot importance randomForest
 NULL
