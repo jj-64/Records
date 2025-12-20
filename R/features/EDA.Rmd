@@ -87,7 +87,7 @@ na_summary <- tibble(
 if(sum (na_summary$n_na) >0 ) print(na_summary %>% dplyr::filter(n_na > 0)) else print("no NA")
 ```
 Remove NAs if needed. Note that database is large so removing few NAs won't bias the analysis.
-```{r}
+```{r remove NAs}
 feature_matrix=feature_matrix[complete.cases(feature_matrix),]
 ```
 
@@ -267,7 +267,7 @@ Check whether features contain structure before labels
 If clusters align with known regimes → strong signal
 
 If not → classification may rely on subtle margins
-```{r}
+```{r clusters}
 clusters = data.frame( features = regime, submodel = feature_matrix$label_m, cluster = k_means_result$cluster)
 table(clusters)
 ```
@@ -277,6 +277,7 @@ factoextra::fviz_nbclust(scale(t(feature_only)), kmeans, method = "wss")
 ```
 
 Plot kmeans. They should be a lot of distinct clusters
+If a cluster has a lot of variables, they may be redundant (such as the logLik values)
 ```{r kmeans plot variables}
 kmeans_result_var <- stats::kmeans(t(feature_only), centers = 6, nstart = 25)
 
@@ -320,8 +321,11 @@ We aim to have only clear (low correlation) zones.
 corrplot::corrplot(cor_mat,
          method = "color",
          type = "upper",
-         tl.cex = 0.6,
-         order = "hclust")
+         tl.cex = 0.3,
+         tl.col = "black",
+         order = "hclust", #c("original", "AOE", "FPC", "hclust", "alphabet"),
+         rect.lwd = 3
+         )
 ```
 
 Identify highly correlated pairs
