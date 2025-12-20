@@ -189,26 +189,34 @@ Remove low-importance features
 
 ```{r Remove low-importance features}
 
-selected_features <- c("nperiods", "seasonal_period")
+selected_features2 <- c( "garch_acf", "garch_r2",
+                       "local_maxima", "local_minima",
+                       "sign_change_rate",
+                       "dom_power", "min",
+                       "cv", "diff_mean",
+                       "median", "std" ,
+                       "diff_sd",
+                       "diff_skew","range","rolling_var_instab.var_instab"
+                       )
 ```
 
 Create cleaned dataset:
-```{r Create cleaned dataset}
-df_clean_RF <- feature_only %>%
-  select(all_of(selected_features), regime)
+```{r Create cleaned dataset 2}
+df_clean <- feature_only %>%
+  select(-all_of(selected_features2))
 ```
 
 
 Use the same split:
 ```{r split cleaned data}
-train_clean_RF <- df_clean_RF[train_idx, ]
-test_clean_RF  <- df_clean_RF[-train_idx, ]
+train_clean <- df_clean[train_idx, ]
+test_clean <- df_clean[-train_idx, ]
 ```
 
 Random Forest on the cleaned feature matrix 
 Fit model
 
-```{r fit model on RF cleaned}
+```{r fit model on desc cleaned}
 rf_clean <- randomForest::randomForest(
   regime ~ .,
   data = train_clean_RF,
@@ -219,8 +227,8 @@ rf_clean <- randomForest::randomForest(
 
 6.2 Performance evaluation
 ```{r}
-pred_clean_RF <- predict(rf_clean, newdata = test_clean_RF)
-confusionMatrix(pred_clean_RF, test_clean_RF$regime)
+pred_clean <- predict(clean, newdata = test_clean)
+confusionMatrix(pred_clean, test_clean$regime)
 ```
 
 Store accuracy:

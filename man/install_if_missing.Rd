@@ -13,9 +13,9 @@ install_if_missing(pkgs)
 install missing packages if needed
 }
 \examples{
-required_packages <- c(
-  "tidyverse",
-  "moments"
-)
-install_if_missing(required_packages)
+# required_packages <- c(
+#   "tidyverse",
+#   "moments"
+# )
+# install_if_missing(required_packages)
 }

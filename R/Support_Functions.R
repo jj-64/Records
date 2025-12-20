@@ -29,11 +29,11 @@ bounds = function(value,z,variance){
 #' @export
 #'
 #' @examples
-#' required_packages <- c(
-#'   "tidyverse",
-#'   "moments"
-#' )
-#' install_if_missing(required_packages)
+#' # required_packages <- c(
+#' #   "tidyverse",
+#' #   "moments"
+#' # )
+#' # install_if_missing(required_packages)
 install_if_missing <- function(pkgs) {
   for (p in pkgs) {
     if (!suppressWarnings(require(p, character.only = TRUE))) {
@@ -51,11 +51,11 @@ install_if_missing <- function(pkgs) {
 #' @export
 #'
 #' @examples
-#' required_packages <- c(
-#'   "tidyverse",
-#'   "moments"
-#' )
-#' load_package(required_packages)
+#' # required_packages <- c(
+#' #  "tidyverse",
+#' # "moments"
+#' # )
+#' # load_package(required_packages)
 load_package = function(required_packages){
 lapply(required_packages, require, character.only = TRUE)
 }
