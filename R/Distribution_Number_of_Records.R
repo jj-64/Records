@@ -168,7 +168,7 @@ rec_count_var_iid = function(T){
 #'
 #' @export
 rec_count_dist_iid = function(m,T,s=NA){
-  if(is.na(s)== TRUE) s=abs(gmp::Stirling1(n=T, k=m))
+  if(is.na(s)== TRUE) s= as.numeric ( abs(gmp::Stirling1(n=T, k=m)) )
       #Stirling_first_kind(n=T, k=m)
   s / factorial(T)
 }
