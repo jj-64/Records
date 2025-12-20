@@ -13,9 +13,9 @@ load_package(required_packages)
 load missing packages if needed
 }
 \examples{
-required_packages <- c(
-  "tidyverse",
-  "moments"
-)
-load_package(required_packages)
+# required_packages <- c(
+#  "tidyverse",
+# "moments"
+# )
+# load_package(required_packages)
 }
