@@ -68,21 +68,25 @@ Promise data
 ```{r see data}
 str(feature_matrix)
 ```
-Train–test split (shared across models)
+Train–test split (shared across three models)
 
 Use the same split for both matrices to ensure differences are attributable to feature cleaning only.
 ```{r}
-train_idx <- createDataPartition(df_full$y, p = 0.7, list = FALSE)
+feature_only$regime = regime
 
-train_full <- df_full[train_idx, ]
-test_full  <- df_full[-train_idx, ]
+train_idx <- createDataPartition(regime, p = 0.7, list = FALSE)
+
+train_full <- feature_only[train_idx, ]
+test_full  <- feature_only[-train_idx, ]
 ```
 
 
-Random Forest on the original  matrix
+# ----- Model 1: Original Matrix -----------------
+
+Random Forest on the original matrix
 ```{r}
-rf_full <- randomForest(
-  y ~ .,
+rf_full <- randomForest::randomForest(
+  regime ~ .,
   data = train_full,
   ntree = 1000,
   importance = TRUE
@@ -92,80 +96,152 @@ rf_full <- randomForest(
 Performance evaluation
 ```{r}
 pred_full <- predict(rf_full, newdata = test_full)
-confusionMatrix(pred_full, test_full$y)
+confusionMatrix(pred_full, test_full$regime)
 ```
 
 Store metric
-```{r}
-acc_full <- confusionMatrix(pred_full, test_full$y)$overall["Accuracy"]
+```{r Accuracy original}
+acc_full <- confusionMatrix(pred_full, test_full$regime)$overall["Accuracy"]
 
 ```
 
 
+# ----- 2. Variable importance analysis (original matrix) ----------
 
-
-4. Variable importance analysis (original matrix)
-4.1 Extract importance
-imp_full <- importance(rf_full, type = 1)  # Mean Decrease Accuracy
+Extract importance
+```{r Extract importance}
+imp_full <- randomForest::importance(rf_full, type = 1)  # Mean Decrease Accuracy
 imp_full <- data.frame(
   feature = rownames(imp_full),
   MDA = imp_full[, 1]
 ) %>% arrange(desc(MDA))
+```
 
-4.2 Visual inspection
-varImpPlot(rf_full, type = 1, n.var = 20)
+Visual inspection
 
+      Interpretation:
 
-Interpretation guidance
+      Near-zero or negative MDA → strong candidates for redundancy
 
-Near-zero or negative MDA → strong candidates for redundancy
+      Highly correlated features often split importance
 
-Highly correlated features often split importance
+      Features important only deep in trees are often unstable
+```{r Visual importance}
+randomForest::varImpPlot(rf_full, type = 1, n.var = 30)
+```
+```{r variable importance}
+rf_full$importance %>% as.data.frame %>% arrange(MeanDecreaseAccuracy) %>%
+   select(MeanDecreaseAccuracy)
+```
 
-Features important only deep in trees are often unstable
-
-5. Cleaning strategy (data-driven, RF-consistent)
-5.1 Remove low-importance features
+# ----- 3. Cleaning strategy (data-driven, RF-consistent) --------
+Remove low-importance features
 
 Define a conservative threshold (example: bottom 20%):
 
+```{r Remove low-importance features}
 threshold <- quantile(imp_full$MDA, 0.20)
 
 selected_features <- imp_full %>%
   filter(MDA > threshold) %>%
   pull(feature)
-
+```
 
 Create cleaned dataset:
-
-df_clean <- df_full %>%
-  select(all_of(selected_features), y)
+```{r Create cleaned dataset}
+df_clean_RF <- feature_only %>%
+  select(all_of(selected_features), regime)
+```
 
 
 Use the same split:
+```{r split cleaned data}
+train_clean_RF <- df_clean_RF[train_idx, ]
+test_clean_RF  <- df_clean_RF[-train_idx, ]
+```
 
-train_clean <- df_clean[train_idx, ]
-test_clean  <- df_clean[-train_idx, ]
+Random Forest on the cleaned feature matrix 
+Fit model
 
-6. Random Forest on the cleaned feature matrix
-6.1 Fit model
-rf_clean <- randomForest(
-  y ~ .,
-  data = train_clean,
+```{r fit model on RF cleaned}
+rf_clean <- randomForest::randomForest(
+  regime ~ .,
+  data = train_clean_RF,
   ntree = 1000,
   importance = TRUE
 )
+```
 
 6.2 Performance evaluation
-pred_clean <- predict(rf_clean, newdata = test_clean)
-confusionMatrix(pred_clean, test_clean$y)
-
+```{r}
+pred_clean_RF <- predict(rf_clean, newdata = test_clean_RF)
+confusionMatrix(pred_clean_RF, test_clean_RF$regime)
+```
 
 Store accuracy:
+```{r}
+acc_clean_RF <- confusionMatrix(pred_clean_RF, test_clean_RF$regime)$overall["Accuracy"]
+```
 
-acc_clean <- confusionMatrix(pred_clean, test_clean$y)$overall["Accuracy"]
 
-7. Direct comparison
+# ----- 4. Cleaning strategy (Desc analysis) --------
+Remove low-importance features
+
+```{r Remove low-importance features}
+
+selected_features <- c("nperiods", "seasonal_period")
+```
+
+Create cleaned dataset:
+```{r Create cleaned dataset}
+df_clean_RF <- feature_only %>%
+  select(all_of(selected_features), regime)
+```
+
+
+Use the same split:
+```{r split cleaned data}
+train_clean_RF <- df_clean_RF[train_idx, ]
+test_clean_RF  <- df_clean_RF[-train_idx, ]
+```
+
+Random Forest on the cleaned feature matrix 
+Fit model
+
+```{r fit model on RF cleaned}
+rf_clean <- randomForest::randomForest(
+  regime ~ .,
+  data = train_clean_RF,
+  ntree = 1000,
+  importance = TRUE
+)
+```
+
+6.2 Performance evaluation
+```{r}
+pred_clean_RF <- predict(rf_clean, newdata = test_clean_RF)
+confusionMatrix(pred_clean_RF, test_clean_RF$regime)
+```
+
+Store accuracy:
+```{r}
+acc_clean_RF <- confusionMatrix(pred_clean_RF, test_clean_RF$regime)$overall["Accuracy"]
+```
+
+
+# ----- 5. Direct comparison -----------------
+
+comparison
+
+    Key outcomes to interpret
+    
+    Same or higher accuracy with fewer features → redundancy confirmed
+    
+    Accuracy drop → removed features contained complementary signal
+    
+    Accuracy increase → noise reduction / variance control
+    
+```{r}
 comparison <- data.frame(
   Model = c("Original", "Cleaned"),
   Accuracy = c(acc_full, acc_clean),
@@ -175,16 +251,9 @@ comparison <- data.frame(
   )
 )
 
-comparison
+print(comparison)
+```
 
-
-Key outcomes to interpret
-
-Same or higher accuracy with fewer features → redundancy confirmed
-
-Accuracy drop → removed features contained complementary signal
-
-Accuracy increase → noise reduction / variance control
 
 8. Redundancy diagnostics (recommended)
 8.1 Correlation among top features
