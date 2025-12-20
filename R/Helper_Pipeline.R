@@ -761,11 +761,19 @@ extract_all_features <- function(x) {
   b =  extract_tsfeatures(x)
 
   # message("Extract LogLik features ...")
-  c = extract_LogLik_features(x)
+  cc = extract_LogLik_features(x)
 
-  Max_logLik = substr(names(which.max(c)[1]),start = 12, stop = 25)
+  Max_logLik = substr(names(which.max(cc)[1]),start = 12, stop = 25)
 
-  return(c(a, b, c, Max_logLik = Max_logLik))
+  idx_rec <- grepl("^logLik_rec_", names(cc))
+  idx_all <- grepl("^logLik_all_", names(cc))
+
+  Max_logLik_rec <- substr(names(cc[idx_rec][which.max(cc[idx_rec])]), start=12, stop = 25)
+  Max_logLik_all <- substr(names(cc[idx_all][which.max(cc[idx_all])]), start=12, stop = 25)
+
+  return(c(a, b, cc, Max_logLik = Max_logLik,
+           Max_logLik_rec = Max_logLik_rec,
+           Max_logLik_all = Max_logLik_all))
 }
 
 # ----- 3. Build labeled feature_matrix of features ---------------------------------------

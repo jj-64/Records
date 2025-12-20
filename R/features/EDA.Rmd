@@ -71,11 +71,8 @@ str(feature_matrix)
 ```
 Basic dimensions
 ```{r Basic dimensions original}
-n_obs  <- nrow(feature_matrix)
-n_feat <- ncol(feature_matrix)
-
-cat("Observations:", n_obs, "\n")
-cat("Features:", n_feat, "\n")
+cat("Observations:", nrow(feature_matrix), "\n")
+cat("Features:", ncol(feature_matrix), "\n")
 ```
 # ----- 2. Missingness and degeneracy --------------------------
 
@@ -95,12 +92,9 @@ feature_matrix=feature_matrix[complete.cases(feature_matrix),]
 ```
 
 new basic dimensions after NAs
-```{r}
-n_obs  <- nrow(feature_matrix)
-n_feat <- ncol(feature_matrix)
-
-cat("Observations:", n_obs, "\n")
-cat("Features:", n_feat, "\n")
+```{r basic dimensions after NAs} 
+cat("Observations:", nrow(feature_matrix), "\n")
+cat("Features:", ncol(feature_matrix), "\n")
 ```
 
 # ----- 3. Feature_only data ----------------------------------
@@ -126,12 +120,9 @@ regime = feature_matrix$label
 ```
 
 Basic dimensions
-```{r Basic dimensions}
-n_obs  <- nrow(feature_only)
-n_feat <- ncol(feature_only)
-
-cat("Observations:", n_obs, "\n")
-cat("Features:", n_feat, "\n")
+```{r Basic dimensions feature_only}
+cat("Observations:", nrow(feature_only), "\n")
+cat("Features:", ncol(feature_only), "\n")
 ```
 # ----- 4. Degeneracy ---------------------------------------
 Check for constant or near-constant features.
@@ -156,7 +147,7 @@ These features will be removed immediately as they are obviously redundant and d
 degenerate_features <- subset(variance_summary , variance == 0 | unique_vals <=2)
 
 if (nrow(degenerate_features) > 0) {
-  warning("Degenerate or quasi-degenerate features detected")
+  #warning("Degenerate or quasi-degenerate features detected")
   print(degenerate_features)
 }
 ```
@@ -232,6 +223,8 @@ factoextra::fviz_pca_ind(pca,
 
 
 Feature Contribution to first PCs
+
+We have features in all dimensions -> less redundancy
 ```{r var plot pca}
 #loadings
 # print(pca$var$coord)
@@ -261,14 +254,12 @@ k_means_result <- stats::kmeans(scale(feature_only), centers = 4, nstart = 20)
 Plot kmeans. They should be 4 distinct clusters
 
 ```{r kmeans plot}
-factoextra::fviz_cluster(k_means_result, 
-             data = scale(feature_only),
-             geom = "point", # Use points to represent observations
-             ellipse.type = "convex", # Drawing a concentration ellipse around each cluster
-             palette = "jco", # Color palette
-             main = "K-Means Cluster Visualization (PCA-based)")
-
+factoextra::fviz_cluster(list(data = feature_only, cluster = regime),
+             ellipse.type = "convex",
+             palette = "jco",
+             main = "Actual Species Labels (Supervised Plot)")
 ```
+
 Clusters
 
 Check whether features contain structure before labels
@@ -280,6 +271,24 @@ If not → classification may rely on subtle margins
 clusters = data.frame( features = regime, submodel = feature_matrix$label_m, cluster = k_means_result$cluster)
 table(clusters)
 ```
+Run k-means on variables reduction
+```{r elbow method kmeans of variables}
+factoextra::fviz_nbclust(scale(t(feature_only)), kmeans, method = "wss")
+```
+
+Plot kmeans. They should be a lot of distinct clusters
+```{r kmeans plot variables}
+kmeans_result_var <- stats::kmeans(t(feature_only), centers = 6, nstart = 25)
+
+# Visualize the k-means results
+factoextra::fviz_cluster(kmeans_result_var, data = t(feature_only),
+             ellipse.type = "convex",
+             palette = "jco",
+             main = "K-Means Cluster Visualization (factoextra)",
+             labelsize = 6, # Set a small font size for observation labels
+             outlier.labelsize = 6)
+```
+
 # ----- 7. Univariate Description ---------------------------
 Univariate summary statistics
     
