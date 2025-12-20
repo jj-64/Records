@@ -167,6 +167,11 @@ feature_only[grep("^logLik_", names(feature_only))] <-
   })
 ```
 
+Save for now
+```{r}
+save(feature_only, file = "feature_only.rda")
+```
+
 # ----- 5 . Supervised PCA (Sanity Check) ----------------
 
 The aim is to check if generated dataset is really separable and can be well identified. i.e if the four models are well identified.
@@ -352,7 +357,7 @@ high_corr_pairs <- high_corr_pairs %>%
   dplyr::mutate(pair = paste(sort(c(feature_1, feature_2)), collapse = "_")) %>%
   ungroup() %>%
   dplyr::distinct(pair, .keep_all = TRUE) %>%
-  dplyr::select(-pair)
+  dplyr::select(-pair) %>% arrange(feature_1)
 
 
 print(high_corr_pairs)
@@ -512,7 +517,7 @@ eta2_summary <- eta2_summary %>%
 
 recommended variables to remove below 0.02
 ```{r anova var to remove}
-print(eta2_summary[which(eta2_summary$eta2 <0.02 | is.na(eta2_summary$eta2)),])
+eta2_summary %>% filter(eta2 < 0.01)  %>% arrange(eta2)
 ```
 
 # ----- Non-Parameteric Seperation: Kruskal -----------
@@ -525,7 +530,7 @@ kw_summary <- lapply(
     kt <- kruskal.test(feature_only[[f]] ~ regime)
     data.frame(
       feature = f,
-      p_value = round(kt$p.value,3)
+      p_value = round(kt$p.value,5)
     )
   }
 ) %>% bind_rows() %>%
