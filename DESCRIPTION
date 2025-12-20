@@ -32,10 +32,12 @@ Imports:
     robustbase,
     tsfeatures,
     zoo,
+    psych
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    devtools
+    devtools,
+    randomForest
 VignetteBuilder: knitr
 
