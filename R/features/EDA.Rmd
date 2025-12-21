@@ -168,7 +168,7 @@ feature_only[grep("^logLik_", names(feature_only))] <-
 ```
 
 Save for now
-```{r}
+```{r save feature_only}
 save(feature_only, file = "feature_only.rda")
 ```
 

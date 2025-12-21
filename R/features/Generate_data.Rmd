@@ -91,6 +91,16 @@ This may take a while depending on the raw data size.
 ```{r compute feature matrix}
 feature_matrix  = as.data.frame(create_feature_dataset(raw_data))
 ```
+
+```{r remove -Inf for logLik}
+feature_matrix[grep("^logLik_", names(feature_matrix))] <-
+  lapply(feature_matrix[grep("^logLik_", names(feature_matrix))], function(x) {
+    x[x < -1e5] <- -1e5#Inf
+    x[!is.finite(x)] <- -1e5
+    x
+  })
+```
+
 look at a glimpse
 ```{r glimpse feature matrix}
 head(feature_matrix, 1)

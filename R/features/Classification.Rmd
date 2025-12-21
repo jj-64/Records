@@ -62,6 +62,7 @@ Load feature matrix
 
 ## Locally
 data("feature_matrix")
+data("feature_only")
 ```
 
 Promise data
@@ -71,10 +72,10 @@ str(feature_matrix)
 Train–test split (shared across three models)
 
 Use the same split for both matrices to ensure differences are attributable to feature cleaning only.
-```{r}
-feature_only$regime = regime
+```{r train-test split}
+feature_only$regime = feature_matrix$label
 
-train_idx <- createDataPartition(regime, p = 0.7, list = FALSE)
+train_idx <- createDataPartition(feature_only$regime , p = 0.7, list = FALSE)
 
 train_full <- feature_only[train_idx, ]
 test_full  <- feature_only[-train_idx, ]
@@ -84,7 +85,7 @@ test_full  <- feature_only[-train_idx, ]
 # ----- Model 1: Original Matrix -----------------
 
 Random Forest on the original matrix
-```{r}
+```{r Rf original}
 rf_full <- randomForest::randomForest(
   regime ~ .,
   data = train_full,
@@ -94,7 +95,7 @@ rf_full <- randomForest::randomForest(
 ```
 
 Performance evaluation
-```{r}
+```{r Performance original}
 pred_full <- predict(rf_full, newdata = test_full)
 confusionMatrix(pred_full, test_full$regime)
 ```
@@ -142,15 +143,15 @@ Define a conservative threshold (example: bottom 20%):
 ```{r Remove low-importance features}
 threshold <- quantile(imp_full$MDA, 0.20)
 
-selected_features <- imp_full %>%
-  filter(MDA > threshold) %>%
+remove_features_RF <- imp_full %>%
+  filter(MDA < threshold) %>%
   pull(feature)
 ```
 
 Create cleaned dataset:
 ```{r Create cleaned dataset}
 df_clean_RF <- feature_only %>%
-  select(all_of(selected_features), regime)
+  select(-all_of(remove_features_RF))
 ```
 
 
@@ -173,23 +174,24 @@ rf_clean <- randomForest::randomForest(
 ```
 
 6.2 Performance evaluation
-```{r}
+```{r Performance RF clean}
 pred_clean_RF <- predict(rf_clean, newdata = test_clean_RF)
 confusionMatrix(pred_clean_RF, test_clean_RF$regime)
 ```
 
 Store accuracy:
-```{r}
+```{r Accuracy RF clean}
 acc_clean_RF <- confusionMatrix(pred_clean_RF, test_clean_RF$regime)$overall["Accuracy"]
 ```
 
 
 # ----- 4. Cleaning strategy (Desc analysis) --------
-Remove low-importance features
+
+Remove low-importance features according to descriptive stat
 
 ```{r Remove low-importance features}
 
-selected_features2 <- c( "garch_acf", "garch_r2",
+remove_features <- c( "garch_acf", "garch_r2",
                        "local_maxima", "local_minima",
                        "sign_change_rate",
                        "dom_power", "min",
@@ -203,7 +205,7 @@ selected_features2 <- c( "garch_acf", "garch_r2",
 Create cleaned dataset:
 ```{r Create cleaned dataset 2}
 df_clean <- feature_only %>%
-  select(-all_of(selected_features2))
+  select(-all_of(remove_features))
 ```
 
 
@@ -217,9 +219,9 @@ Random Forest on the cleaned feature matrix
 Fit model
 
 ```{r fit model on desc cleaned}
-rf_clean <- randomForest::randomForest(
+rf_clean_desc <- randomForest::randomForest(
   regime ~ .,
-  data = train_clean_RF,
+  data = train_clean,
   ntree = 1000,
   importance = TRUE
 )
@@ -227,13 +229,13 @@ rf_clean <- randomForest::randomForest(
 
 6.2 Performance evaluation
 ```{r}
-pred_clean <- predict(clean, newdata = test_clean)
+pred_clean <- predict(rf_clean_desc, newdata = test_clean)
 confusionMatrix(pred_clean, test_clean$regime)
 ```
 
 Store accuracy:
 ```{r}
-acc_clean_RF <- confusionMatrix(pred_clean_RF, test_clean_RF$regime)$overall["Accuracy"]
+acc_clean_desc <- confusionMatrix(pred_clean, test_clean$regime)$overall["Accuracy"]
 ```
 
 
@@ -249,37 +251,72 @@ comparison
     
     Accuracy increase → noise reduction / variance control
     
-```{r}
+```{r comparison acc}
 comparison <- data.frame(
-  Model = c("Original", "Cleaned"),
-  Accuracy = c(acc_full, acc_clean),
+  Model = c("Original", "Cleaned_RF", "Cleaned_desc"),
+  Accuracy = c(acc_full, acc_clean_RF, acc_clean_desc),
   Num_Features = c(
     ncol(train_full) - 1,
-    ncol(train_clean) - 1
+    ncol(train_clean_RF) - 1,
+     ncol(train_clean) - 1
   )
 )
 
 print(comparison)
 ```
 
+Removed features
+```{r removed features compare}
+# print("Remove features according to VarImp")
+# print(remove_features_RF)
+# 
+# 
+# print("Remove features according to descriptive")
+# print(remove_features)
 
-8. Redundancy diagnostics (recommended)
+## common features
+intersect(remove_features, remove_features_RF)
+```
+
+# -----8. Redundancy diagnostics (recommended) -------
 8.1 Correlation among top features
-top_feats <- head(imp_full$feature, 20)
-cor_mat <- cor(train_full[, top_feats])
+      
+      Highly correlated important variables suggest:
+
+      Exchangeability
+
+      Potential for further dimensional reduction
+
+```{r}
+imp_clean <- randomForest::importance(rf_clean_desc, type = 1)  # Mean Decrease Accuracy
+imp_clean <- data.frame(
+  feature = rownames(imp_clean),
+  MDA = imp_clean[, 1]
+) %>% arrange(desc(MDA))
+
+top_feats <- head(imp_clean$feature, 20)
+cor_mat <- cor(train_clean[, top_feats])
+
+high_corr <- which(abs(cor_mat) > 0.95 & abs(cor_mat) < 1, arr.ind = TRUE) 
+
+high_corr_pairs <- tibble(
+  feature_1 = rownames(cor_mat)[high_corr[,1]],
+  feature_2 = colnames(cor_mat)[high_corr[,2]],
+  rho = cor_mat[high_corr]
+   ) %>% dplyr::filter(feature_1 != feature_2)
+
+print(high_corr_pairs)
+
+```
+
+# ----- Importance stability check (optional but strong) --------------
 
 
-Highly correlated important variables suggest:
-
-Exchangeability
-
-Potential for further dimensional reduction
-
-8.2 Importance stability check (optional but strong)
-set.seed(1)
+High SD = unstable importance = weak justification for inclusion.
+```{repeat rf}
 rf_repeat <- replicate(
-  20,
-  randomForest(y ~ ., data = train_full, ntree = 500, importance = TRUE),
+  50,
+  randomForest(regime ~ ., data = train_clean, ntree = 500, importance = TRUE),
   simplify = FALSE
 )
 
@@ -287,6 +324,51 @@ imp_stability <- sapply(rf_repeat, function(m)
   importance(m, type = 1)[, 1])
 
 imp_sd <- apply(imp_stability, 1, sd)
+ print(imp_sd)
+```
+# -------- Test on one series --------------------------
+
+```{r test series}
+series_single = LDM_series(100, 0.2, "gumbel", loc=0, scale=1)
+series_single_feature = extract_all_features(series_single) %>% as.data.frame()
+```
+
+```{r remove -Inf for logLik}
+series_single_feature[grep("^logLik_", names(series_single_feature))] <-
+  lapply(series_single_feature[grep("^logLik_", names(series_single_feature))], function(x) {
+    x[x < -1e5] <- -1e5#Inf
+    x[!is.finite(x)] <- -1e5
+    x
+  })
+```
+
+```{r}
+predict(rf_clean, series_single_feature)
+```
+# -------- Test on multiple series --------------------------
+
+```{r test series}
+series = generate_series_multiple(n_per_model = 5, T_vals = c(100))
+```
 
 
-High SD = unstable importance = weak justification for inclusion.
+```{r feature series}
+series_feature = as.data.frame(create_feature_dataset(series))
+```
+
+```{r remove -Inf for logLik}
+series_feature[grep("^logLik_", names(series_feature))] <-
+  lapply(series_feature[grep("^logLik_", names(series_feature))], function(x) {
+    x[x < -1e5] <- -1e5#Inf
+    x[!is.finite(x)] <- -1e5
+    x
+  })
+```
+
+```{r}
+predicted_series = predict(rf_full, series_feature)
+```
+
+```{r compare predict}
+table(predicted_series, series_feature$label)
+```
