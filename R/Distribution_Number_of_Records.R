@@ -131,6 +131,24 @@ rec_count_var_iid = function(T){
   sum( 1/(1:T) ) -  sum( 1/(1:T)^2 )
 }
 
+# ## Fucntion needed to compute the distribution of number of records
+
+#' Stirling function of the first kind in Classical
+#'
+#' Stirling function of the first kind in the case of classical process.
+#' It is used later to compute the distribution of number of records
+#'
+#'@details
+#'Each item is computed as
+#'\deqn{\prod_{t=0}^{n-1} (s-t) = \sum_{k=0}^{n} s^k S(n,k)}
+#'
+#' @param n positive integer
+#' @param k integer in 0:n.
+#' @returns number of S(n,k)
+#' @export
+Stirling_first_kind = function(n, k){
+  as.numeric ( abs(gmp::Stirling1(n=n, k=k)) )
+}
 
 #' Distribution of number of records in Classical Model
 #'
