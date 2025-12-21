@@ -49,7 +49,7 @@ install_if_missing(required_packages)
 load_package(required_packages = required_packages)
 
 ## Set caret parallel if desired (commented out by default)
-library(doParallel)
+# library(doParallel)
 # cl <- makeCluster(detectCores() - 1); registerDoParallel(cl)
 ```
 
