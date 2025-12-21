@@ -19,7 +19,9 @@ A generic function for applying a series of functions to rolling margins
 of a vector. The functions are mean, variance, and sd-to-mean ratio.
 }
 \examples{
+\dontrun{
 rolling_instability(x=c(1,2,3,4,5) , width = 2)
 #     mean_instab    var_instab mean_sd_ratio
 #      1.290994      0.000000      1.825742
+}
 }

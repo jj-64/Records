@@ -20,10 +20,13 @@ FEATURE_DATE <- "2025-12-15"
 #' @param x the data to be used (representing a series of observations).
 #' @param width numeric value, an integer specifying the window width (in numbers of observations).
 #' @return A named vector the results of the rolling functions.
+#' @export
 #' @examples
+#' \dontrun{
 #' rolling_instability(x=c(1,2,3,4,5) , width = 2)
 #' #     mean_instab    var_instab mean_sd_ratio
 #' #      1.290994      0.000000      1.825742
+#' }
 rolling_instability <- function(x, width = 20) {
   n <- length(x)
   if (n < 2 * width) return(c(NA, NA, NA))
