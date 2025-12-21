@@ -1,4 +1,3 @@
-#library(combinat)
 ## Wrapper -------------------
 #' Record Statistics for Multiple Models
 #'
