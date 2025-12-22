@@ -577,7 +577,7 @@ extract_LogLik_features <- function(series) {
   theta_hat = as.numeric(coef(lmfit)[2])
 
   ## gamma hat
-  gamma_hat = estimate_model_param(series, method="mle_indicator", model = "YNM", min= 1, max=5, step = 0.001, approximate = FALSE)$param
+  gamma_hat = estimate_model_param(series, method="mle_indicator", model = "YNM", min= 1.01, max=5, step = 0.001, approximate = FALSE)$param
 
   ## record data
   data_rec = data.frame(rec_values = rec_values(series),
