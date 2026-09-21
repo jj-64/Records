@@ -95,7 +95,7 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
       scale <- args$scale %||% 1
       shape <- args$shape %||% 2
       if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-      VGAM::rpareto(T * 1.5, scale, shape)
+      VGAM::rpareto(T, scale, shape)
     },
 
     uniform ={

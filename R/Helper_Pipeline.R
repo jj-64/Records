@@ -27,7 +27,7 @@ FEATURE_DATE <- "2025-12-15"
 #' #     mean_instab    var_instab mean_sd_ratio
 #' #      1.290994      0.000000      1.825742
 #' }
-rolling_instability <- function(x, width = 20) {
+rolling_instability <- function(x, width = 10) {
   n <- length(x)
   if (n < 2 * width) return(c(NA, NA, NA))
 
@@ -44,10 +44,149 @@ rolling_instability <- function(x, width = 20) {
   c(mean_instab = mean_instab, var_instab = var_instab, mean_sd_ratio = mean_sd_ratio)
 }
 
+#' Rolling Instability for records
+#'
+#' A generic function for applying a series of functions to rolling margins
+#' of a vector. The functions are mean, variance, and sd-to-mean ratio.
+#'
+#' @param x the data to be used (representing a series of observations).
+#' @param width numeric value, NA by default. an integer specifying the window width (in numbers of observations).
+#' @return A named vector the results of the rolling functions.
+#' @export
+#' @examples
+#' \dontrun{
+#' rolling_records(x=rnorm(100) , width = 2)}
+rolling_records <- function(x, width = NA) {
+  n <- length(x)
+  if(!is.na(width)){
+      if (n < 2 * width) return(c(NA, NA, NA))
+  } else { width = n/2
+  }
+
+  rolls <- zoo::rollapply(
+    x, width = width,
+    FUN = function(x) c(rec_count(x), max(rec_gaps(x)), tail(rec_times(x),1) ),
+    by.column = FALSE, align = "right"
+  )
+  ## sub-vectors with only one trivial record will have a record gap equal to width
+  rolls[!is.finite(rolls[,2]),2] = width
+
+  rec_rate <- mean(rolls[,1] / width)
+  gaps <- median(rolls[,2])
+  age_last_rec <- (width - tail(mean(rolls[,3]), 1) ) / width
+
+  c(rec_rate_instab = rec_rate,
+    max_rec_gaps_instab = gaps,
+    age_last_rec_insta = age_last_rec )
+}
+
 fast_slope <- function(s) {
   n <- length(s)
-  t <- seq_len(n)
-  return(cov(s, t) / var(t))
+  t_vec <- seq_len(n)
+  return(cov(s, t_vec) / var(t_vec))
+}
+
+# Extreme Value Theory helper functions
+fit_gev_block_maxima <- function(x, block_size = "sqrt") {
+  # Fit GEV to block maxima
+  if(block_size == "sqrt") block_size <- floor(sqrt(length(x)))
+
+  n_blocks <- floor(length(x) / block_size)
+  if(n_blocks < 5) return(list(shape = NA, scale = NA, loc = NA, se_shape = NA))
+
+  block_maxima <- sapply(1:n_blocks, function(i) {
+    max(x[((i-1)*block_size + 1):(i*block_size)])
+  })
+
+  tryCatch({
+    fit <- fExtremes::gevFit(block_maxima, type = "pwm")
+    params <- fit@fit$par.ests
+    std_err <- fit@fit$par.ses
+    list(shape = params["xi"], scale = params["beta"],
+         loc = params["mu"], se_shape = std_err["xi"])
+  }, error = function(e) {
+    list(shape = NA, scale = NA, loc = NA, se_shape = NA)
+  })
+}
+
+fit_gpd <- function(x, threshold_quantile = 0.85) {
+  # Fit GPD to peaks over threshold
+  threshold <- quantile(x, threshold_quantile, na.rm = TRUE)
+  exceedances <- x[x > threshold] - threshold
+
+  if(length(exceedances) < 3) return(list(shape = NA, scale = NA, threshold = threshold, exceedance_rate = NA))
+
+  tryCatch({
+    fit <- fExtremes::gpdFit(x, u = threshold, type = "pwm")
+    params <- fit@fit$par.ests
+    list(shape = params["xi"], scale = params["beta"],
+         threshold = threshold, exceedance_rate = length(exceedances)/length(x))
+  }, error = function(e) {
+    list(shape = NA, scale = NA, threshold = threshold, exceedance_rate = NA)
+  })
+}
+
+hill_estimator <- function(x, k = NULL) {
+  # Hill estimator for tail index
+  if(is.null(k)) k <- floor(0.1 * length(x))
+  sorted_x <- sort(x, decreasing = TRUE)
+
+  if(k < 2 || k >= length(x)) return(NA)
+
+  log_ratios <- log(sorted_x[1:k] / sorted_x[k+1])
+  alpha <- 1 / mean(log_ratios)
+  alpha
+}
+
+extremal_index <- function(x, threshold_quantile = 0.95, r = 1) {
+  # Estimate extremal index (clustering of extremes)
+  threshold <- quantile(x, threshold_quantile, na.rm = TRUE)
+  exceedances <- which(x > threshold)
+
+  if(length(exceedances) < 2) return(NA)
+
+  # Runs estimator
+  clusters <- 1
+  for(i in 2:length(exceedances)) {
+    if(exceedances[i] - exceedances[i-1] > r) {
+      clusters <- clusters + 1
+    }
+  }
+
+  theta <- clusters / length(exceedances)
+  theta
+}
+
+## accelaration index
+#Acceleration (Record Arrival Rate): In a Linear Drift model, the probability of
+# a record stays relatively high because the trend keeps pushing the values up.
+#In Yang-Nevzorov, the probability $P(R_n) = \frac{\alpha}{\alpha + n - 1}$
+#decays according to a very specific power-law-like curve.
+compute_acceleration <- function(x) {
+  n <- length(x)
+  records <- as.numeric(x == cummax(x))
+  cum_records <- cumsum(records)
+  time_indices <- 1:n
+
+  # Regress cumulative records against log(time)
+  # The slope represents the 'intensity' or 'acceleration'
+  fit <- lm(cum_records ~ log(time_indices))
+  return(as.numeric(coef(fit)[2])) # Return the slope
+}
+
+## Detrending and Residual Records
+#This is your "silver bullet." If you remove the linear trend from a Linear Drift series,
+#the residuals become i.i.d. noise (the Classical Model). However, removing a
+# linear trend from a Yang-Nevzorov series won't "fix" it because its structure
+# isn't linear—it's probabilistic.
+compute_residual_records <- function(x) {
+  time <- 1:length(x)
+  # Extract residuals from a linear model
+  resids <- resid(lm(x ~ time))
+
+  # Count how many records occur in the 'cleaned' data
+  num_resid_records <- sum(resids == cummax(resids))
+  return(num_resid_records)
 }
 
 # ----- 1. Simulate time series under multiple record models --------------------
@@ -82,7 +221,7 @@ generate_series_multiple <- function(
 
   for (T_val in T_vals) {
 
-    ## ---- DTRW
+    ## ---- DTRW ------------
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
@@ -92,7 +231,7 @@ generate_series_multiple <- function(
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "DTRW")
+      labels <- c(labels, "dtrw")
       series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "norm")
@@ -103,12 +242,12 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         DTRW_series,
-        series_args = list(dist = "cauchy", mean = 0, scale = 1),
+        series_args = list(dist = "norm", mean = 0, scale = 1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "DTRW")
+      labels <- c(labels, "dtrw")
       series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "cauchy")
@@ -124,26 +263,26 @@ generate_series_multiple <- function(
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "DTRW")
+      labels <- c(labels, "dtrw")
       series_id <- c(series_id, paste0("DTRW_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "uniform")
       i = i + 1
     }
 
-    ## ---- LDM
+    ## ---- LDM ----------
         ## Frechet
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
         LDM_series,
-        series_args = list(theta = runif(1,0.02,0.1),
+        series_args = list(theta = runif(1,0.02,0.15),
                            dist = "frechet", shape=5, scale=1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "LDM")
+      labels <- c(labels, "ldm")
       series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "frechet")
@@ -154,30 +293,30 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         LDM_series,
-        series_args = list(theta = runif(1,0.02,0.1),
+        series_args = list(theta = runif(1,0.02,0.15),
                            dist = "weibull", shape = 2, scale=1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "LDM")
+      labels <- c(labels, "ldm")
       series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "weibull")
       i = i + 1
     }
-        ## Normal
+        ## Gumbel
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
         LDM_series,
-        series_args = list(theta = runif(1,0.02,0.1),
-                           dist = "norm", mean =0 , sd =1),
+        series_args = list(theta = runif(1,0.09,0.2),
+                           dist = "gumbel", loc =0 , scale =1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "LDM")
+      labels <- c(labels, "ldm")
       series_id <- c(series_id, paste0("LDM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "norm")
@@ -189,13 +328,13 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.1,1.2),
-                           dist = "frechet", shape=3, scale=1),
+        series_args = list(gamma = runif(1,1.2,1.4),
+                           dist = "frechet", shape=5, scale=0.1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "YNM")
+      labels <- c(labels, "ynm")
       series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "frechet")
@@ -206,13 +345,13 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.2,1.5),
+        series_args = list(gamma = runif(1,1.4,1.7),
                            dist = "weibull", shape= 1/2, scale =0.1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "YNM")
+      labels <- c(labels, "ynm")
       series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "weibull")
@@ -223,13 +362,13 @@ generate_series_multiple <- function(
     while(i <= n_per_model) {
       s <- generate_series(
         YNM_series,
-        series_args = list(gamma = runif(1,1.2,1.5),
-                           dist = "pareto_trunc", shape= 2.8, scale =1, xmax = 1000),
+        series_args = list(gamma = runif(1,1.3,2),
+                           dist = "pareto", shape= 10, scale =1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "YNM")
+      labels <- c(labels, "ynm")
       series_id <- c(series_id, paste0("YNM_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "pareto")
@@ -242,7 +381,7 @@ generate_series_multiple <- function(
       s <- VGAM::rfrechet(T_val, shape = 4, scale=1)
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "Classical")
+      labels <- c(labels, "iid")
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "frechet")
@@ -254,7 +393,7 @@ generate_series_multiple <- function(
       s <- VGAM::rgumbel(T_val, 0, 1)
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "Classical")
+      labels <- c(labels, "iid")
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "gumbel")
@@ -266,7 +405,7 @@ generate_series_multiple <- function(
       s <- rweibull(T_val, shape = 2, scale=1)
       if(length(rec_gaps(s)) <2 ) next;
       all_series[[length(all_series) + 1]] <- if(normalized) {s/max(s) } else {s}
-      labels <- c(labels, "Classical")
+      labels <- c(labels, "iid")
       series_id <- c(series_id, paste0("Classical_T",T_val,"_",i))
       Ts <- c(Ts, T_val)
       labels_m = c(labels_m, "weibull")
@@ -283,12 +422,324 @@ generate_series_multiple <- function(
 # Helper: `%||%` operator - return left if not null else right
 `%||%` <- function(a, b) if (!is.null(a)) a else b
 
-# ----- 2A. Feature extraction per series :Custom ---------------------------------------
+# ----- 2A. Feature extraction per series :Rec ---------------------------------
 
 # We'll compute a rich feature vector for each series.
 # The feature extraction function returns a named list.
 
-extract_custom_features <- function(series) {
+extract_record_features <- function(series) {
+
+  ## --- Preliminaries --------------------------------------------------------
+  s <- as.numeric(series)
+  s_n <- as.numeric (s/max(s))
+  n <- length(s)
+
+  if (n < 10) stop("Series too short for stable feature extraction")
+
+  ## Record helpers exist:
+  ## is_rec(), rec_count(), rec_times(), rec_values(), rec_gaps()
+
+  ## --- 0. Pre-eliminary statistics ----------------------------------
+  t_vec <- seq_len(n)
+  rec_times_vec <- rec_times(s)
+  rec_times_b <- rec_times(rev(s))
+  rec_vals <- rec_values(s)
+  rec_seq <- is_rec(s)
+  rec_nb <- rec_count(s)
+  diffs = diff(s)
+
+  ## --- 1. Basic distributional statistics ----------------------------------
+  ave  <- mean(s_n)
+  med  <- median(s_n)
+  std  <- sd(s_n)
+  iqrv <- IQR(s_n)
+  minv <- min(s)
+  #maxv <- max(s)
+  #rng  <- maxv - minv
+  cv   <- ifelse(ave != 0, std / ave, NA)
+
+  skew <- if (n > 2) moments::skewness(s) else NA
+  kurt <- if (n > 3) moments::kurtosis(s) else NA
+
+  ## --- 2. Trend features ----------------------------------------------------
+  lmfit <- lm(s_n ~ t_vec)
+
+  slope        <- coef(lmfit)[2]  #fast_slope(s) #
+  slope_pval   <- summary(lmfit)$coefficients[2, 4]
+  slope_R2     <- summary(lmfit)$r.squared
+  #kendall_tau  <- cor(t_vec, s, method = "kendall")
+
+  ## --- 3. Increment / difference features ----------------------------------
+  diff_mean <- mean(diffs)
+  diff_sd   <- sd(diffs)
+  diff_mad  <- mean(abs(diffs))
+
+  diff_skew <- if (length(diffs) > 2)
+    moments::skewness(diffs) else NA
+
+  signs <- sign(diffs)
+  sign_change_rate <- if (length(signs) > 2)
+    mean(signs[-1] * signs[-length(signs)] < 0) else NA
+
+  ## --- 4. Record counts and asymptotics ------------------------------------
+
+    # Estimate decay exponent (α in R_n ~ n^α)
+    # Fit power law: log(R) ~ α*log(t)
+  R_cum <- cumsum(rec_seq)
+  model_log <- lm(log(R_cum[R_cum > 0]) ~ log(t_vec[R_cum > 0])) #lm(R_cum ~ log(t))
+
+  beta_log      <- coef(model_log)[2]
+  # beta_log_pval <- summary(model_log)$coefficients[2, 4]
+  # beta_log_R2   <- summary(model_log)$r.squared
+
+  ## --- 5. Forward / backward record rates ----------------------------------
+
+  rec_rate <- rec_nb / n
+  rec_rate_b <- length(rec_times_b) / n
+
+  rec_rate_ratio <- ifelse(rec_rate_b > 0,
+                          rec_rate / rec_rate_b, NA)
+
+  #intensity = sum(rec_count(s)) / log(n)
+  ## --- 6. Record timing and span -------------------------------------------
+  age_last_rec <- (n-tail(rec_times_vec, 1)) / n
+
+  # maximum jump
+  max_jump = max(diff(cummax(s)), na.rm = TRUE)
+
+  # Length of longest record streak
+  longest_record_streak <- max(c(rec_gaps(s), (n-rec_times(s))[rec_nb]))
+
+  frac_rec_first_half  <- mean(rec_times_vec <= n / 2)
+  frac_rec_last_quart  <- mean(rec_times_vec > 3 * n / 4)
+
+  # Record ratio
+  frac_rec_last_first  <- if(rec_nb >2 ) {
+            tail(rec_vals,1)/head(rec_vals,2)[2]
+  } else { tail(rec_vals,1)/head(rec_vals,1)}
+
+  #mean_frac_rec_last_first <- mean(rec_vals[-1]/ rec_vals[-rec_nb])
+
+  ## --- 7. Inter-record gap statistics --------------------------------------
+  mean_inter_time = mean(rec_times_vec, na.rm = TRUE)/n
+
+  rec_gap <- if (length(rec_times_vec) >= 2) rec_gaps(s) else NA
+  rec_gap_b <- if (length(rec_times_b) >= 2) rec_gaps(rev(s)) else NA
+
+  rec_gap_mean = mean(rec_gap, na.rm = TRUE)
+  rec_gap_med <- median(rec_gap, na.rm = TRUE)
+  rec_gap_sd  <- sd(rec_gap, na.rm = TRUE)
+  rec_gap_cv  <- ifelse(rec_gap_med> 0,
+                          rec_gap_sd / rec_gap_mean , NA)
+
+  rec_gap_med_b <- if (length(rec_times_b) >= 2) median(rec_gap_b, na.rm = TRUE) else n
+
+  max_gap_over_n <- if (!all(is.na(rec_gap))) max(rec_gap, na.rm = TRUE) / n else NA
+
+  # Random observation process proxy (using gaps between records)
+  # if(length(rec_gap) > 2 && !all(is.na(rec_gap))) {
+  #   # Kolmogorov-Smirnov test for exponentiality
+  #   if(rec_gap_mean > 0 && length(rec_gap) > 5) {
+  #     ks_test <- ks.test(rec_gap, "pexp", rate = 1/rec_gap_mean)
+  #     rec_gap_exp_ks <- ks_test$statistic
+  #   }
+  # } else{
+  #   rec_gap_exp_ks <- NA
+  # }
+
+  ## --- 8. Record entropy ----------------------------------------------------
+  # entropy <- if (rec_rate > 0 && rec_rate < 1)
+  #   - (rec_rate * log2(rec_rate) + (1 - rec_rate) * log2(1 - rec_rate)) else 0
+
+  # entropy <- ifelse(rec_rate > 0 & rec_rate < 1, -rec_rate*log(rec_rate) - (1-rec_rate)*log(1-rec_rate), 0)
+
+  ## --- 9. Spectral features -------------------------------------------------
+  # spec <- stats::spec.pgram(s, plot = FALSE, taper = 0)
+  #
+  # if (length(spec$spec) > 0) {
+  #   dom_idx   <- which.max(spec$spec)
+  #   dom_freq  <- 1/spec$freq[dom_idx]
+  #   dom_power <- spec$spec[dom_idx]
+  # } else {
+  #   dom_freq <- dom_power <- NA
+  # }
+
+  ## --- 10. Crossing, extremes, dependence ---------------------------------
+  arith_ave = mean(s)
+  cross_mean <- sum(diff(s > arith_ave) != 0)
+
+  extreme_2sd <- mean(abs(s_n - mean(s_n)) > 2 * std)
+  #extreme_3sd <- mean(abs(s - arith_ave) > 3 * std)
+
+  #acf1 <- tryCatch(acf(s, plot = FALSE)$acf[2], error = function(e) NA)
+
+  ## Stationarity proxies
+  ndiff_needed <- tryCatch(forecast::ndiffs(s), error = function(e) NA)
+
+  # ljung_p <- tryCatch(
+  #   Box.test(s, lag = 10, type = "Ljung-Box")$p.value,
+  #   error = function(e) NA
+  # )
+
+  ## --- 11. Local extrema ----------------------------------------------------
+  diff_sign <- diff(sign(diffs))
+  #local_maxima <- mean(diff_sign == -2, na.rm = TRUE)
+  #local_minima <- mean(diff_sign ==  2, na.rm = TRUE)
+
+  ## --- 12. Low (minimum) records via symmetry -----------------------------------
+  # s_low <- -s
+  #
+  # rec_times_low_f <- rec_times(s_low)
+  # rec_times_low_b <- rec_times(rev(s_low))
+  #
+  # rec_low_rate      <- length(rec_times_low_f) / n
+  # rec_low_back_rate <- length(rec_times_low_b) / n
+  #
+  # rec_low_rate_ratio <- ifelse(rec_low_back_rate > 0,
+  #                              rec_low_rate / rec_low_back_rate, NA)
+  #
+  # rec_gap_low <- if (length(rec_times_low_f) >= 2) rec_gaps(s_low) else NA
+  # rec_gap_low_med <- if (length(rec_times_low_f) >= 2) median(rec_gap_low, na.rm = TRUE) else n
+
+  ## --- 13. Rolling instability ---
+  roll_feats <- rolling_instability(s)
+
+  rolling_mean_instab = roll_feats[1]
+  rolling_var_instab  = roll_feats[2]
+  rolling_mean_sd_ratio = roll_feats[3]
+
+  rolling_rec <- rolling_records(s)
+
+  rec_rate_instab = rolling_rec[1]
+  max_rec_gaps_instab = rolling_rec[2]
+  age_last_rec_instab = rolling_rec[3]
+
+  ## --- 14. YNM vs LDM ----------------------
+  residual_records = compute_residual_records(s)
+  acceleration = compute_acceleration(s)
+
+  ## --- 14. Sequence Pattern Features ----
+
+  # Record clusters (records within k observations)
+  # k_cluster <- floor(sqrt(n))
+  # if(length(rec_times_vec) > 1) {
+  #   rec_clusters <- 1
+  #   for(i in 2:length(rec_times_vec)) {
+  #     if(rec_times_vec[i] - rec_times_vec[i-1] > k_cluster) {
+  #       rec_clusters <- rec_clusters + 1
+  #     }
+  #   }
+  #   record_clusters <- rec_clusters
+  # } else {
+  #   record_clusters <- 1
+  # }
+
+  ## Transition probabilities
+  transitions <- table(paste0(rec_seq[-n], "->", rec_seq[-1]))
+  p_nonrec_to_rec <- transitions["0->1"] / sum(transitions["0->0"], transitions["0->1"], na.rm = TRUE)
+  p_rec_to_rec <- transitions["1->1"] / sum(transitions["1->0"], transitions["1->1"], na.rm = TRUE)
+
+  ## New
+  slope = mean(diff((s-min(s))/(max(s)-min(s))))/var(diff((s-min(s))/(max(s)-min(s))))
+  acf_diff1 <- acf(diff(s), plot=FALSE)$acf[2]
+  vr2 =  vrtest::Auto.VR(s)$stat
+  curv  <- sd(diff(diff(s)))
+
+  ## --- Feature vector -------------------------------------------------------
+  features <- c(
+    ave = ave,
+    std = std,
+    cv = cv,
+    median = med,
+    iqr = iqrv,
+    skewness = skew,
+    kurtosis = kurt,
+    #min = minv,
+    #range = rng,
+
+    slope = slope,# ifelse(slope_pval < 0.05 & slope_R2 >= 0.8, slope, 0),
+    #slope_R2 = ifelse(slope_pval < 0.05, slope_R2, 0),
+    #kendall_tau = kendall_tau,
+
+    diff_mean = diff_mean,
+    diff_sd = diff_sd,
+    diff_mad = diff_mad,
+    diff_skew = diff_skew,
+    sign_change_rate = sign_change_rate,
+
+    rec_rate = rec_rate,
+    rec_rate_b = rec_rate_b,
+    rec_rate_ratio = rec_rate_ratio,
+    #intensity = intensity,
+    convexity = mean(diff(diff(s))),
+
+    age_last_rec = age_last_rec,
+    max_jump = max_jump,
+    longest_record_streak = longest_record_streak,
+    frac_rec_first_half = frac_rec_first_half,
+    frac_rec_last_quarter = frac_rec_last_quart,
+    frac_rec_last_first = frac_rec_last_first,
+    #mean_frac_rec_last_first = mean_frac_rec_last_first,
+
+    mean_inter_time = mean_inter_time ,
+    # rec_gap_mean = rec_gap_mean,
+    rec_gap_median = rec_gap_med,
+    rec_gap_sd = rec_gap_sd,
+    rec_gap_cv = rec_gap_cv,
+    rec_gap_back_median = rec_gap_med_b,
+    max_gap_over_n = max_gap_over_n,
+    #rec_gap_exp_ks = rec_gap_exp_ks,
+
+
+#     entropy_shann = entropy,
+#     dom_period = dom_freq,
+#     dom_power = dom_power,
+
+    #cross_mean = cross_mean, # we have crossing_points in ts
+    extreme_2sd = extreme_2sd,
+    #extreme_3sd = extreme_3sd,
+
+    #acf1 = acf1,
+    ndiff_needed = ndiff_needed,
+    #ljung_pvalue = ljung_p,
+
+    #local_minima = local_minima,
+    #local_maxima = local_maxima,
+
+    # rec_low_rate = rec_low_rate,
+    # rec_low_back_rate = rec_low_back_rate,
+    # rec_low_rate_ratio = rec_low_rate_ratio,
+    # rec_low_gap_median = rec_gap_low_med,
+
+    rolling_mean_instab = as.numeric(rolling_mean_instab),
+    rolling_var_instab  = as.numeric(rolling_var_instab),
+    rolling_mean_sd_ratio = as.numeric(rolling_mean_sd_ratio),
+
+    rec_rate_instab = as.numeric(rec_rate_instab),
+    max_rec_gaps_instab = as.numeric(max_rec_gaps_instab),
+    age_last_rec_instab = as.numeric(age_last_rec_instab),
+
+    # rec_clusters = rec_clusters,
+    p_nonrec_to_rec = as.numeric(p_nonrec_to_rec),
+    p_rec_to_rec = as.numeric(p_rec_to_rec),
+
+    ## LDM vs YNM
+    residual_records = residual_records,
+    acceleration = acceleration,
+
+    vr2 = vr2,
+    curv = curv,
+    acf_diff1 = acf_diff1
+  )
+
+  attr(features, "version") <- FEATURE_VERSION
+  attr(features, "date") <- FEATURE_DATE
+  return(features)
+}
+
+# ----- 2B. Feature extraction per series : EVT---------------------------------
+
+extract_EVT_features <- function(series) {
 
   ## --- Preliminaries --------------------------------------------------------
   s <- as.numeric(series)
@@ -299,206 +750,119 @@ extract_custom_features <- function(series) {
   ## Record helpers exist:
   ## is_rec(), rec_count(), rec_times(), rec_values(), rec_gaps()
 
-  ## --- 1. Basic distributional statistics ----------------------------------
-  ave  <- mean(s)
-  med  <- median(s)
-  std  <- sd(s)
-  iqrv <- IQR(s)
-  minv <- min(s)
-  maxv <- max(s)
-  rng  <- maxv - minv
-  cv   <- ifelse(ave != 0, std / ave, NA)
-
-  skew <- if (n > 2) moments::skewness(s) else NA
-  kurt <- if (n > 3) moments::kurtosis(s) else NA
-
-  ## --- 2. Trend features ----------------------------------------------------
-  t <- seq_len(n)
-  lmfit <- lm(s ~ t)
-
-  slope        <- coef(lmfit)[2]  #fast_slope(s) #
-  slope_pval   <- summary(lmfit)$coefficients[2, 4]
-  slope_R2     <- summary(lmfit)$r.squared
-  kendall_tau  <- cor(t, s, method = "kendall")
-
-  ## --- 3. Increment / difference features ----------------------------------
-  diffs <- diff(s)
-  mean_diff <- mean(diffs)
-  sd_diff   <- sd(diffs)
-  mad_diff  <- mean(abs(diffs))
-
-  diff_skew <- if (length(diffs) > 2)
-    moments::skewness(diffs) else NA
-
-  signs <- sign(diffs)
-  sign_change_rate <- if (length(signs) > 2)
-    mean(signs[-1] * signs[-length(signs)] < 0) else NA
-
-  ## --- 4. Record counts and asymptotics ------------------------------------
+  ## --- 0. Pre-eliminary statistics ----------------------------------
+  t_vec <- seq_len(n)
+  rec_vals <- rec_values(s)
   rec_nb <- rec_count(s)
-  rec_rate <- rec_nb / n
+  rec_rate <- rec_nb/n
+  threshold <- quantile(s, 0.9, na.rm = TRUE)
+  exceed_series <- as.numeric(s > threshold)
 
-  R_cum <- cumsum(is_rec(s))
-  model_log <- lm(R_cum ~ log(t))
+  ## --- 15. EXTREME VALUE THEORY FEATURES ------------------------------------
 
-  beta_log      <- coef(model_log)[2]
-  beta_log_pval <- summary(model_log)$coefficients[2, 4]
-  beta_log_R2   <- summary(model_log)$r.squared
+  # 3.1 GEV Parameter Estimates
+  gev_fit <- fit_gev_block_maxima(s)
+  gev_shape <- gev_fit$shape
+  gev_scale <- gev_fit$scale
+  gev_loc <- gev_fit$loc
+  #gev_shape_se <- gev_fit$se_shape
 
-  ## --- 5. Forward / backward record rates ----------------------------------
-  rec_times_f <- rec_times(s)
-  rec_times_b <- rec_times(rev(s))
+  # 3.2 GPD Parameter Estimates
+  gpd_fit <- fit_gpd(s)
+  gpd_shape <- gpd_fit$shape
+  gpd_scale <- gpd_fit$scale
+  gpd_threshold <- gpd_fit$threshold
+  gpd_exceedance_rate <- gpd_fit$exceedance_rate
 
-  rec_high_rate      <- length(rec_times_f) / n
-  rec_high_back_rate <- length(rec_times_b) / n
+  # Mean excess function slope
+  threshold_seq <- quantile(s, probs = seq(0.7, 0.95, by = 0.05), na.rm = TRUE)
+  mean_excess <- sapply(threshold_seq, function(u) {
+    exceed <- s[s > u] - u
+    if(length(exceed) > 0) mean(exceed) else NA
+  })
 
-  rec_rate_ratio <- ifelse(rec_high_back_rate > 0,
-                           rec_high_rate / rec_high_back_rate, NA)
+  if(sum(!is.na(mean_excess)) > 2) {
+    me_fit <- lm(mean_excess ~ threshold_seq)
+    mean_excess_slope <- coef(me_fit)[2]  ##
+  } else {mean_excess_slope = NA }
 
-  ## --- 6. Record timing and span -------------------------------------------
-  if (length(rec_times_f) >= 2) {
-    span_norm <- (tail(rec_times_f, 1) - head(rec_times_f, 1)) / n
-  } else {
-    span_norm <- NA
+  ### --- 16. Tail Index Features ------------
+  hill_tail_index <- hill_estimator(s)  ##
+  pickands_tail_index <- tryCatch({ ##
+    Dowd::PickandsEstimator(s, tail.size = floor(0.1*n))
+  }, error = function(e) NA)
+
+  # Tail heaviness ratio
+  q99 <- quantile(s, 0.99, na.rm = TRUE)
+  q95 <- quantile(s, 0.95, na.rm = TRUE)
+  #tail_heaviness_ratio <- mean(s > q99, na.rm = TRUE) / mean(s > q95, na.rm = TRUE) ##
+
+  ## ---- 17. Extreme Dependence Features --------------
+  # extremal_index <- extremal_index(s) ##
+
+  ## Autocorrelation of exceedances
+  if(sum(exceed_series) > 3) { ##
+    exceedance_acf1 <- acf(exceed_series, plot = FALSE, na.action = na.pass)$acf[2,1,1]
+  } else { exceedance_acf1 <- NA}
+
+  ## Return level estimates
+  if(!is.na(gev_fit$shape) && !is.na(gev_fit$scale) && !is.na(gev_fit$loc)) {
+    # 100-year return level (assuming 1 observation per time unit)
+    T <- 100 ##
+    return_level_100 <- gev_fit$loc + gev_fit$scale/gev_fit$shape * ((-log(1-1/T))^(-gev_fit$shape) - 1)
+  } else { return_level_100 <- NA}
+
+  # 3.5 Extreme Value Mixture Features
+  # Probability of being in tail (using mixture threshold)
+  #tail_probability_estimate <- mean(s > threshold, na.rm = TRUE) ##
+
+  ## --- 18. CROSS-DOMAIN FEATURES (Record Theory + EVT) ----------------------
+
+  # 4.1 Record-EVT Relationship Features
+  if(!is.na(gpd_exceedance_rate) | !is.null(gpd_exceedance_rate)) {
+    records_to_exceedances_ratio <- rec_rate/ gpd_exceedance_rate
   }
 
-  frac_rec_first_half  <- mean(rec_times_f <= n / 2)
-  frac_rec_last_quart  <- mean(rec_times_f > 3 * n / 4)
+  # Difference between record value distribution and GEV fit
+  # if( rec_nb >= 5 && !is.na(gev_fit$loc)) {
+  #   # KS test between record values and GEV distribution
+  #   pgev = fExtremes::pgev
+  #   ks_gev <- ks.test(rec_vals, "pgev", xi = gev_fit$shape, mu = gev_fit$loc, beta = gev_fit$scale)
+  #   record_gev_ks <- ks_gev$statistic ##
+  # } else {record_gev_ks <- NA}
+  #
+  # # 4.3 Distributional Comparison Features
+  # # KS statistic between record values and full dataset
+  # if(length(rec_vals) > 5) {
+  #   ks_full <- ks.test(rec_vals, s)
+  #   record_full_ks <- ks_full$statistic ##
+  # } else {record_full_ks <- NA}
 
-  ## --- 7. Inter-record gap statistics --------------------------------------
-  rec_gap_f <- if (length(rec_times_f) >= 2) rec_gaps(s) else NA
-  rec_gap_b <- if (length(rec_times_b) >= 2) rec_gaps(rev(s)) else NA
-
-  rec_gap_med_f <- median(rec_gap_f, na.rm = TRUE)
-  rec_gap_sd_f  <- sd(rec_gap_f, na.rm = TRUE)
-  rec_gap_cv_f  <- ifelse(rec_gap_med_f > 0,
-                          rec_gap_sd_f / mean(rec_gap_f, na.rm = TRUE), NA)
-
-  rec_gap_med_b <- if (length(rec_times_b) >= 2) median(rec_gap_b, na.rm = TRUE) else n
-
-  max_gap_over_n <- if (!all(is.na(rec_gap_f)))
-    max(rec_gap_f, na.rm = TRUE) / n else NA
-
-  ## --- 8. Record entropy ----------------------------------------------------
-  p_rec <- mean(is_rec(s))
-  # entropy <- if (p_rec > 0 && p_rec < 1)
-  #   - (p_rec * log2(p_rec) + (1 - p_rec) * log2(1 - p_rec)) else 0
-
-  entropy <- ifelse(p_rec > 0 & p_rec < 1, -p_rec*log(p_rec) - (1-p_rec)*log(1-p_rec), 0)
-
-  ## --- 9. Spectral features -------------------------------------------------
-  spec <- stats::spec.pgram(s, plot = FALSE, taper = 0)
-
-  if (length(spec$spec) > 0) {
-    dom_idx   <- which.max(spec$spec)
-    dom_freq  <- 1/spec$freq[dom_idx]
-    dom_power <- spec$spec[dom_idx]
-  } else {
-    dom_freq <- dom_power <- NA
-  }
-
-  ## --- 10. Crossing, extremes, dependence ---------------------------------
-  cross_mean <- sum(diff(s > ave) != 0)
-
-  extreme_2sd <- mean(abs(s - ave) > 2 * std)
-  extreme_3sd <- mean(abs(s - ave) > 3 * std)
-
-  #acf1 <- tryCatch(acf(s, plot = FALSE)$acf[2], error = function(e) NA)
-
-  ## Stationarity proxies
-  ndiff_needed <- tryCatch(forecast::ndiffs(s), error = function(e) NA)
-
-  ljung_p <- tryCatch(
-    Box.test(s, lag = 10, type = "Ljung-Box")$p.value,
-    error = function(e) NA
-  )
-
-  ## --- 11. Local extrema ----------------------------------------------------
-  diff_sign <- diff(sign(diffs))
-  local_maxima <- mean(diff_sign == -2, na.rm = TRUE)
-  local_minima <- mean(diff_sign ==  2, na.rm = TRUE)
-
-  ## --- 12. Low (minimum) records via symmetry -----------------------------------
-  s_low <- -s
-
-  rec_times_low_f <- rec_times(s_low)
-  rec_times_low_b <- rec_times(rev(s_low))
-
-  rec_low_rate      <- length(rec_times_low_f) / n
-  rec_low_back_rate <- length(rec_times_low_b) / n
-
-  rec_low_rate_ratio <- ifelse(rec_low_back_rate > 0,
-                               rec_low_rate / rec_low_back_rate, NA)
-
-  rec_gap_low <- if (length(rec_times_low_f) >= 2) rec_gaps(s_low) else NA
-  rec_gap_low_med <- if (length(rec_times_low_f) >= 2) median(rec_gap_low, na.rm = TRUE) else n
-
-  ## --- 13. Rolling instability ---
-  roll_feats <- rolling_instability(s)
-
-  rolling_mean_instab = roll_feats[1]
-  rolling_var_instab  = roll_feats[2]
-  rolling_mean_sd_ratio = roll_feats[3]
 
   ## --- Feature vector -------------------------------------------------------
   features <- c(
-    ave = ave, std = std, cv = cv,
-    median = med, iqr = iqrv,
-    skewness = skew, kurtosis = kurt,
-    min = minv,
-    #max = maxv,
-    range = rng,
+    "gev_shape" = as.numeric(gev_shape),
+    #"gev_scale" = as.numeric(gev_scale),
+    #"gev_loc" = as.numeric(gev_loc),
 
-    slope = ifelse(slope_pval < 0.05, slope, 0),
-    slope_R2 = ifelse(slope_pval < 0.05, slope_R2, 0),
-    kendall_tau = kendall_tau,
+    "gpd_shape" = as.numeric(gpd_shape),
+    #"gpd_scale" = as.numeric(gpd_scale),
+    #"gpd_threshold" = as.numeric(gpd_threshold),
+    #"gpd_exceedance_rate" = as.numeric(gpd_exceedance_rate),
 
-    diff_mean = mean_diff,
-    diff_sd = sd_diff,
-    diff_mad = mad_diff,
-    diff_skew = diff_skew,
-    sign_change_rate = sign_change_rate,
+    "mean_excess_slope" = as.numeric(mean_excess_slope),
 
-    rec_rate = rec_rate,
-    rec_high_rate = rec_high_rate,
-    rec_high_back_rate = rec_high_back_rate,
-    rec_rate_ratio = rec_rate_ratio,
+    "hill_tail_index"  = hill_tail_index ,
+    "pickands_tail_index" =  pickands_tail_index,
+    #"tail_heaviness_ratio" = tail_heaviness_ratio,
 
-    rec_gap_median = rec_gap_med_f,
-    rec_gap_sd = rec_gap_sd_f,
-    rec_gap_cv = rec_gap_cv_f,
-    rec_gap_back_median = rec_gap_med_b,
-    max_gap_over_n = max_gap_over_n,
+    #"exceedance_acf1" = as.numeric(exceedance_acf1),
+    "return_level_100" =  as.numeric(return_level_100),
+    #"tail_probability_estimate" = as.numeric(tail_probability_estimate),
 
-    frac_rec_first_half = frac_rec_first_half,
-    frac_rec_last_quarter = frac_rec_last_quart,
-    span_norm = span_norm,
-
-    entropy_shann = entropy,
-
-    dom_period = dom_freq,
-    dom_power = dom_power,
-
-    #cross_mean = cross_mean, # we have crossing_points in ts
-    extreme_2sd = extreme_2sd,
-    #extreme_3sd = extreme_3sd,
-
-    #acf1 = acf1,
-    ndiff_needed = ndiff_needed,
-    ljung_pvalue = ljung_p,
-
-    local_minima = local_minima,
-    local_maxima = local_maxima,
-
-    rec_low_rate = rec_low_rate,
-    rec_low_back_rate = rec_low_back_rate,
-    rec_low_rate_ratio = rec_low_rate_ratio,
-    rec_low_gap_median = rec_gap_low_med,
-
-    rolling_mean_instab = rolling_mean_instab,
-    rolling_var_instab  = rolling_var_instab,
-    rolling_mean_sd_ratio = rolling_mean_sd_ratio
-
+    "records_to_exceedances_ratio" =  as.numeric(records_to_exceedances_ratio)
+    #"record_gev_ks" = as.numeric(record_gev_ks),
+    #"record_full_ks" =  as.numeric(record_full_ks)
   )
 
   attr(features, "version") <- FEATURE_VERSION
@@ -506,8 +870,7 @@ extract_custom_features <- function(series) {
   return(features)
 }
 
-
-# ----- 2B. Feature extraction per series :tsfeatures ---------------------------------------
+# ----- 2C. Feature extraction per series :tsfeatures ---------------------------------------
 
 ## acf_features: autocorrelation function of the series, the differenced series,
   ## and the twice-differenced series. It produces a vector comprising the first autocorrelation coefficient
@@ -559,10 +922,49 @@ extract_tsfeatures <- function(x) {
                  "stl_features"
                   )
   )
-  return(as.list(tsf[1, ]))
+  results = tsf[1, ]             ##ACF & PACF Features
+  results = results %>% dplyr::select("x_acf1", # Lag-1 autocorrelation of original series
+                               "x_acf10", # Sum of squared autocorrelations up to lag 10 (original series)
+                               #"diff1_acf1", # Lag-1 autocorrelation of first-differenced series
+                               #"diff1_acf10", # Sum of squared autocorrelations up to lag 10 (1st diff)
+                               #"diff2_acf1", # Lag-1 autocorrelation of second-differenced series
+                               #"diff2_acf10", #Sum of squared autocorrelations up to lag 10 (2nd diff)
+                               #"x_pacf5",# Sum of absolute partial autocorrelations (PACF) up to lag 5
+                               #"diff1x_pacf5" ,# Same as above but for 1st-differenced series
+                               #"diff2x_pacf5",# Same for 2nd-differe
+
+                               ## ARCH/GARCH Features
+                               #"ARCH.LM", #Test statistic from ARCH LM test; detects conditional heteroskedasticity
+                               #"arch_acf", "arch_r2", # Autocorrelations and R² from residuals of ARCH model
+                               #"garch_acf", "garch_r2", #Same, but using GARCH model
+
+                               ## Structural & Complexity Features
+                               "crossing_points", # Number of times the series crosses its median
+                               "entropy",##Spectral entropy; measures predictability/complexity
+                               "flat_spots" , ##Number of flat segments in the series (constant value)
+                               "hurst", ## Hurst exponent; >0.5 indicates long-term memory/persistence
+                               "nonlinearity", ## Test statistic for nonlinearity (Teräsvirta test)
+
+                               ## Trend/Seasonality (STL Features)
+                               "trend", ## Strength of trend (from STL decomposition)
+                               "spike", ##Measure of spikiness in the series
+                               "linearity", ##Degree to which trend is linear
+                               "curvature", ## Amount of curvature (non-linearity) in the trend
+                               "e_acf1", "e_acf10", ## ACF at lag 1 and sum of ACFs up to lag 10 of remainder (after STL)
+
+                               ##Heterogeneity & Local Variation
+                               "stability", ##Variance change across time windows
+                               "lumpiness", ##Variance across non-overlapping windows
+
+                               ##Others
+                               "alpha","beta", ##Parameters from Holt’s linear exponential smoothing (level & trend)
+                               #"std1st_der" ## Std dev of first derivative (local change)
+  )
+
+  return(as.list(results))
 }
 
-# ----- 2C. Feature extraction per series : LogLik ---------------------------------------
+# ----- 2D. Feature extraction per series : LogLik ---------------------------------------
 
 ## Extract Likelihood features
 extract_LogLik_features <- function(series) {
@@ -577,7 +979,7 @@ extract_LogLik_features <- function(series) {
   theta_hat = as.numeric(coef(lmfit)[2])
 
   ## gamma hat
-  gamma_hat = estimate_model_param(series, method="mle_indicator", model = "YNM", min= 1.01, max=5, step = 0.001, approximate = FALSE)$param
+  gamma_hat = estimate_model_param(series, method="mle_indicator", model = "ynm", min= 1.01, max=5, step = 0.001, approximate = FALSE)$param
 
   ## record data
   data_rec = data.frame(rec_values = rec_values(series),
@@ -629,88 +1031,88 @@ extract_LogLik_features <- function(series) {
                                          params =  c(shape=shape_rec, scale=var_rec))
 
   ## DTRW - all
-  logLik_all_DTRW_norm = logLik_records(model = "DTRW", obs_type = "all",
+  logLik_all_DTRW_norm = logLik_records(model = "dtrw", obs_type = "all",
                                           dist = "norm", data = series,
                                           params = c(mean = mean_all, sd= sqrt(var_all)))
 
-  logLik_all_DTRW_cauchy = logLik_records(model = "DTRW", obs_type = "all",
+  logLik_all_DTRW_cauchy = logLik_records(model = "dtrw", obs_type = "all",
                                         dist = "cauchy", data = series,
                                         params = c(loc = mean_all, scale=var_all))
 
   ## DTRW - rec
-  logLik_rec_DTRW_norm = logLik_records(model = "DTRW", obs_type = "records",
+  logLik_rec_DTRW_norm = logLik_records(model = "dtrw", obs_type = "records",
                                         dist = "norm", data = data_rec,
                                         params = c(mean = mean_rec, sd= sqrt(var_all) ) )
 
-  logLik_rec_DTRW_cauchy = logLik_records(model = "DTRW", obs_type = "records",
+  logLik_rec_DTRW_cauchy = logLik_records(model = "dtrw", obs_type = "records",
                                           dist = "cauchy", data = data_rec,
                                           params = c(loc = mean_rec, scale=var_all ))
 
   ## LDM - Xt
-  logLik_all_LDM_norm = logLik_records(model = "LDM", obs_type = "all",
+  logLik_all_LDM_norm = logLik_records(model = "ldm", obs_type = "all",
                                        dist = "norm", data = series,
                                        params = c(theta = theta_hat, mean = mean_all, sd=sqrt(var_all)))
 
-  logLik_all_LDM_gumbel = logLik_records(model = "LDM", obs_type = "all",
+  logLik_all_LDM_gumbel = logLik_records(model = "ldm", obs_type = "all",
                                          dist = "gumbel", data = series,
                                          params = c(theta = theta_hat, loc = mean_all, scale=var_all))
 
-  logLik_all_LDM_frechet = logLik_records(model = "LDM", obs_type = "all",
+  logLik_all_LDM_frechet = logLik_records(model = "ldm", obs_type = "all",
                                           dist = "frechet", data = series,
                                           params = c(theta = theta_hat, shape=shape_all, scale=var_all))
 
-  logLik_all_LDM_weibull = logLik_records(model = "LDM", obs_type = "all",
+  logLik_all_LDM_weibull = logLik_records(model = "ldm", obs_type = "all",
                                           dist = "weibull", data = series,
                                           params = c(theta = theta_hat, shape=shape_all, scale=var_all))
 
   ## LDM - rec
-  logLik_rec_LDM_norm = logLik_records(model = "LDM", obs_type = "records",
+  logLik_rec_LDM_norm = logLik_records(model = "ldm", obs_type = "records",
                                        dist = "norm", data = data_rec,
                                        params = c(theta = theta_hat, mean = mean_rec, sd= sqrt(var_rec)))
 
-  logLik_rec_LDM_gumbel = logLik_records(model = "LDM", obs_type = "records",
+  logLik_rec_LDM_gumbel = logLik_records(model = "ldm", obs_type = "records",
                                          dist = "gumbel", data = data_rec,
                                          params = c(theta = theta_hat, loc = mean_rec, scale=var_rec))
 
-  logLik_rec_LDM_frechet = logLik_records(model = "LDM", obs_type = "records",
+  logLik_rec_LDM_frechet = logLik_records(model = "ldm", obs_type = "records",
                                           dist = "frechet", data = data_rec,
                                           params = c(theta = theta_hat, shape=shape_rec, scale=var_rec))
 
-  logLik_rec_LDM_weibull = logLik_records(model = "LDM", obs_type = "records",
+  logLik_rec_LDM_weibull = logLik_records(model = "ldm", obs_type = "records",
                                           dist = "weibull", data = data_rec,
                                           params = c(theta = theta_hat, shape = shape_rec, scale=var_rec))
 
   ## YNM - Xt
-  logLik_all_YNM_norm = logLik_records(model = "YNM", obs_type = "all",
+  logLik_all_YNM_norm = logLik_records(model = "ynm", obs_type = "all",
                                        dist = "norm", data = series,
                                        params = c(gamma = gamma_hat, mean = mean_all, sd=sqrt(var_all)))
 
-  logLik_all_YNM_gumbel = logLik_records(model = "YNM", obs_type = "all",
+  logLik_all_YNM_gumbel = logLik_records(model = "ynm", obs_type = "all",
                                          dist = "gumbel", data = series,
                                          params = c(gamma = gamma_hat, loc = mean_all, scale=var_all))
 
-  logLik_all_YNM_frechet = logLik_records(model = "YNM", obs_type = "all",
+  logLik_all_YNM_frechet = logLik_records(model = "ynm", obs_type = "all",
                                           dist = "frechet", data = series,
                                           params = c(gamma = gamma_hat, shape=shape_all, scale=var_all))
 
-  logLik_all_YNM_weibull = logLik_records(model = "YNM", obs_type = "all",
+  logLik_all_YNM_weibull = logLik_records(model = "ynm", obs_type = "all",
                                           dist = "weibull", data = series,
                                           params = c(gamma = gamma_hat, shape =shape_all, scale=var_all))
 
   ## YNM - rec
-  logLik_rec_YNM_norm = logLik_records(model = "YNM", obs_type = "records",
+  logLik_rec_YNM_norm = logLik_records(model = "ynm", obs_type = "records",
                                        dist = "norm", data = data_rec,
                                        params = c(gamma = gamma_hat, mean = mean_rec, sd= sqrt(var_rec)) )
 
-  logLik_rec_YNM_gumbel = logLik_records(model = "YNM", obs_type = "records",
+  logLik_rec_YNM_gumbel = logLik_records(model = "ynm", obs_type = "records",
                                          dist = "gumbel", data = data_rec,
                                          params = c(gamma = gamma_hat, loc = mean_rec, scale=var_rec))
 
-  logLik_rec_YNM_frechet = logLik_records(model = "YNM", obs_type = "records",
+  logLik_rec_YNM_frechet = logLik_records(model = "ynm", obs_type = "records",
                                           dist = "frechet", data = data_rec,
                                           params = c(gamma = gamma_hat, shape=shape_rec, scale=var_rec))
 
-  logLik_rec_YNM_weibull = logLik_records(model = "YNM", obs_type = "records",
+  logLik_rec_YNM_weibull = logLik_records(model = "ynm", obs_type = "records",
                                           dist = "weibull", data = data_rec,
                                           params = c(gamma = gamma_hat, shape=shape_rec, scale=var_rec))
   Log_values = c(
@@ -754,29 +1156,116 @@ extract_LogLik_features <- function(series) {
   return(Log_values )
   }
 
-# ----- 2D. Feature extraction per series : All ---------------------------------------
+# ----- 2E. Feature extraction per series : anomaly
+
+extract_anomaly_features = function(series){
+  s = as.numeric(series)
+
+  ## mad_outlier_rate
+        # High values → frequent abrupt deviations.
+  # median_s <- median(s, na.rm = TRUE)
+  # mad_s <- mad(s, constant = 1, na.rm = TRUE)
+  #
+  # robust_z <- (s - median_s) / mad_s
+  #
+  # mad_outlier_rate <- mean(abs(robust_z) > 3, na.rm = TRUE)
+
+  ##Rolling Local Anomaly Score (Adaptive Z-score)
+      # Detect local anomalies relative to rolling window behavior.
+
+  # window_size <- floor(length(s) * 0.1)
+  #
+  # roll_mean <- zoo::rollapply(s, window_size, mean, fill = NA, align = "right")
+  # roll_sd   <- zoo::rollapply(s, window_size, sd, fill = NA, align = "right")
+  #
+  # roll_z <- (s - roll_mean) / roll_sd
+  #
+  # rolling_outlier_rate <- mean(abs(roll_z) > 3, na.rm = TRUE)
+  # rolling_max_z <- max(abs(roll_z), na.rm = TRUE)
+
+  ## Change-Point Instability (Structural Break Count)
+  # Anomalies often correspond to regime shifts.
+  #
+  # Use mean-shift detection via cumulative sum (CUSUM proxy).
+  # s_centered <- s - mean(s, na.rm = TRUE)
+  # cusum <- cumsum(s_centered) / sd(s, na.rm = TRUE)
+  #
+  # mean_shift_score <- max(abs(cusum), na.rm = TRUE) / length(s)
+
+  # Spectral Residual Anomaly Score
+  # Unexpected spikes relative to dominant frequency structure.
+  #
+  # Remove dominant spectral component and measure residual spikes.
+  spec <- spec.pgram(s, plot = FALSE)
+
+  if(length(spec$spec) > 0) {
+    dominant_power <- max(spec$spec)
+    mean_power <- mean(spec$spec)
+    spectral_spike_ratio <- dominant_power / mean_power
+  } else {
+    spectral_spike_ratio <- NA
+  }
+  # Isolation Forest Anomaly Score (Model-Based)
+        # Model-free anomaly detection using isolation trees.
+  # iso_model <- isotree::isolation.forest(matrix(s, ncol = 1), ntrees = 100)
+  #
+  # iso_scores <- predict(iso_model, matrix(s, ncol = 1), type = "score")
+  #
+  # isolation_anomaly_score <- mean(iso_scores, na.rm = TRUE)
+
+  ##Extreme Jump Score (Derivative-Based)
+  #Captures sudden jumps:
+
+  # diff_s <- diff(s)
+  # jump_threshold <- 3 * sd(diff_s, na.rm = TRUE)
+  #
+  # extreme_jump_rate <- mean(abs(diff_s) > jump_threshold, na.rm = TRUE)
+
+  ## --- Feature vector -------------------------------------------------------
+  features <- c(
+    mad_outlier_rate = mad_outlier_rate,
+    #rolling_outlier_rate = rolling_outlier_rate,
+    #rolling_max_z = rolling_max_z,
+    mean_shift_score= mean_shift_score,
+    spectral_spike_ratio = spectral_spike_ratio,
+    #isolation_anomaly_score = isolation_anomaly_score,
+    #extreme_jump_rate = extreme_jump_rate
+    )
+  return(features)
+
+}
+
+# ----- 2F. Feature extraction per series : All ---------------------------------------
 
 extract_all_features <- function(x) {
   # print("Extract custom features ...")
-  a = extract_custom_features(x)
+  rec = extract_record_features(x)
+
+  evt = extract_EVT_features(x)
 
   # message("Extract time series features ...")
-  b =  extract_tsfeatures(x)
+  tss =  extract_tsfeatures(x)
+
+  # message("Extract Anomaly series features ...")
+  #anom =  extract_anomaly_features(x)
 
   # message("Extract LogLik features ...")
-  cc = extract_LogLik_features(x)
+  #loG = extract_LogLik_features(x)
 
-  Max_logLik = substr(names(which.max(cc)[1]),start = 12, stop = 25)
+  #Max_logLik = substr(names(which.max(loG)[1]),start = 12, stop = 25)
 
-  idx_rec <- grepl("^logLik_rec_", names(cc))
-  idx_all <- grepl("^logLik_all_", names(cc))
+  #idx_rec <- grepl("^logLik_rec_", names(loG))
+  #idx_all <- grepl("^logLik_all_", names(loG))
 
-  Max_logLik_rec <- substr(names(cc[idx_rec][which.max(cc[idx_rec])]), start=12, stop = 25)
-  Max_logLik_all <- substr(names(cc[idx_all][which.max(cc[idx_all])]), start=12, stop = 25)
+  #Max_logLik_rec <- substr(names(loG[idx_rec][which.max(loG[idx_rec])]), start=12, stop = 25)
+  #Max_logLik_all <- substr(names(loG[idx_all][which.max(loG[idx_all])]), start=12, stop = 25)
 
-  return(c(a, b, cc, Max_logLik = Max_logLik,
-           Max_logLik_rec = Max_logLik_rec,
-           Max_logLik_all = Max_logLik_all))
+  return(c(rec, evt = evt, tss
+           # loG,
+           # Max_logLik = Max_logLik,
+           # Max_logLik_rec = Max_logLik_rec,
+           # Max_logLik_all = Max_logLik_all
+           ))
 }
 
 # ----- 3. Build labeled feature_matrix of features ---------------------------------------

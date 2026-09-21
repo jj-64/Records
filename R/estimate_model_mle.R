@@ -80,11 +80,11 @@ estimate_model_mle = function(data,
                              ){
   if(obs_type == "all"){
     if(!is.numeric(data)) stop("data should be a numerical vector")
-    if(length(rec_values(data))<=2) {return("Impossible to solve since we have only one trivial record")}  ## only one record, ignore
+    if(length(rec_values(data))<=1) {return("Impossible to solve since we have only one trivial record")}  ## only one record, ignore
 
   } else{
     if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
-    if(length(data$rec_values)<=2) {return("Impossible to solve since we have only one trivial record")}  ## only one record, ignore
+    if(length(data$rec_values)<=1) {return("Impossible to solve since we have only one trivial record")}  ## only one record, ignore
   }
 
   success <- FALSE

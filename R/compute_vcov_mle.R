@@ -43,7 +43,7 @@ invert_posdef_matrix <- function(M, ridge = 1e-8, max_attempts = 5) {
 #'              rec_times =  c(1,3,6,7),
 #'                time = 7)
 #'  params = list(theta= 0.3, scale=2, shape=2)
-#' logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",data=data, params)
+#' logLik_wrapper <- function(params) logLik_records("ldm", "records", "frechet",data=data, params)
 #' vcov_num <- compute_vcov_loglik(logLik_fun=logLik_wrapper, params = params, method = "numDeriv")
 #' vcov_df <- compute_vcov_loglik(logLik_fun=logLik_wrapper, params = params, method = "fd")
 #' vcov_num
@@ -124,9 +124,9 @@ compute_vcov_loglik <- function(logLik_fun, params, method = c("numDeriv", "fd")
 #'                time = 7)
 #'  params = list(theta= 0.3, scale=2, shape=2)
 #' var_funs <- list(
-#'   theta = var_logLik_records("LDM","records","frechet","theta"),
-#'   scale = var_logLik_records("LDM","records","frechet","scale"),
-#'   shape = var_logLik_records("LDM","records","frechet","shape")
+#'   theta = var_logLik_records("ldm","records","frechet","theta"),
+#'   scale = var_logLik_records("ldm","records","frechet","scale"),
+#'   shape = var_logLik_records("ldm","records","frechet","shape")
 #' )
 #' vcov_marg <- compute_vcov_marginal(var_funs, data, params)
 #' #          theta        scale       shape
@@ -191,12 +191,12 @@ se_delta <- function(g_fun, par, vcov, method = c("numDeriv", "fd")) {
 #'              rec_times =  c(1,3,6,7),
 #'                time = 7)
 #'  params = list(theta= 0.3, scale=2, shape=2)
-#' logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",
+#' logLik_wrapper <- function(params) logLik_records("ldm", "records", "frechet",
 #' data=data, params)
 #' var_funs <- list(
-#'   theta = var_logLik_records("LDM","records","frechet","theta"),
-#'   scale = var_logLik_records("LDM","records","frechet","scale"),
-#'   shape = var_logLik_records("LDM","records","frechet","shape")
+#'   theta = var_logLik_records("ldm","records","frechet","theta"),
+#'   scale = var_logLik_records("ldm","records","frechet","scale"),
+#'   shape = var_logLik_records("ldm","records","frechet","shape")
 #' )
 #' compute_vcov_mle(logLik_wrapper, params, var_funs, data)
 #' }

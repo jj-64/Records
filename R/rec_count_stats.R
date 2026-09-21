@@ -40,7 +40,7 @@
 #' rec_count_stats("ldm", stat="dist", T=25, m=c(1:5), theta=0.4, scale=1)
 #' # [1] 0.00002232982 0.00030729569 0.00201438186 0.00837570638 0.02481251456
 #' rec_count_stats("iid", stat="dist", T=50, m=4)
-#' rec_count_stats("dtrw", stat="dist", T=200, m=10, approx=TRUE)
+#' rec_count_stats("dtrw", stat="dist", T=200, m=10, approximate=TRUE)
 rec_count_stats <- function(model,
                          stat = c("mean", "var", "dist"),
                          T,
@@ -86,7 +86,7 @@ rec_count_stats <- function(model,
 #' The average expected number of records in an i.i.d process. It is distribution-free,
 #' i.e. independent from the process underlying distribution. It only depends from the length of the series.
 #' @param T numeric, the length of the series
-#' @param approx logical, if approximated value. default = FALSE
+#' @param approximate logical, if approximated value. default = FALSE
 #'
 #' @returns a single value of the expected number of records
 #' @export
@@ -96,10 +96,10 @@ rec_count_stats <- function(model,
 #' @examples
 #' rec_count_mean_iid(T=25)
 #' # 3.815958
-#' rec_count_mean_iid(T=25, approx = TRUE)
+#' rec_count_mean_iid(T=25, approximate = TRUE)
 #' # 3.796091
-rec_count_mean_iid = function(T, approx = FALSE){
-  if (approx){
+rec_count_mean_iid = function(T, approximate = FALSE){
+  if (approximate){
     return(log(T) + 0.57721566490153)
   } else {
   return(sum( 1/(1:T) )) }
@@ -202,7 +202,7 @@ rec_count_dist_iid = function(m,T,s=NA){
 #'  is the length of the process
 #'
 #' @param T numeric, the length of the series
-#' @param approx logical, if approximated value. default = FALSE
+#' @param approximate logical, if approximated value. default = FALSE
 #'
 #' @returns a single value of the expected number of records
 #' @export
@@ -211,10 +211,10 @@ rec_count_dist_iid = function(m,T,s=NA){
 #' rec_count_mean_DTRW(T=25)
 #' # [1] 5.726034
 #'
-#' rec_count_mean_DTRW(T=25, approx = TRUE)
+#' rec_count_mean_DTRW(T=25, approximate = TRUE)
 #' # [1] 5.641896
-rec_count_mean_DTRW <- function(T, approx = FALSE) {
-  if(approx) {
+rec_count_mean_DTRW <- function(T, approximate = FALSE) {
+  if(approximate) {
     return(sqrt(4*T/pi))
     } else {
   return((2*T+1)*choose(2*T,T)*2^(-2*T)) }
@@ -225,7 +225,7 @@ rec_count_mean_DTRW <- function(T, approx = FALSE) {
 #'
 #'The approximated variance of number of records in DTRW model.
 #' @param T numeric, the length of the series
-#' @param approx logical, if approximated value. default = FALSE
+#' @param approximate logical, if approximated value. default = FALSE
 #'
 #'@details Exact variance is computed as
 #'\eqn{V(N_T)= 2T+2-E(N_T)-E(N_T)^2}
@@ -239,25 +239,25 @@ rec_count_mean_DTRW <- function(T, approx = FALSE) {
 #' @export
 #'
 #' @examples
-#' rec_count_var_DTRW(T=25, approx = TRUE)
+#' rec_count_var_DTRW(T=25, approximate = TRUE)
 #' # [1] 18.16901
 #'
-#' rec_count_mean_DTRW(T=25, approx = TRUE)
+#' rec_count_mean_DTRW(T=25, approximate = TRUE)
 #' # [1] 5.641896
 #'
-#' rec_count_var_DTRW(T=25, approx = FALSE)
+#' rec_count_var_DTRW(T=25, approximate = FALSE)
 #' # [1] 13.4865
 #'
-#' rec_count_mean_DTRW(T=25, approx = FALSE)
+#' rec_count_mean_DTRW(T=25, approximate = FALSE)
 #' # [1] 5.726034
 #'
 #' # For a series of length 25 and following a DTRW model, we expect to observe
 #' # around 5.62 records with an approximated variance of 18.169
-rec_count_var_DTRW = function(T, approx = FALSE){
-  if (approx){
+rec_count_var_DTRW = function(T, approximate = FALSE){
+  if (approximate){
   return(2*(1-2/pi)*T)
   } else {
-    m = rec_count_mean_DTRW(T, approx= FALSE)
+    m = rec_count_mean_DTRW(T, approximate= FALSE)
     v=2*T+2-m-m^2
     return(v)
   }
@@ -281,16 +281,16 @@ rec_count_var_DTRW = function(T, approx = FALSE){
 #'
 #' @param m the number of records we are computing its probabolity (integer)
 #' @param T length of the series (integer)
-#' @param approx logical, if approximated value. Default = FALSE
+#' @param approximate logical, if approximated value. Default = FALSE
 #'
 #' @returns a probability less than one
 #' @export
 #'
 #' @examples
-#' rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
+#' rec_count_dist_DTRW(m=1,T=25, approximate = TRUE)
 #' # [1]  0.1117152
 #'
-#' rec_count_dist_DTRW(m=1,T=25, approx = TRUE)
+#' rec_count_dist_DTRW(m=1,T=25, approximate = TRUE)
 #' # [1] 0.1122752
 #'
 #' rec_count_dist_DTRW(m=1,T=25)
@@ -298,8 +298,8 @@ rec_count_var_DTRW = function(T, approx = FALSE){
 #'
 #' rec_count_dist_DTRW(m=5,T=25)
 #' # [1] 0.09867345
-rec_count_dist_DTRW=function(m,T, approx = FALSE){
-  if ( approx){
+rec_count_dist_DTRW=function(m,T, approximate = FALSE){
+  if ( approximate){
   return (exp(-m^2/(4*T))/sqrt(pi*T))
   } else {
     choose(2*T-m+1,T)*2^(-2*T+m-1)
@@ -741,4 +741,319 @@ rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
 
   return(s[T, m] / ((gamma^T) * p))
 }
+
+## Record count acceptance bounds --------------
+#' Compute Record-Count Acceptance Bounds
+#'
+#' Computes lower and upper critical bounds for the number of records
+#' expected under a ceratin record-generating model of length
+#' \eqn{T}. The bounds define a two-sided acceptance region at
+#' significance level \eqn{\alpha} and may be used in record-based
+#' hypothesis tests.
+#'
+#' @details
+#' Let \eqn{N_T} denote the total number of upper records observed in a
+#' process of length \eqn{T}. The exact (or approximate) distribution of
+#' \eqn{N_T} is obtained from \code{rec_count_stats()}.
+#'
+#' For each possible record count \eqn{m = 1,\ldots,T}, the function
+#' computes:
+#'
+#' \deqn{
+#' P(N_T = m)
+#' }
+#'
+#' and constructs the cumulative distribution function:
+#'
+#' \deqn{
+#' F(m)=P(N_T\le m)
+#' =\sum_{i=1}^{m} P(N_T=i).
+#' }
+#'
+#' The returned bounds correspond to the smallest record count whose
+#' cumulative probability exceeds the lower and upper tail probabilities:
+#'
+#' \deqn{
+#' L = \min \{m : F(m)\ge \alpha\}
+#' }
+#'
+#' \deqn{
+#' U = \min \{m : F(m)\ge 1-\alpha\}.
+#' }
+#'
+#' Values of \eqn{N_T} falling outside the interval
+#' \eqn{[L,U]} are considered unusually small or unusually large
+#' under the DTRW model at significance level \eqn{\alpha}.
+#'
+#' \strong{for the Linear Drift Model (LDM)}
+#'
+#' The function computes the distribution of the number of records under the LDM,
+#' using the Stirling numbers of the second kind (\code{Stirling_2nd_LDM}) and
+#' the probability mass function \code{rec_count_dist_LDM}.
+#' The cumulative distribution function (CDF) is then compared to the
+#' desired quantile levels.
+#'
+#'
+#' @param T Integer. Length of the random walk.
+#'
+#' @param model. character of one of the record-generating processes "ldm", "iid", "ynm" or "dtrw".
+#'
+#' @param alpha Numeric significance level in \eqn{(0,0.5)}.
+#' Default is \code{0.05}.
+#'
+#'
+#' @param ... Additional model-specific parameters:
+#'
+#' \describe{
+#'   \item{gamma}{
+#'   Shape parameter for the Yule–Nielsen model ("ynm").
+#'   }
+#'
+#'   \item{theta}{
+#'   Dependence parameter for the Linear Drift Model ("ldm").
+#'   }
+#'
+#'   \item{scale}{
+#'   Scale parameter for the Linear Drift Model ("ldm").
+#'   Default is 1.
+#'   }
+#'
+#'   \item{approximate} {Logical for the DTRW ("dtrw")
+#' If \code{TRUE}, uses the asymptotic approximation of the record-count
+#' distribution. If \code{FALSE}, uses the exact distribution whenever
+#' available.}
+#'
+#' }
+#'
+#' @return A named list containing:
+#' \describe{
+#'   \item{lower_bound}{
+#'   Lower critical record count.
+#'   }
+#'
+#'   \item{upper_bound}{
+#'   Upper critical record count.
+#'   }
+#'
+#'   \item{alpha}{
+#'   Significance level used.
+#'   }
+#'
+#'   \item{T}{
+#'   Series length.
+#'   }
+#' }
+#'
+#' @seealso
+#' \code{\link{test_dtrw_records}},
+#' \code{\link{rec_count_stats}}
+#' \code{\link{test_ldm_rec_count}} for hypothesis testing of the number of records.
+#'
+#'
+#' @examples
+#' rec_count_bounds(
+#'   T = 10,
+#'   model = "dtrw",
+#'   alpha = 0.05
+#' )
+#' # $lower_bound
+#' # [1] 1
+#' #
+#' # $upper_bound
+#' # [1] 8
+#' #
+#' # $alpha
+#' # [1] 0.05
+#' #
+#' # $T
+#' # [1] 10
+#'
+#' # DTRW
+#' rec_count_bounds(
+#'  T = 100,
+#'    model = "dtrw"
+#' )
+#'
+#' # IID
+#' rec_count_bounds(
+#'  T = 100,
+#'  model = "iid"
+#' )
+#'
+#' # YNM
+#' rec_count_bounds(
+#'  T = 100,
+#'  model = "ynm",
+#'  gamma = 0.5
+#')
+#'
+#' # LDM
+#' rec_count_bounds(
+#'  T = 100,
+#'  model = "ldm",
+#'  theta = 2,
+#'  scale = 1
+#')
+#' @export
+#'
+#'
+rec_count_bounds <- function(
+    T,
+    model = c("dtrw", "ldm", "ynm", "iid"),
+    alpha = 0.05,
+    approximate = FALSE,
+    ...
+) {
+
+  model <- match.arg(model)
+
+  if (!is.numeric(T) || length(T) != 1 || T < 1)
+    stop("'T' must be a positive integer.")
+
+  if (!is.numeric(alpha) || alpha <= 0 || alpha >= 0.5)
+    stop("'alpha' must lie in (0,0.5).")
+
+  args <- list(...)
+
+  prob <- switch(
+
+    model,
+
+    ## dtrw
+    dtrw = sapply(
+      1:T,
+      function(m) {
+        rec_count_stats(
+          model = "dtrw",
+          stat = "dist",
+          T = T,
+          m = m,
+          approximate = approximate
+        )
+      }
+    ),
+
+    ## iid
+    iid = sapply(
+      1:T,
+      function(m) {
+        rec_count_stats(
+          model = "iid",
+          stat = "dist",
+          T = T,
+          m = m,
+          approximate = approximate
+        )
+      }
+    ),
+
+    ## ynm
+    ynm = {
+
+      if (is.null(args$gamma))
+        stop("'gamma' must be provided for model = \"ynm\".")
+
+      sapply(
+        1:T,
+        function(m) {
+          rec_count_dist_YNM(
+            m = m,
+            T = T,
+            gamma = args$gamma
+          )
+        }
+      )
+    },
+
+    ## ldm
+    ldm = {
+
+      if (is.null(args$theta))
+        stop("'theta' must be provided for model = \"ldm\".")
+
+      scale <- ifelse(
+        is.null(args$scale),
+        1,
+        args$scale
+      )
+
+      S <- Stirling_2nd_LDM(
+        T = T,
+        theta = args$theta,
+        scale = scale
+      )
+
+      sapply(
+        1:T,
+        function(m) {
+          rec_count_dist_LDM(
+            m = m,
+            T = T,
+            theta = args$theta,
+            scale = scale,
+            s = S
+          )
+        }
+      )
+    }
+  )
+
+  ## safeguard
+  prob <- prob / sum(prob)   # safeguard
+
+  cdf <- cumsum(prob)
+
+  lower_bound <- which(cdf >= alpha / 2)[1]
+
+  upper_bound <- which(cdf >= 1 - alpha / 2)[1]
+
+  list(
+    model = model,
+    lower_bound = lower_bound,
+    upper_bound = upper_bound,
+    alpha = alpha,
+    T = T
+  )
+}
+
+# rec_count_bounds <- function(
+#     T,
+#     model = c("dtrw", "ldm", "ynm", "iid"),
+#     alpha = 0.05,
+#     approximate = FALSE
+# ) {
+#
+#   model <- match.arg(model)
+#
+#   if (!is.numeric(T) || length(T) != 1 || T < 1)
+#     stop("'T' must be a positive integer.")
+#
+#   if (!is.numeric(alpha) || alpha <= 0 || alpha >= 0.5)
+#     stop("'alpha' must lie in (0, 0.5).")
+#
+#   prob <- sapply(
+#     1:T,
+#     function(m) {
+#       rec_count_stats(
+#         model = model,
+#         stat = "dist",
+#         T = T,
+#         m = m,
+#         approximate = approximate
+#       )
+#     }
+#   )
+#
+#   cdf <- cumsum(prob)
+#
+#   lower_bound <- which(cdf >= alpha)[1]
+#   upper_bound <- which(cdf >= (1 - alpha))[1]
+#
+#   list(
+#     lower_bound = lower_bound,
+#     upper_bound = upper_bound,
+#     alpha = alpha,
+#     T = T
+#   )
+# }
 

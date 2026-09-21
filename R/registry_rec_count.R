@@ -34,14 +34,14 @@ register_record_model(
 )
 
 register_record_model(
-  "DTRW",
+  "dtrw",
   mean_fun = rec_count_mean_DTRW,
   var_fun  = rec_count_var_DTRW,
   dist_fun = rec_count_dist_DTRW
 )
 
 register_record_model(
-  "LDM",
+  "ldm",
   mean_fun = rec_count_mean_LDM,
   var_fun  = rec_count_var_LDM,
   dist_fun = rec_count_dist_LDM,
@@ -49,7 +49,7 @@ register_record_model(
 )
 
 register_record_model(
-  "YNM",
+  "ynm",
   mean_fun = rec_count_mean_YNM,
   var_fun  = rec_count_var_YNM,
   dist_fun = rec_count_dist_YNM,

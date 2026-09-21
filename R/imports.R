@@ -21,4 +21,6 @@
 #' @importFrom zoo rollapply
 #' @importFrom psych ICC describe
 #' @importFrom randomForest varImpPlot importance randomForest
+#' @importFrom fExtremes gevFit gpdFit
+#' @importFrom Dowd PickandsEstimator
 NULL
