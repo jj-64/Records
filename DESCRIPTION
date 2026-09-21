@@ -33,11 +33,14 @@ Imports:
     tsfeatures,
     zoo,
     psych,
-    randomForest
+    randomForest,
+    fExtremes,
+    Dowd
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    devtools
+    devtools,
+    VGAM
 VignetteBuilder: knitr
 
