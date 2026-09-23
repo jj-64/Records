@@ -83,7 +83,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
                   D = tryCatch(test_dtrw_increment(X, alpha = alpha)$decision, error = function(e) NA),
                   L = tryCatch(test_ldm_sequential(X, alpha = alpha)$decision, error = function(e) NA),
                   C = tryCatch(Test_iid_BoxJenkins(X, alpha = alpha, lags = lag)$decision, error = function(e) NA),
-                  Y = tryCatch(test_ynm_record_gap(X, alpha = alpha, warmup = warmup, obs_type = "all")$decision, error = function(e) NA),
+                  Y = tryCatch(test_ynm_rec_gap(X, alpha = alpha, warmup = warmup, obs_type = "all")$decision, error = function(e) NA),
                   NA)
     if (is.null(res) || length(res) == 0) res <- NA
     return(res)
@@ -464,7 +464,7 @@ Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA,
   results$"YNM_Pearson" = Test_YNM_Pearson(X=X, Partition = NA, gamma = NULL, K=K, estimated = estimate_gamma, alpha = alpha)
 
   ##YNM_Geom
-  results$"YNM_Geom" = test_ynm_record_gap(X = X, alpha=alpha, K=K, warmup=warmup, record_times= record_times)
+  results$"YNM_Geom" = test_ynm_rec_gap(X = X, alpha=alpha, K=K, warmup=warmup, record_times= record_times)
 
   ##  LDM_NT
   results$"LDM_NT" = test_ldm_rec_count(X = X, alpha = alpha)

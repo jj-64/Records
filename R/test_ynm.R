@@ -518,7 +518,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 }
 
 
-## ---- test_ynm_record_gap -------------- #########
+## ---- test_ynm_rec_gap -------------- #########
 
 #The usual test assumes Gaps are i.i.d. Geom(p). If gaps are nonstationary (e.g. short early gaps, longer later gaps) the single-sample mean
 #is dominated by early small gaps → p biased high → expected tail mass under the null is underestimated → observed long gaps look unsurprising → test fails to reject.
@@ -620,7 +620,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 #' @examples
 #' set.seed(123)
 #' X <- YNM_series(T = 50, dist = "gumbel", gamma = 1.2, location = 0, scale= 1)
-#' test_ynm_record_gap(X, alpha = 0.05, K = 4, warmup=2)
+#' test_ynm_rec_gap(X, alpha = 0.05, K = 4, warmup=2)
 #'
 #' # $observed_count
 #' # [1] 1 0 2 1
@@ -661,7 +661,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 #' # $decision
 #' # [1] "ynm"
 
-test_ynm_record_gap <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("all", "records"), record_times=NA) {
+test_ynm_rec_gap <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("all", "records"), record_times=NA) {
 
   obs_type <- match.arg(obs_type)
 

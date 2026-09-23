@@ -17,7 +17,7 @@ DT_CLYD = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){     return(score=3)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ##DTRW
@@ -49,7 +49,7 @@ DT_CLDY = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
 
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ## No model
@@ -65,7 +65,7 @@ DT_CYLD = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=1)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ## LDM
@@ -94,7 +94,7 @@ DT_CYDL = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=1)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ##DTRW
@@ -131,7 +131,7 @@ DT_CDYL = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=2)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ## LDM
@@ -166,7 +166,7 @@ DT_CDLY = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=3)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ## No model
@@ -188,7 +188,7 @@ DT_LCYD = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=1)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ##DTRW
@@ -222,7 +222,7 @@ DT_LCDY = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=2)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ## No model
@@ -239,7 +239,7 @@ DT_LYCD = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=3)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ##Classical
@@ -267,7 +267,7 @@ DT_LYDC = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=3)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ##DTRW
@@ -299,7 +299,7 @@ DT_LDYC = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=2)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ##Classical
@@ -330,7 +330,7 @@ DT_LDCY = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=1)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return(score=4)}
 
   ## No model
@@ -343,7 +343,7 @@ DT_YCLD = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   score=0
 
   ## YANG
-  dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
+  dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
   if(dec!="no"){    return(score=4)}
 
   ##Classical
@@ -368,7 +368,7 @@ DT_YCDL = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   score=0
 
   ## YANG
-  dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
+  dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
   if(dec!="no"){    return( score=4)}
 
   ##Classical
@@ -393,7 +393,7 @@ DT_YLCD = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   score=0
 
   ## YANG
-  dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
+  dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
   if(dec!="no"){    return( score=4)}
 
   ## LDM
@@ -418,7 +418,7 @@ DT_YLDC = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   score=0
 
   ## YANG
-  dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
+  dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
   if(dec!="no"){    return( score=4)}
 
   ## LDM
@@ -445,7 +445,7 @@ DT_YDLC = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   score=0
 
   ## YANG
-  dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
+  dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
   if(dec!="no"){    return( score=4)}
 
   ##DTRW
@@ -470,7 +470,7 @@ DT_YDCL = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   score=0
 
   ## YANG
-  dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
+  dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision
   if(dec!="no"){    return( score=4)}
 
   ##DTRW
@@ -509,7 +509,7 @@ DT_DCLY = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=3)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
   if(dec!="no"){    return( score=4)}
 
   ## No model
@@ -530,7 +530,7 @@ DT_DCYL = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=1)}
 
   ## YANG
-  if(dec=="no"){dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return( score=4)}
 
   ## LDM
@@ -552,7 +552,7 @@ DT_DYCL = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=2)}
 
   ## YANG
-  if(dec=="no"){dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
+  if(dec=="no"){dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
   if(dec!="no"){    return( score=4)}
 
   ##Classical
@@ -577,7 +577,7 @@ DT_DYLC = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=2)}
 
   ## YANG
-  if(dec=="no"){dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
+  if(dec=="no"){dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
   if(dec!="no"){    return( score=4)}
 
   ## LDM
@@ -606,7 +606,7 @@ DT_DLYC = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=3)}
 
   ## YANG
-  if(dec=="no"){dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
+  if(dec=="no"){dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision}
   if(dec!="no"){    return( score=4)}
 
   ##Classical
@@ -635,7 +635,7 @@ DT_DLCY = function(X, alpha=0.05, RSq = 0.8, warmup = 2, K=NULL){
   if(dec!="no"){    return( score=1)}
 
   ## YANG
-  if(dec=="no"){ dec=test_ynm_record_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
+  if(dec=="no"){ dec=test_ynm_rec_gap(X=X,alpha=alpha, warmup = warmup, K=K )$decision }
   if(dec!="no"){    return( score=4)}
 
   ## No model
