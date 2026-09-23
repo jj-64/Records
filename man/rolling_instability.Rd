@@ -4,7 +4,7 @@
 \alias{rolling_instability}
 \title{Rolling Instability}
 \usage{
-rolling_instability(x, width = 20)
+rolling_instability(x, width = 10)
 }
 \arguments{
 \item{x}{the data to be used (representing a series of observations).}

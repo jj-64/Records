@@ -34,12 +34,12 @@ master helper: try Hessian-based vcov, fallback to diag of provided var_fun
              rec_times =  c(1,3,6,7),
                time = 7)
  params = list(theta= 0.3, scale=2, shape=2)
-logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",
+logLik_wrapper <- function(params) logLik_records("ldm", "records", "frechet",
 data=data, params)
 var_funs <- list(
-  theta = var_logLik_records("LDM","records","frechet","theta"),
-  scale = var_logLik_records("LDM","records","frechet","scale"),
-  shape = var_logLik_records("LDM","records","frechet","shape")
+  theta = var_logLik_records("ldm","records","frechet","theta"),
+  scale = var_logLik_records("ldm","records","frechet","scale"),
+  shape = var_logLik_records("ldm","records","frechet","shape")
 )
 compute_vcov_mle(logLik_wrapper, params, var_funs, data)
 }

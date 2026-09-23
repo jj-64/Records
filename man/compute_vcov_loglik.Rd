@@ -37,7 +37,7 @@ For computations assuming independence, see \code{\link{compute_vcov_marginal}}
              rec_times =  c(1,3,6,7),
                time = 7)
  params = list(theta= 0.3, scale=2, shape=2)
-logLik_wrapper <- function(params) logLik_records("LDM", "records", "frechet",data=data, params)
+logLik_wrapper <- function(params) logLik_records("ldm", "records", "frechet",data=data, params)
 vcov_num <- compute_vcov_loglik(logLik_fun=logLik_wrapper, params = params, method = "numDeriv")
 vcov_df <- compute_vcov_loglik(logLik_fun=logLik_wrapper, params = params, method = "fd")
 vcov_num

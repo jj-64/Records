@@ -33,9 +33,9 @@ For numerical computations, see \code{\link{compute_vcov_loglik}}
                time = 7)
  params = list(theta= 0.3, scale=2, shape=2)
 var_funs <- list(
-  theta = var_logLik_records("LDM","records","frechet","theta"),
-  scale = var_logLik_records("LDM","records","frechet","scale"),
-  shape = var_logLik_records("LDM","records","frechet","shape")
+  theta = var_logLik_records("ldm","records","frechet","theta"),
+  scale = var_logLik_records("ldm","records","frechet","scale"),
+  shape = var_logLik_records("ldm","records","frechet","shape")
 )
 vcov_marg <- compute_vcov_marginal(var_funs, data, params)
 #          theta        scale       shape
