@@ -5,7 +5,7 @@
 feature_only2 = feature_only
 feature_only2$regime = regime
 quantile_diff <- feature_only2 %>%
-  group_by(regime) %>%
+  dplyr::group_by(regime) %>%
   summarise(across(
     .cols = where(is.numeric),
     .fns = list(
@@ -20,7 +20,7 @@ rm(feature_only2)
 ## Measure range across regimes
 quantile_range <- quantile_diff %>%
   pivot_longer(-regime) %>%
-  group_by(name) %>%
+  dplyr::group_by(name) %>%
   summarise(
     range_across_regimes = max(value) - min(value)
   ) %>%
