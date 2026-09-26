@@ -71,7 +71,7 @@ The procedure consists of two stages:
 \item Drift detection.
 
 The drift parameter \eqn{\theta} is estimated using
-\code{estimate_LDM_mle_indicator()}.
+\code{estimate_ldm_mle_indicator()}.
 
 A Wald-type statistic is then computed:
 
@@ -103,6 +103,6 @@ X <- rnorm(50, mean = 0.2 * (1:50))  # Linear drift
 test_ldm_rec_count(X, alpha = 0.05)
 }
 \seealso{
-\code{\link{estimate_LDM_mle_indicator}},
+\code{\link{estimate_ldm_mle_indicator}},
 \code{\link{rec_count_bounds}}
 }

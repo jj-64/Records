@@ -88,8 +88,8 @@ under the DTRW model at significance level \eqn{\alpha}.
 \strong{for the Linear Drift Model (LDM)}
 
 The function computes the distribution of the number of records under the LDM,
-using the Stirling numbers of the second kind (\code{Stirling_2nd_LDM}) and
-the probability mass function \code{rec_count_dist_LDM}.
+using the Stirling numbers of the second kind (\code{stirling_second_kind_ldm}) and
+the probability mass function \code{rec_count_dist_ldm}.
 The cumulative distribution function (CDF) is then compared to the
 desired quantile levels.
 }

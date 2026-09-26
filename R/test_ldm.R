@@ -341,8 +341,8 @@ test_ldm_trend <- function(
 # #'
 # #' @details
 # #' The function computes the distribution of the number of records under the LDM,
-# #' using the Stirling numbers of the second kind (\code{Stirling_2nd_LDM}) and
-# #' the probability mass function \code{rec_count_dist_LDM}.
+# #' using the Stirling numbers of the second kind (\code{stirling_second_kind_ldm}) and
+# #' the probability mass function \code{rec_count_dist_ldm}.
 # #' The cumulative distribution function (CDF) is then compared to the
 # #' desired quantile levels.
 # #'
@@ -350,7 +350,7 @@ test_ldm_trend <- function(
 # #' @export
 # #' @examples
 # #' Quantile_LDM(T = 20, theta = 0.5, alpha = 0.05)
-# #' # Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {#   S <- Stirling_2nd_LDM(T, theta, scale)##   # Vectorized probability computation#   Prob <- vapply(1:T, function(i) {#     rec_count_dist_LDM(m = i, T = T, theta = theta, scale = scale, s = S)#   }, numeric(1))##   # Cumulative distribution#   CDF <- cumsum(Prob)##   # Return indices closest to alpha/2 and 1 - alpha/2#   return(c(#     which.min(abs(CDF - alpha / 2)),#     which.min(abs(CDF - (1 - alpha / 2)))#   ))#
+# #' # Quantile_LDM <- function(T, theta, scale = 1, alpha = 0.05) {#   S <- stirling_second_kind_ldm(T, theta, scale)##   # Vectorized probability computation#   Prob <- vapply(1:T, function(i) {#     rec_count_dist_ldm(m = i, T = T, theta = theta, scale = scale, s = S)#   }, numeric(1))##   # Cumulative distribution#   CDF <- cumsum(Prob)##   # Return indices closest to alpha/2 and 1 - alpha/2#   return(c(#     which.min(abs(CDF - alpha / 2)),#     which.min(abs(CDF - (1 - alpha / 2)))#   ))#
 
 #' Hypothesis Test for Number of Records under LDM and Gumbel underlying distribution
 #'
@@ -379,7 +379,7 @@ test_ldm_trend <- function(
 #' \item Drift detection.
 #'
 #' The drift parameter \eqn{\theta} is estimated using
-#' \code{estimate_LDM_mle_indicator()}.
+#' \code{estimate_ldm_mle_indicator()}.
 #'
 #' A Wald-type statistic is then computed:
 #'
@@ -442,7 +442,7 @@ test_ldm_trend <- function(
 #' }
 #'
 #' @seealso
-#' \code{\link{estimate_LDM_mle_indicator}},
+#' \code{\link{estimate_ldm_mle_indicator}},
 #' \code{\link{rec_count_bounds}}
 #'
 #' @examples
@@ -455,7 +455,7 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 
     obs <- rec_count(X)
 
-    estimate <- estimate_LDM_mle_indicator(
+    estimate <- estimate_ldm_mle_indicator(
       X = X,
       variance = TRUE,
       scale = 1,

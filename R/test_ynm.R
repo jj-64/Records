@@ -411,7 +411,7 @@ test_ynm_chisq <- function(X,
 #   Prob = 0
 #
 #   for(i in 1:T){
-#     Prob[i]= rec_count_dist_YNM(m=i, T=T,gamma=gamma)
+#     Prob[i]= rec_count_dist_ynm(m=i, T=T,gamma=gamma)
 #   }
 #   CDF = cumsum(Prob)  ## cumulative distribution
 #
@@ -466,11 +466,11 @@ test_ynm_chisq <- function(X,
 #'       \eqn{1-\alpha} acceptance region.
 #' }
 #'
-#' If \eqn{\gamma} is unknown, it is estimated using \code{\link{estimate_YNM_mle_indicator}}
+#' If \eqn{\gamma} is unknown, it is estimated using \code{\link{estimate_ynm_mle_indicator}}
 #' with its variance.
 #'
 #' The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
-#' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_YNM}}
+#' \deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_ynm}}
 #'
 #' @param X A numeric vector (time series).
 #' @param gamma Optional. The power parameter of the YNM-Nevzorov Model. If not provided, it will be estimated.
@@ -555,7 +555,7 @@ test_ynm_rec_count <- function(X, gamma = NULL, alpha = 0.05) {
   # --- Estimate gamma if not provided ---
   if (is.null(gamma) || is.na(gamma)) {
 
-    est <- estimate_YNM_mle_indicator(
+    est <- estimate_ynm_mle_indicator(
       X,
       variance = TRUE,
       approximate = FALSE,

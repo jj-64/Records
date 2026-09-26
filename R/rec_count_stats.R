@@ -9,13 +9,13 @@
 #' \code{\link{rec_count_dist_iid}}
 #' \code{\link{rec_count_mean_dtrw}}
 #' \code{\link{rec_count_var_dtrw}}
-#' \code{\link{rec_count_dist_DTRW}}
+#' \code{\link{rec_count_dist_dtrw}}
 #' \code{\link{rec_count_mean_ldm}}
 #' \code{\link{rec_count_var_ldm}}
-#' \code{\link{rec_count_dist_LDM}}
+#' \code{\link{rec_count_dist_ldm}}
 #' \code{\link{rec_count_mean_ynm}}
 #' \code{\link{rec_count_var_ynm}}
-#' \code{\link{rec_count_dist_YNM}}
+#' \code{\link{rec_count_dist_ynm}}
 #' @param model Character string specifying the model. Available models:
 #'   \code{"iid"}, \code{"dtrw"}, \code{"ldm"}, \code{"ynm"}.
 #' @param stat Either \code{"mean"} or \code{"var"} or \code{"dist"}.
@@ -286,18 +286,18 @@ rec_count_var_dtrw = function(T, approximate = FALSE){
 #' @export
 #'
 #' @examples
-#' rec_count_dist_DTRW(m=1,T=25, approximate = TRUE)
+#' rec_count_dist_dtrw(m=1,T=25, approximate = TRUE)
 #' # [1]  0.1117152
 #'
-#' rec_count_dist_DTRW(m=1,T=25, approximate = TRUE)
+#' rec_count_dist_dtrw(m=1,T=25, approximate = TRUE)
 #' # [1] 0.1122752
 #'
-#' rec_count_dist_DTRW(m=1,T=25)
+#' rec_count_dist_dtrw(m=1,T=25)
 #' # [1] 0.1122752
 #'
-#' rec_count_dist_DTRW(m=5,T=25)
+#' rec_count_dist_dtrw(m=5,T=25)
 #' # [1] 0.09867345
-rec_count_dist_DTRW=function(m,T, approximate = FALSE){
+rec_count_dist_dtrw=function(m,T, approximate = FALSE){
   if ( approximate){
   return (exp(-m^2/(4*T))/sqrt(pi*T))
   } else {
@@ -494,14 +494,14 @@ rec_count_var_ldm <- function(T,
 #' @export
 #'
 #' @examples
-#' Stirling_2nd_LDM(T=5, theta=0.5)
+#' stirling_second_kind_ldm(T=5, theta=0.5)
 #' #       [,1]     [,2]     [,3]     [,4] [,5]
 #' # [1,] 1.0000000 0.000000 0.000000 0.000000    0
 #' # [2,] 0.6065307 1.000000 0.000000 0.000000    0
 #' # [3,] 0.5910096 1.580941 1.000000 0.000000    0
 #' # [4,] 0.7077578 2.484250 2.778481 1.000000    0
 #' # [5,] 0.9433531 4.018954 6.187619 4.111357    1
-Stirling_2nd_LDM = function(T,theta,scale=1){  ## compute stirling number of second kind
+stirling_second_kind_ldm = function(T,theta,scale=1){  ## compute stirling number of second kind
 
    u_t_LDM=function(t,theta,scale=1){
      exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
@@ -546,19 +546,19 @@ Stirling_2nd_LDM = function(T,theta,scale=1){  ## compute stirling number of sec
 #' @export
 #'
 #' @examples
-#' rec_count_dist_LDM(m=5,T=25, theta=0.5)
+#' rec_count_dist_ldm(m=5,T=25, theta=0.5)
 #' # 0.006915892
 #'
-#' rec_count_dist_LDM(m=5,T=25, theta=0.5, s = Stirling_2nd_LDM(T=25,theta=0.5,scale=1))
+#' rec_count_dist_ldm(m=5,T=25, theta=0.5, s = stirling_second_kind_ldm(T=25,theta=0.5,scale=1))
 #' # 0.006915892
-rec_count_dist_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirling matrix
+rec_count_dist_ldm = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta and Stirling matrix
 
   u_t_LDM=function(t,theta,scale=1){
     exp(-theta/scale) * (1-exp(-theta*t/scale)) / (1-exp(-theta/scale)) }
 
   ## compute stirling matrix
   if(is.na(s)[1] == TRUE) {
-    s=Stirling_2nd_LDM(T=T,theta=theta,scale=scale)}
+    s=stirling_second_kind_ldm(T=T,theta=theta,scale=scale)}
 
   p=(prod(u_t_LDM(t=1:T,theta=theta,scale=scale)))
 
@@ -666,14 +666,14 @@ u_t_YNM = function(t, gamma) {(1-gamma^t)/(gamma^t * (1- gamma))}
 #' @export
 #'
 #' @examples
-#' Stirling_2nd_YNM(T=5, gamma=1.1)
+#' stirling_second_kind_ynm(T=5, gamma=1.1)
 #' #          [,1]      [,2]     [,3]     [,4]   [,5]
 #' # [1,]  1.0000000  0.000000  0.00000 0.000000    0
 #' # [2,]  0.9090909  1.000000  0.00000 0.000000    0
 #' # [3,]  1.5777611  2.644628  1.00000 0.000000    0
 #' # [4,]  3.9236583  8.154560  5.13148 1.000000    0
 #' # [5,] 12.4374688 29.772515 24.42066 8.301346    1
-Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
+stirling_second_kind_ynm = function(T,gamma){  ## compute stirling number of second kind
 
   # Precompute u_t for efficiency
   t = 1:T
@@ -718,19 +718,19 @@ Stirling_2nd_YNM = function(T,gamma){  ## compute stirling number of second kind
 #' @param T the length of the series
 #' @param gamma The power of the process, \eqn{\gamma >= 1}
 #' @param s Optional. Precomputed Stirling matrix from
-#'   \code{\link{Stirling_2nd_YNM}} (default = NA so it is recomputed internally).
+#'   \code{\link{stirling_second_kind_ynm}} (default = NA so it is recomputed internally).
 #'
 #' @returns Probability value \eqn{P(N_T = m)} less than one
 #' @export
 #'
 #' @examples
-#' rec_count_dist_YNM(m=5,T=25, gamma=1.1)
+#' rec_count_dist_ynm(m=5,T=25, gamma=1.1)
 #'  # 0.2223667
-#' rec_count_dist_YNM(m=5,T=25, gamma=1.1, s = Stirling_2nd_YNM(T=25,gamma=1.1))
+#' rec_count_dist_ynm(m=5,T=25, gamma=1.1, s = stirling_second_kind_ynm(T=25,gamma=1.1))
 #'  # 0.2223667
-rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
+rec_count_dist_ynm <- function(m, T, gamma, s = NULL) {
   if (is.null(s)) {
-    s <- Stirling_2nd_YNM(T = T, gamma = gamma)
+    s <- stirling_second_kind_ynm(T = T, gamma = gamma)
   }
 
   # Precompute product of u_t
@@ -778,8 +778,8 @@ rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
 #' \strong{for the Linear Drift Model (LDM)}
 #'
 #' The function computes the distribution of the number of records under the LDM,
-#' using the Stirling numbers of the second kind (\code{Stirling_2nd_LDM}) and
-#' the probability mass function \code{rec_count_dist_LDM}.
+#' using the Stirling numbers of the second kind (\code{stirling_second_kind_ldm}) and
+#' the probability mass function \code{rec_count_dist_ldm}.
 #' The cumulative distribution function (CDF) is then compared to the
 #' desired quantile levels.
 #'
@@ -933,7 +933,7 @@ rec_count_bounds <- function(
       sapply(
         1:T,
         function(m) {
-          rec_count_dist_YNM(
+          rec_count_dist_ynm(
             m = m,
             T = T,
             gamma = args$gamma
@@ -954,7 +954,7 @@ rec_count_bounds <- function(
         args$scale
       )
 
-      S <- Stirling_2nd_LDM(
+      S <- stirling_second_kind_ldm(
         T = T,
         theta = args$theta,
         scale = scale
@@ -963,7 +963,7 @@ rec_count_bounds <- function(
       sapply(
         1:T,
         function(m) {
-          rec_count_dist_LDM(
+          rec_count_dist_ldm(
             m = m,
             T = T,
             theta = args$theta,

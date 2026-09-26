@@ -18,7 +18,7 @@
 #' }
 #'
 #' This estimator is known to be biased for small sample sizes.
-#' A bias-corrected version is available in \code{\link{estimate_YNM_moments_unbias}}.
+#' A bias-corrected version is available in \code{\link{estimate_ynm_moments_unbias}}.
 #'
 #' The analytical variance of the estimator is:
 #' \deqn{
@@ -44,7 +44,7 @@
 #' # [43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067
 #' # [50] 3.1171138
 #'
-#' estimate_YNM_moments(X)
+#' estimate_ynm_moments(X)
 #' # $gamma
 #' # [1] 1.282051
 #'
@@ -52,7 +52,7 @@
 #' # [1] 0.4635951
 #'
 #' @export
-estimate_YNM_moments <- function(X, variance = TRUE) {
+estimate_ynm_moments <- function(X, variance = TRUE) {
   if (!is.numeric(X) || length(X) < 4)
     stop("X must be a numeric vector of length > 4.")
 
@@ -78,7 +78,7 @@ estimate_YNM_moments <- function(X, variance = TRUE) {
 #'
 #' Computes **bias-corrected** estimator of the (\eqn{\gamma}) parameter using a
 #' bias correction, correcting
-#' \code{\link{estimate_YNM_moments}}, and
+#' \code{\link{estimate_ynm_moments}}, and
 #' optionally computes its analytical variance.
 #'
 #' @details
@@ -168,13 +168,13 @@ estimate_YNM_moments <- function(X, variance = TRUE) {
 #' # [43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067
 #' # [50] 3.1171138
 #'
-#' estimate_YNM_moments_unbias(X)
+#' estimate_ynm_moments_unbias(X)
 #' # $gamma
 #' # [1] 1.212979
 #' #
 #' # $variance
 #' # [1] 0.2997593
-estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the second estimator*
+estimate_ynm_moments_unbias = function(X, variance = TRUE){ ## compute the second estimator*
 
   if (!is.numeric(X) || length(X) < 4) stop("X must be a numeric vector of length >= 4.")
 
@@ -182,12 +182,12 @@ estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the secon
 
   # --- 0. Obtain baseline NT estimate (assumes this function exists and returns list(param, variance)) ---
   # Use variance = FALSE to avoid unnecessary computation inside that function if we will compute variance here
-  if (!exists("estimate_YNM_moments", mode = "function")) {
-    stop("Required helper function 'estimate_YNM_moments' not found in the environment.")
+  if (!exists("estimate_ynm_moments", mode = "function")) {
+    stop("Required helper function 'estimate_ynm_moments' not found in the environment.")
   }
-  Estimated <- estimate_YNM_moments(X = X, variance = TRUE)
+  Estimated <- estimate_ynm_moments(X = X, variance = TRUE)
   if (!is.list(Estimated) || is.null(Estimated$param)) {
-    stop("estimate_YNM_moments must return a list with at least element $gamma.")
+    stop("estimate_ynm_moments must return a list with at least element $gamma.")
   }
 
   gamma_biased = Estimated$param
@@ -233,7 +233,7 @@ estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the secon
     fisher = fisher + (3*dP *(sum(P_t*(1-P_t))/T^2) * (term)^2 ) /(1-P)^4
     fisher = fisher + (mean_dP_t/T - sum(dP_t^2)/T^2 + 2*(term) * (mean_dP_t - dP) ) /(1-P)^3
 
-    # lambda_gamma: variance of the biased NT-estimator (obtained from estimate_LDM_moments if available)
+    # lambda_gamma: variance of the biased NT-estimator (obtained from estimate_ldm_moments if available)
         lambda_gamma <- NA_real_
     if (!is.null(Estimated$variance) && is.numeric(Estimated$variance)) {
       lambda_gamma <- Estimated$variance
@@ -320,21 +320,21 @@ estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the secon
 #' # [43] 2.7151352 2.8182222 3.3822301 3.7379543 3.1460838 3.1213262 3.1302067
 #' # [50] 3.1171138
 #'
-#' estimate_YNM_mle_indicator(X)
+#' estimate_ynm_mle_indicator(X)
 #' # $gamma
 #' # [1] 1.183
 #'
 #' # $variance
 #' # [1] 0.006915017
 #'
-#' estimate_YNM_mle_indicator(X, approximate = TRUE)
+#' estimate_ynm_mle_indicator(X, approximate = TRUE)
 #' # $gamma
 #' # [1] 1.183
 #'
 #' # $variance
 #' # [1] 0.00512213
 #' @export
-estimate_YNM_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
+estimate_ynm_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
                                        min = 1, max = 5, step = 0.001) {
 
   if (!is.numeric(X) || length(X) < 4)

@@ -42,7 +42,7 @@ choosing the "mle_indicator" should provide additional arguments of
 min, max, step for the parameter grid search
 approximate : Logical for variance.
 scale in case of LDM Gumbel
-For more info, see \code{\link{estimate_YNM_mle_indicator}} and \code{\link{estimate_LDM_mle_indicator}}
+For more info, see \code{\link{estimate_ynm_mle_indicator}} and \code{\link{estimate_ldm_mle_indicator}}
 }
 \examples{
 X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,

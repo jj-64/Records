@@ -15,7 +15,7 @@
 #' min, max, step for the parameter grid search
 #' approximate : Logical for variance.
 #' scale in case of LDM Gumbel
-#' For more info, see \code{\link{estimate_YNM_mle_indicator}} and \code{\link{estimate_LDM_mle_indicator}}
+#' For more info, see \code{\link{estimate_ynm_mle_indicator}} and \code{\link{estimate_ldm_mle_indicator}}
 #' @return Numeric estimate of theta and variance (if TRUE)
 #' @export
 #' @examples
@@ -77,24 +77,24 @@ estimate_model_param <- function(X, method = c("moments","mle_indicator"),
   if(obs_type == "records"){
   if (model == "LDM"){
     if (method == "moments" && bias == TRUE) {
-      est <- estimate_LDM_moments(X, variance = variance, scale=args$scale)
+      est <- estimate_ldm_moments(X, variance = variance, scale=args$scale)
 
     } else if (method == "moments" && bias == FALSE) {
-      est = estimate_LDM_moments_unbias(X, variance = variance, scale=args$scale)
+      est = estimate_ldm_moments_unbias(X, variance = variance, scale=args$scale)
 
     } else if (method == "mle_indicator") {
-      est = estimate_LDM_mle_indicator(X, variance = variance, min = args$min, max=args$max, step=args$step, scale = args$scale)
+      est = estimate_ldm_mle_indicator(X, variance = variance, min = args$min, max=args$max, step=args$step, scale = args$scale)
 
     }
   } else if(model == "YNM"){
     if (method == "moments" && bias == TRUE) {
-      est <- estimate_YNM_moments(X, variance = variance)
+      est <- estimate_ynm_moments(X, variance = variance)
 
     } else if (method == "moments" && bias == FALSE) {
-      est = estimate_YNM_moments_unbias(X, variance = variance)
+      est = estimate_ynm_moments_unbias(X, variance = variance)
 
     } else if (method == "mle_indicator") {
-      est = estimate_YNM_mle_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)
+      est = estimate_ynm_mle_indicator(X, variance = variance, approximate=args$approximate, min = args$min, max=args$max, step=args$step)
     }
   }
   }

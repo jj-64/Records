@@ -33,13 +33,13 @@ For model-specific functions and formulas, look at
 \code{\link{rec_count_dist_iid}}
 \code{\link{rec_count_mean_dtrw}}
 \code{\link{rec_count_var_dtrw}}
-\code{\link{rec_count_dist_DTRW}}
+\code{\link{rec_count_dist_dtrw}}
 \code{\link{rec_count_mean_ldm}}
 \code{\link{rec_count_var_ldm}}
-\code{\link{rec_count_dist_LDM}}
+\code{\link{rec_count_dist_ldm}}
 \code{\link{rec_count_mean_ynm}}
 \code{\link{rec_count_var_ynm}}
-\code{\link{rec_count_dist_YNM}}
+\code{\link{rec_count_dist_ynm}}
 }
 \examples{
 rec_count_stats("iid", stat = "mean", T = 100)

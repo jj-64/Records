@@ -10,7 +10,7 @@ test_that("DTRW mean approx works", {
 })
 
 test_that("dist returns probability-like values", {
-  p <- rec_count_dist_DTRW(m = 3, T = 10, approx = TRUE)
+  p <- rec_count_dist_dtrw(m = 3, T = 10, approx = TRUE)
   expect_true(is.numeric(p))
   expect_true(p >= 0)
 })

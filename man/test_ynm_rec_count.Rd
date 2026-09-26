@@ -64,11 +64,11 @@ The YNM hypothesis is supported only if:
 \eqn{1-\alpha} acceptance region.
 }
 
-If \eqn{\gamma} is unknown, it is estimated using \code{\link{estimate_YNM_mle_indicator}}
+If \eqn{\gamma} is unknown, it is estimated using \code{\link{estimate_ynm_mle_indicator}}
 with its variance.
 
 The quantiles (theoretical) of the record distribution are obtained from the cumulative distribution:
-\deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_YNM}}
+\deqn{F(m) = \sum_{i=1}^{m} P(N_T = i)} as in \code{\link{rec_count_dist_ynm}}
 }
 \examples{
 set.seed(123)
