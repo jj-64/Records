@@ -67,7 +67,7 @@ The analytical variance of the estimator is:
 }
 }
 \examples{
-X=YNM_series(T=50, gamma=1.2, dist="weibull", shape=2, scale=1)
+X=ynm_series(T=50, gamma=1.2, dist="weibull", shape=2, scale=1)
 X
 # [1] 0.3984360 0.9623867 1.5793358 0.5810157 1.1990188 1.1023248 0.7779932
 # [8] 1.7265598 1.6089237 1.8683241 1.9077715 1.1938959 2.1730424 1.8272045
@@ -85,7 +85,7 @@ estimate_YNM_moments(X)
 # $variance
 # [1] 0.4635951
 
-X=YNM_series(T=50, gamma=1.2, dist="weibull", shape=2, scale=1)
+X=ynm_series(T=50, gamma=1.2, dist="weibull", shape=2, scale=1)
 X
 # [1] 0.3984360 0.9623867 1.5793358 0.5810157 1.1990188 1.1023248 0.7779932
 # [8] 1.7265598 1.6089237 1.8683241 1.9077715 1.1938959 2.1730424 1.8272045

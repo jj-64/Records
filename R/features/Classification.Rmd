@@ -329,7 +329,7 @@ imp_sd <- apply(imp_stability, 1, sd)
 # -------- Test on one series --------------------------
 
 ```{r test series}
-series_single = LDM_series(100, 0.2, "gumbel", loc=0, scale=1)
+series_single = ldm_series(100, 0.2, "gumbel", loc=0, scale=1)
 series_single_feature = extract_all_features(series_single) %>% as.data.frame()
 ```
 
