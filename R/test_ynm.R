@@ -153,14 +153,13 @@ partition <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = 
 #' @param estimated Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
 #' @param alpha Significance level (default = 0.05).
 #' @return A list with:
-#'   \item{j}{Partition start points}
 #'   \item{observed_count}{Frequencies in each partition}
 #'   \item{pearson_residuals}{Pearson Residuals as difference between observed and expected divided by square root of expected}
-#'   \item{stat} Chisquare Test statistic
-#'   \item{p_value} significane level
-#'   \item{gamma_hat} Estimated or provided gamma parameter
-#'   \item{df} Degrees of freedom
-#'   \item{decision} decision if "ynm" or "no"
+#'   \item{stat}{Chisquare Test statistic}
+#'   \item{p_value}{significane level}
+#'   \item{gamma_hat}{Estimated or provided gamma parameter}
+#'   \item{df}{Degrees of freedom}
+#'   \item{decision}{decision if "ynm" or "no"}
 #' @examples
 #' y = ynm_series(T= 50, gamma = 1.2, dist = "gumbel", location = 0, scale = 1)
 #' X = rec_values(y)

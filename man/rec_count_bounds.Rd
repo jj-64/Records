@@ -21,23 +21,13 @@ Default is \code{0.05}.}
 \item{...}{Additional model-specific parameters:
 
 \describe{
-\item{gamma}{
-Shape parameter for the Yule–Nielsen model ("ynm").
-}
+\item{gamma}{Shape parameter for the Yule–Nielsen model ("ynm").}
 
-\item{theta}{
-Dependence parameter for the Linear Drift Model ("ldm").
-}
+\item{theta}{ Dependence parameter for the Linear Drift Model ("ldm").}
 
-\item{scale}{
-Scale parameter for the Linear Drift Model ("ldm").
-Default is 1.
-}
+\item{scale}{Scale parameter for the Linear Drift Model ("ldm").Default is 1.}
 
-\item{approximate} {Logical for the DTRW ("dtrw")
-If \code{TRUE}, uses the asymptotic approximation of the record-count
-distribution. If \code{FALSE}, uses the exact distribution whenever
-available.}
+\item{approximate}{Logical for the DTRW ("dtrw") If \code{TRUE}, uses the asymptotic approximation of the record-count distribution. If \code{FALSE}, uses the exact distribution whenever available.}
 
 }}
 
@@ -78,27 +68,18 @@ process of length \eqn{T}. The exact (or approximate) distribution of
 For each possible record count \eqn{m = 1,\ldots,T}, the function
 computes:
 
-\deqn{
-P(N_T = m)
-}
+\deqn{P(N_T = m)}
 
 and constructs the cumulative distribution function:
 
-\deqn{
-F(m)=P(N_T\le m)
-=\sum_{i=1}^{m} P(N_T=i).
-}
+\deqn{ F(m)=P(N_T\le m) =\sum_{i=1}^{m} P(N_T=i).}
 
 The returned bounds correspond to the smallest record count whose
 cumulative probability exceeds the lower and upper tail probabilities:
 
-\deqn{
-L = \min \{m : F(m)\ge \alpha\}
-}
+\deqn{L = \min \{m : F(m)\ge \alpha\} }
 
-\deqn{
-U = \min \{m : F(m)\ge 1-\alpha\}.
-}
+\deqn{U = \min \{m : F(m)\ge 1-\alpha\}.}
 
 Values of \eqn{N_T} falling outside the interval
 \eqn{[L,U]} are considered unusually small or unusually large

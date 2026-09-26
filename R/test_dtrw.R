@@ -44,7 +44,7 @@
 #' \item{method}{Method used to combine tests.}
 #' \item{alternative_ljung_box} {Alternative hypthesis for Ljung-Box independence test.}
 #' \item{p_value_ljung_box}{P-value from Ljung–Box independence test.}
-#' \item{alternative_wilcoxon} {Alternative hypthesis for Wilcoxon symmetry test.}
+#' \item{alternative_wilcoxon}{Alternative hypthesis for Wilcoxon symmetry test.}
 #' \item{p_value_wilcoxon}{P-value from Wilcoxon symmetry test.}
 #' \item{decision}{Overall decision: "dtrw" if consistent with random walk assumptions, "no" otherwise.}
 #'
