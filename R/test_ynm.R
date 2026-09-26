@@ -836,7 +836,7 @@ test_ynm_rec_gap <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("a
   # (n-1) * obs_var/theor_var <= qchisq(1-alpha, df = n-1)
 
   # define bins 1:(k-1) and K = ">=k"
-  if (is.null(K) | is.na(K)) {
+  if (is.null(K) || is.na(K)) {
     K <- min(
       6,
       floor(sqrt(n))

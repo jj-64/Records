@@ -89,6 +89,7 @@ test_model_permutations <- function(
     alpha = 0.05,
     lag = 10,
     warmup = 2,
+    K = NULL,
     verbose = TRUE,
     obs_type = c("all", "records"),
     record_times = NULL,
@@ -131,7 +132,8 @@ test_model_permutations <- function(
         test_ynm_rec_gap(
           X,
           alpha = alpha,
-          warmup = warmup
+          warmup = warmup,
+          K = K
         )$decision
     )
 

@@ -9,6 +9,7 @@ test_model_permutations(
   alpha = 0.05,
   lag = 10,
   warmup = 2,
+  K = NULL,
   verbose = TRUE,
   obs_type = c("all", "records"),
   record_times = NULL,
