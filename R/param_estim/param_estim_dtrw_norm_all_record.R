@@ -366,7 +366,7 @@ if(save_details){
 
   ## summary table by Number of records
   summary_table_NT <- final_combined_data %>%
-    dplyr::group_by(Param_N_T) %>%
+    dplyr::group_by(.data$Param_N_T) %>%
     dplyr::summarise(
       count_sim = n(),
       Proba_N_T = n() / nrow(final_combined_data),
@@ -378,7 +378,7 @@ if(save_details){
   writeData(wb, sheet = "summary_NT", summary_table_NT, rowNames = FALSE, colNames = TRUE)
 
   summary_table_NT_record <- final_combined_data_record %>%
-    dplyr::group_by(Param_N_T) %>%
+    dplyr::group_by(.data$Param_N_T) %>%
     dplyr::summarise(
       count_sim = n(),
       Proba_N_T = n() / nrow(final_combined_data_record),

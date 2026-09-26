@@ -43,7 +43,7 @@ aggregate_by_NT <- function(data,
 
     # Aggregate
     res <- data %>%
-      dplyr::group_by(Param_N_T) %>%
+      dplyr::group_by(.data$Param_N_T) %>%
       summarise(
         Parameter = param,
 
@@ -133,7 +133,7 @@ aggregate_by_T <- function(data,
 
     # Aggregate
     res <- data %>%
-      dplyr::group_by(T_value) %>%
+      dplyr::group_by(.data$T_value) %>%
       summarise(
         Parameter = param,
 
