@@ -802,7 +802,7 @@ extract_EVT_features <- function(series) {
 
   ## Autocorrelation of exceedances
   if(sum(exceed_series) > 3) { ##
-    exceedance_acf1 <- stats::acf(exceed_series, plot = FALSE, na.action = na.pass)$acf[2,1,1]
+    exceedance_acf1 <- stats::acf(exceed_series, plot = FALSE, na.action = stats::na.pass)$acf[2,1,1]
   } else { exceedance_acf1 <- NA}
 
   ## Return level estimates
