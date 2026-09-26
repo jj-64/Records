@@ -37,13 +37,13 @@ Imports:
     pROC,
     magrittr,
     forecast,
-    lawstat
+    lawstat,
+    MASS,
+    vrtest
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
-    devtools,
-    MASS,
-    vrtest
+    devtools
 VignetteBuilder: knitr
 
