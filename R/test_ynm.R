@@ -336,69 +336,69 @@ test_ynm_chisq <- function(X,
 
 
 ## Test lisse
-Test_YNM_Smooth <- function(X, alpha = 0.05) {
-
-  # Meixner-like polynomials
-  h2 <- function(x, a) x*(x-1) - 4*a*x + 2*a^2
-  h3 <- function(x, a) x*(x-1)*(x-2) - 9*a*x*(x-1) + 18*x*a^2 - 6*a^3
-  h4 <- function(x, a) 24*choose(n=x, k=4) - 96*a*choose(n=x, k=3) +
-    144*a^2*choose(n=x, k=2) - 96*x*a^3 + 24*a^4
-  h5 <- function(x, a) 120*choose(n=x, k=5) - 600*a*choose(n=x, k=4) +
-    1200*a^2*choose(n=x, k=3) - 1200*a^3*choose(n=x, k=2) +
-    600*a^4*x - 120*a^5
-
-  # record count and mean gap
-  m <- rec_count(X)
-  gaps <- rec_gaps(X)
-  dbar <- sum(gaps) / (m - 1)
-
-  # helper for variance scaling
-  Vr <- function(r, m, dbar, Hsum) {
-    scale <- ( (m-1) * factorial(r)^2 * ((dbar-1)^2 + (dbar-1))^r )^(-0.5)
-    scale * Hsum
-  }
-
-  # correction factor
-  correct_factor <- function(m, dbar) {
-    1 + 3.643/(m-1) - 2.314/sqrt(m-1) -
-      0.447 / sqrt((m-1)*(dbar-1)/dbar)
-  }
-
-  # center gaps
-  x <- gaps - 1
-  a <- dbar - 1
-
-  # compute sums of polynomials
-  H2 <- sum(h2(x, a))
-  H3 <- sum(h3(x, a))
-  H4 <- sum(h4(x, a))
-  H5 <- sum(h5(x, a))
-
-  # compute normalized V statistics
-  V2 <- Vr(2, m, dbar, H2)
-  V3 <- Vr(3, m, dbar, H3)
-  V4 <- Vr(4, m, dbar, H4)
-  V5 <- Vr(5, m, dbar, H5)
-
-  # observed test stat
-  Sk <- V2^2 + V3^2 + V4^2 + V5^2
-  obs_stat <- Sk * correct_factor(m, dbar)
-
-  # chi-squared approximation with k=4 df
-  k <- 4
-  crit_val <- qchisq(1 - alpha, df = k)
-  p_value <- 1 - pchisq(obs_stat, df = k)
-
-  decision <- ifelse(obs_stat <= crit_val, "ynm", "no")
-
-  return(list(
-    stat = obs_stat,
-    p_value = p_value,
-    df = k,
-    decision = decision
-  ))
-}
-
+# Test_YNM_Smooth <- function(X, alpha = 0.05) {
+#
+#   # Meixner-like polynomials
+#   h2 <- function(x, a) x*(x-1) - 4*a*x + 2*a^2
+#   h3 <- function(x, a) x*(x-1)*(x-2) - 9*a*x*(x-1) + 18*x*a^2 - 6*a^3
+#   h4 <- function(x, a) 24*choose(n=x, k=4) - 96*a*choose(n=x, k=3) +
+#     144*a^2*choose(n=x, k=2) - 96*x*a^3 + 24*a^4
+#   h5 <- function(x, a) 120*choose(n=x, k=5) - 600*a*choose(n=x, k=4) +
+#     1200*a^2*choose(n=x, k=3) - 1200*a^3*choose(n=x, k=2) +
+#     600*a^4*x - 120*a^5
+#
+#   # record count and mean gap
+#   m <- rec_count(X)
+#   gaps <- rec_gaps(X)
+#   dbar <- sum(gaps) / (m - 1)
+#
+#   # helper for variance scaling
+#   Vr <- function(r, m, dbar, Hsum) {
+#     scale <- ( (m-1) * factorial(r)^2 * ((dbar-1)^2 + (dbar-1))^r )^(-0.5)
+#     scale * Hsum
+#   }
+#
+#   # correction factor
+#   correct_factor <- function(m, dbar) {
+#     1 + 3.643/(m-1) - 2.314/sqrt(m-1) -
+#       0.447 / sqrt((m-1)*(dbar-1)/dbar)
+#   }
+#
+#   # center gaps
+#   x <- gaps - 1
+#   a <- dbar - 1
+#
+#   # compute sums of polynomials
+#   H2 <- sum(h2(x, a))
+#   H3 <- sum(h3(x, a))
+#   H4 <- sum(h4(x, a))
+#   H5 <- sum(h5(x, a))
+#
+#   # compute normalized V statistics
+#   V2 <- Vr(2, m, dbar, H2)
+#   V3 <- Vr(3, m, dbar, H3)
+#   V4 <- Vr(4, m, dbar, H4)
+#   V5 <- Vr(5, m, dbar, H5)
+#
+#   # observed test stat
+#   Sk <- V2^2 + V3^2 + V4^2 + V5^2
+#   obs_stat <- Sk * correct_factor(m, dbar)
+#
+#   # chi-squared approximation with k=4 df
+#   k <- 4
+#   crit_val <- qchisq(1 - alpha, df = k)
+#   p_value <- 1 - pchisq(obs_stat, df = k)
+#
+#   decision <- ifelse(obs_stat <= crit_val, "ynm", "no")
+#
+#   return(list(
+#     stat = obs_stat,
+#     p_value = p_value,
+#     df = k,
+#     decision = decision
+#   ))
+# }
+#
 
 
 ## ----  test_ynm_rec_count -------#########
