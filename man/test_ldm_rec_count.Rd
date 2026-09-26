@@ -39,7 +39,7 @@ Lower and upper record-count acceptance bounds.
 }
 
 \item{decision}{
-\code{"LDM"} if the series is consistent with the Linear Drift
+\code{"ldm"} if the series is consistent with the Linear Drift
 Model and \code{"NO"} otherwise.
 }
 

@@ -56,7 +56,7 @@ Values near zero indicate a strong linear drift component.
 }
 
 \item{decision}{
-\code{"LDM"} if the null hypothesis is rejected at level
+\code{"ldm"} if the null hypothesis is rejected at level
 \code{alpha}; otherwise \code{"NO"}.
 }
 
