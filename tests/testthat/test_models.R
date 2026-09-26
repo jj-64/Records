@@ -6,7 +6,7 @@ test_that("IID mean/var are consistent", {
 })
 
 test_that("DTRW mean approx works", {
-  expect_true(rec_count_mean_DTRW(50, approx = TRUE) > 0)
+  expect_true(rec_count_mean_dtrw(50, approx = TRUE) > 0)
 })
 
 test_that("dist returns probability-like values", {

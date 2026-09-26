@@ -498,8 +498,8 @@ test_dtrw_assumptions <- function(
 #' @seealso
 #' \code{\link{rec_count_bounds}},
 #' \code{\link{rec_count}},
-#' \code{\link{rec_count_mean_DTRW}},
-#' \code{\link{rec_count_var_DTRW}}
+#' \code{\link{rec_count_mean_dtrw}},
+#' \code{\link{rec_count_var_dtrw}}
 #'
 #' @examples
 #' set.seed(123)

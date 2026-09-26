@@ -7,14 +7,14 @@
 #' \code{\link{rec_count_mean_iid}}
 #' \code{\link{rec_count_var_iid}}
 #' \code{\link{rec_count_dist_iid}}
-#' \code{\link{rec_count_mean_DTRW}}
-#' \code{\link{rec_count_var_DTRW}}
+#' \code{\link{rec_count_mean_dtrw}}
+#' \code{\link{rec_count_var_dtrw}}
 #' \code{\link{rec_count_dist_DTRW}}
 #' \code{\link{rec_count_mean_ldm}}
-#' \code{\link{rec_count_var_LDM}}
+#' \code{\link{rec_count_var_ldm}}
 #' \code{\link{rec_count_dist_LDM}}
 #' \code{\link{rec_count_mean_ynm}}
-#' \code{\link{rec_count_var_YNM}}
+#' \code{\link{rec_count_var_ynm}}
 #' \code{\link{rec_count_dist_YNM}}
 #' @param model Character string specifying the model. Available models:
 #'   \code{"iid"}, \code{"dtrw"}, \code{"ldm"}, \code{"ynm"}.
@@ -207,12 +207,12 @@ rec_count_dist_iid = function(m,T,s=NA){
 #' @export
 #'
 #' @examples
-#' rec_count_mean_DTRW(T=25)
+#' rec_count_mean_dtrw(T=25)
 #' # [1] 5.726034
 #'
-#' rec_count_mean_DTRW(T=25, approximate = TRUE)
+#' rec_count_mean_dtrw(T=25, approximate = TRUE)
 #' # [1] 5.641896
-rec_count_mean_DTRW <- function(T, approximate = FALSE) {
+rec_count_mean_dtrw <- function(T, approximate = FALSE) {
   if(approximate) {
     return(sqrt(4*T/pi))
     } else {
@@ -238,25 +238,25 @@ rec_count_mean_DTRW <- function(T, approximate = FALSE) {
 #' @export
 #'
 #' @examples
-#' rec_count_var_DTRW(T=25, approximate = TRUE)
+#' rec_count_var_dtrw(T=25, approximate = TRUE)
 #' # [1] 18.16901
 #'
-#' rec_count_mean_DTRW(T=25, approximate = TRUE)
+#' rec_count_mean_dtrw(T=25, approximate = TRUE)
 #' # [1] 5.641896
 #'
-#' rec_count_var_DTRW(T=25, approximate = FALSE)
+#' rec_count_var_dtrw(T=25, approximate = FALSE)
 #' # [1] 13.4865
 #'
-#' rec_count_mean_DTRW(T=25, approximate = FALSE)
+#' rec_count_mean_dtrw(T=25, approximate = FALSE)
 #' # [1] 5.726034
 #'
 #' # For a series of length 25 and following a DTRW model, we expect to observe
 #' # around 5.62 records with an approximated variance of 18.169
-rec_count_var_DTRW = function(T, approximate = FALSE){
+rec_count_var_dtrw = function(T, approximate = FALSE){
   if (approximate){
   return(2*(1-2/pi)*T)
   } else {
-    m = rec_count_mean_DTRW(T, approximate= FALSE)
+    m = rec_count_mean_dtrw(T, approximate= FALSE)
     v=2*T+2-m-m^2
     return(v)
   }
@@ -423,15 +423,15 @@ rec_count_mean_ldm <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 #' @export
 #'
 #' @examples
-#' rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
+#' rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
 #' # [1] 5.761166
 #'
-#' rec_count_var_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
+#' rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
 #' # [1] 4.509757
 #'
-#' rec_count_var_LDM(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
+#' rec_count_var_ldm(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
 #' # [1] 4.492424
-rec_count_var_LDM <- function(T,
+rec_count_var_ldm <- function(T,
                     theta,
                     dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"),
                     n_sim = 1000,
@@ -464,8 +464,8 @@ rec_count_var_LDM <- function(T,
 #   for(i in 2:t) {N[i] = rec_count(X[1:i])}  ## observed number of records series
 #   E=1
 #   for(i in 2:t) {E[i] = rec_count_mean_ldm(T=i, theta=theta)}  ## expected number of records
-#   sigm=rec_count_var_LDM(T=1,theta=theta)
-#   for(i in 2:t) {sigm[i] =rec_count_var_LDM(T=i,theta=theta)} ## sum of variance
+#   sigm=rec_count_var_ldm(T=1,theta=theta)
+#   for(i in 2:t) {sigm[i] =rec_count_var_ldm(T=i,theta=theta)} ## sum of variance
 #   s=sqrt(cumsum(sigm))
 #
 #   Z = (N-E)/s
@@ -620,9 +620,9 @@ rec_count_mean_ynm = function(T,gamma){
 #' @export
 #'
 #' @examples
-#' rec_count_var_YNM(T=25, gamma=1.1)
+#' rec_count_var_ynm(T=25, gamma=1.1)
 #' # [1] 3.10049
-rec_count_var_YNM = function(T, gamma){
+rec_count_var_ynm = function(T, gamma){
   s=0; s2=0
   for(k in 1:T){
     s[k] = rec_rate_YNM(gamma,k)

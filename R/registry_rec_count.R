@@ -35,15 +35,15 @@ register_record_model(
 
 register_record_model(
   "dtrw",
-  mean_fun = rec_count_mean_DTRW,
-  var_fun  = rec_count_var_DTRW,
+  mean_fun = rec_count_mean_dtrw,
+  var_fun  = rec_count_var_dtrw,
   dist_fun = rec_count_dist_DTRW
 )
 
 register_record_model(
   "ldm",
   mean_fun = rec_count_mean_ldm,
-  var_fun  = rec_count_var_LDM,
+  var_fun  = rec_count_var_ldm,
   dist_fun = rec_count_dist_LDM,
   required_args = c("theta")
 )
@@ -51,7 +51,7 @@ register_record_model(
 register_record_model(
   "ynm",
   mean_fun = rec_count_mean_ynm,
-  var_fun  = rec_count_var_YNM,
+  var_fun  = rec_count_var_ynm,
   dist_fun = rec_count_dist_YNM,
   required_args = c("gamma")
 )
