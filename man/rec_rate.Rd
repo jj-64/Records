@@ -34,10 +34,10 @@ different record process.
 }
 \details{
 For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_ldm}},
-\code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
+\code{\link{rec_rate_dtrw}}, \code{\link{rec_rate_iid}}
 
 For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_ldm}},
-\code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
+\code{\link{rec_rate_dtrw}}, \code{\link{rec_rate_iid}}
 }
 \examples{
 rec_rate(model = "iid", t=10)

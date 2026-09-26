@@ -10,7 +10,7 @@
 #' @param ... additional arguments specific for each model
 #' @details
 #' For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_ldm}},
-#' \code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
+#' \code{\link{rec_rate_dtrw}}, \code{\link{rec_rate_iid}}
 #' @return A numeric value representing the record rate probability.
 #'
 #' @examples
@@ -29,7 +29,7 @@ rec_rate <- function(model = c("iid", "dtrw", "ynm", "ldm"), t, approximate = FA
   if(model == "iid"){
     return(rec_rate_iid(t))
   } else if (model == "dtrw"){
-    return(rec_rate_DTRW(t, approximate = approximate))
+    return(rec_rate_dtrw(t, approximate = approximate))
   } else if (model == "ynm"){
     return(rec_rate_ynm(gamma = args$gamma, t= t))
   } else if (model == "ldm"){
@@ -81,22 +81,22 @@ rec_rate_iid = function(t){
 #'
 #' @examples
 #' # Finite-time exact rate
-#' rec_rate_DTRW(10)
+#' rec_rate_dtrw(10)
 #'
 #' # Asymptotic approximation
-#' rec_rate_DTRW(1000, approximate = TRUE)
+#' rec_rate_dtrw(1000, approximate = TRUE)
 #'
 #' # Vectorized over t
 #' t_seq <- 1:100
-#' plot(t_seq, sapply(t_seq, rec_rate_DTRW), type = "l", col = "blue", lwd = 2,
+#' plot(t_seq, sapply(t_seq, rec_rate_dtrw), type = "l", col = "blue", lwd = 2,
 #'      ylab = "Record Rate", xlab = "t")
-#' lines(t_seq, sapply(t_seq, rec_rate_DTRW, approximate = TRUE),
+#' lines(t_seq, sapply(t_seq, rec_rate_dtrw, approximate = TRUE),
 #'       col = "red", lty = 2)
 #' legend("topright", legend = c("Exact", "Asymptotic"), col = c("blue", "red"),
 #'        lty = c(1,2), lwd = 2, bty = "n")
 #'
 #' @export
-rec_rate_DTRW <- function(t, approximate = FALSE) {
+rec_rate_dtrw <- function(t, approximate = FALSE) {
   if (is.infinite(t) || approximate) {
     # Asymptotic form
     return(1 / sqrt(pi * t))
