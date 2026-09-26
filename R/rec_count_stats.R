@@ -940,8 +940,7 @@ rec_count_bounds <- function(
           model = "iid",
           stat = "dist",
           T = T,
-          m = m,
-          approximate = approximate
+          m = m
         )
       }
     ),
