@@ -9,6 +9,7 @@ test_ynm_chisq(
   Partition = NA,
   gamma = NULL,
   K = NULL,
+  warmup = 2,
   estimated = TRUE,
   alpha = 0.05
 )
@@ -21,6 +22,8 @@ test_ynm_chisq(
 \item{gamma}{Numeric. Optional. to be estimated if NA (default = NA).}
 
 \item{K}{Optional. If given, force exactly K partitions using quantiles.}
+
+\item{warmup}{Integer. Warm-up parameter for YNM test (default = 2)}
 
 \item{estimated}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
 
