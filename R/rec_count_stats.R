@@ -96,13 +96,12 @@ rec_count_stats <- function(model,
 #' @examples
 #' rec_count_mean_iid(T=25)
 #' # 3.815958
-#' rec_count_mean_iid(T=25, approximate = TRUE)
-#' # 3.796091
-rec_count_mean_iid = function(T, approximate = FALSE){
-  if (approximate){
-    return(log(T) + 0.57721566490153)
-  } else {
-  return(sum( 1/(1:T) )) }
+rec_count_mean_iid = function(T){
+  # if (approximate){
+  #   return(log(T) + 0.57721566490153)
+  # } else {
+  return(sum( 1/(1:T) ))
+  #}
 }
 
 
