@@ -28,14 +28,13 @@ test_ynm_chisq(
 }
 \value{
 A list with:
-\item{j}{Partition start points}
 \item{observed_count}{Frequencies in each partition}
 \item{pearson_residuals}{Pearson Residuals as difference between observed and expected divided by square root of expected}
-\item{stat} Chisquare Test statistic
-\item{p_value} significane level
-\item{gamma_hat} Estimated or provided gamma parameter
-\item{df} Degrees of freedom
-\item{decision} decision if "ynm" or "no"
+\item{stat}{Chisquare Test statistic}
+\item{p_value}{significane level}
+\item{gamma_hat}{Estimated or provided gamma parameter}
+\item{df}{Degrees of freedom}
+\item{decision}{decision if "ynm" or "no"}
 }
 \description{
 Tests whether observed record-gap frequencies are consistent
