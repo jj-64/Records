@@ -24,23 +24,35 @@
 #' @param record_times (Default = NA) record times in case obs_type = "records"
 #' @return A list containing all:
 #' \describe{
-#'   \item{results}{List of all Test outcomes}
-#'   \item{decision}{Final decision of each test}
+#'   \item{summary}{List summary of final decision, leading_model, agreement proportion. confidence, model_scores,}
+#'   \item{decisions}{dataframe of decision of each test}
+#'   \item{results}{List of detailed results of each test}
 #' }
 #' @export
 #' @examples
-#' tests = Test_Parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
-#' tests$decision
-#' # iid_NT.decision        DTRW_NT.decision
-#' # "iid"                  "dtrw"
-#' # YNM_NT.decision       YNM_Pearson.decision
-#' #           "no"                      NA
-#' # YNM_Geom.decision         LDM_NT.decision
-#' #            "no"                    "no"
-#' # LDM_Sequential.decision     LDM_Regression.decision
-#' #     "no"                           "no"
-#' # iid_Box.decision     DTRW_Indep.decision
-#' #  "iid"             "no"
+#' \dontrun{
+#' tests = test_model_parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
+#' }
+#' > tests$summary
+#' # $final_decision
+#' # [1] 3
+#' #
+#' # $leading_model
+#' # [1] no
+#' # Levels: dtrw iid no ynm
+#' #
+#' # $agreement
+#' # [1] 0.7272727
+#' #
+#' # $confidence
+#' # [1] 0.6363636
+#' #
+#' # $model_scores
+#' # model count proportion
+#' # 3    no     8 0.72727273
+#' # 1  dtrw     1 0.09090909
+#' # 2   iid     1 0.09090909
+#' # 4   ynm     1 0.09090909
 test_model_parallel <- function(
     X,
     obs_type = c("all", "records"),
@@ -100,7 +112,7 @@ test_model_parallel <- function(
     alpha = alpha
   )
 
-  results$ynm_rec_gaps <- test_ynm_rec_gaps(
+  results$ynm_rec_gap <- test_ynm_rec_gap(
     X = X,
     alpha = alpha,
     K = K,
@@ -109,7 +121,7 @@ test_model_parallel <- function(
     record_times = record_times
   )
 
-  results$ldm_reC_count <- test_ldm_rec_count(
+  results$ldm_rec_count <- test_ldm_rec_count(
     X = X,
     alpha = alpha
   )
@@ -119,7 +131,7 @@ test_model_parallel <- function(
     alpha = alpha
   )
 
-  results$ldm_tred <- test_ldm_trend(
+  results$ldm_trend <- test_ldm_trend(
     X = X,
     alpha = alpha
   )
@@ -130,18 +142,26 @@ test_model_parallel <- function(
 
   if (obs_type == "all") {
 
-    results$IID_Independence <-
-      test_serial_independence(
+    results$iid_serial_independence_all <-
+      test_iid_serial_independence(
         X = X,
         alpha = alpha,
         lags = lag
       )
 
-    results$DTRW_Increment <-
+    results$dtrw_increment_all <-
       test_dtrw_increment(
         X = X,
         alpha = alpha,
         method = method
+      )
+
+    results$dtrw_assumptions_all <-
+      test_dtrw_assumptions(
+        X = X,
+        alpha = alpha,
+        method = method,
+        lag = lag
       )
   }
 
@@ -156,7 +176,7 @@ test_model_parallel <- function(
       function(x) {
 
         if (!is.null(x$decision))
-          toupper(as.character(x$decision))
+          tolower(as.character(x$decision))
         else
           NA_character_
 
@@ -252,51 +272,51 @@ test_model_parallel <- function(
 }
 
 ## older version ------------
-Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA,
-                          alpha = 0.05, lag = 10, warmup = 2, approximate = FALSE,
-                          one.sided = FALSE, method="Bonf",
-                          K= NULL, estimate_gamma = TRUE, gamma = NULL, RSq = 0.8) {
-  results = list()
-  obs_type <- match.arg(obs_type)
-
-  if (obs_type == "all" | obs_type == "records"){
-    ## iid_NT
-    results$"iid_NT" = test_iid_rec_count(X=X, alpha= alpha)
-
-    ## DTRW_NT
-    results$"DTRW_NT" = test_dtrw_rec_count(X=X, alpha = alpha, approximate = approximate, one.sided = one.sided)
-
-    ## YNM_NT
-    results$"YNM_NT" = test_ynm_rec_count(X= X, gamma = NA, alpha = alpha)
-
-    ## YNM_Pearson
-    results$"YNM_Pearson" = test_ynm_chisq(X=X, Partition = NA, gamma = NULL, K=K, estimated = estimate_gamma, alpha = alpha)
-
-    ##YNM_Geom
-    results$"YNM_Geom" = test_ynm_record_gap(X = X, alpha=alpha, K=K, warmup=warmup, record_times= record_times)
-
-    ##  LDM_NT
-    results$"LDM_NT" = test_ldm_rec_count(X = X, alpha = alpha)
-
-    ##LDM_Sequential
-    results$"LDM_Sequential" = test_ldm_sequential(X=X, alpha = alpha)
-
-    ##LDM_Regression
-    results$"LDM_Regression" = test_ldm_trend(X=X, alpha = alpha, RSq = RSq)
-  }
-
-  if (obs_type == "all"){
-    ## iid_Box
-    results$"iid_Box" = test_iid_serial_independence(X=X, alpha= alpha, lags = lag)
-
-    ## DTRW_Indep
-    results$"DTRW_Indep" = test_dtrw_increment(X = X, alpha= alpha, method=method)
-  }
-
-  # Filter elements whose names end with ".decision"
-  unlisted = unlist(results)
-  decision_items <- unlisted[grepl("\\.decision$", names(unlisted))]
-
-  return(list(results = results, decision= decision_items))
-}
-
+# Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA,
+#                           alpha = 0.05, lag = 10, warmup = 2, approximate = FALSE,
+#                           one.sided = FALSE, method="Bonf",
+#                           K= NULL, estimate_gamma = TRUE, gamma = NULL, RSq = 0.8) {
+#   results = list()
+#   obs_type <- match.arg(obs_type)
+#
+#   if (obs_type == "all" | obs_type == "records"){
+#     ## iid_NT
+#     results$"iid_NT" = test_iid_rec_count(X=X, alpha= alpha)
+#
+#     ## DTRW_NT
+#     results$"DTRW_NT" = test_dtrw_rec_count(X=X, alpha = alpha, approximate = approximate, one.sided = one.sided)
+#
+#     ## YNM_NT
+#     results$"YNM_NT" = test_ynm_rec_count(X= X, gamma = NA, alpha = alpha)
+#
+#     ## YNM_Pearson
+#     results$"YNM_Pearson" = test_ynm_chisq(X=X, Partition = NA, gamma = NULL, K=K, estimated = estimate_gamma, alpha = alpha)
+#
+#     ##YNM_Geom
+#     results$"YNM_Geom" = test_ynm_record_gap(X = X, alpha=alpha, K=K, warmup=warmup, record_times= record_times)
+#
+#     ##  LDM_NT
+#     results$"LDM_NT" = test_ldm_rec_count(X = X, alpha = alpha)
+#
+#     ##LDM_Sequential
+#     results$"LDM_Sequential" = test_ldm_sequential(X=X, alpha = alpha)
+#
+#     ##LDM_Regression
+#     results$"LDM_Regression" = test_ldm_trend(X=X, alpha = alpha, RSq = RSq)
+#   }
+#
+#   if (obs_type == "all"){
+#     ## iid_Box
+#     results$"iid_Box" = test_iid_serial_independence(X=X, alpha= alpha, lags = lag)
+#
+#     ## DTRW_Indep
+#     results$"DTRW_Indep" = test_dtrw_increment(X = X, alpha= alpha, method=method)
+#   }
+#
+#   # Filter elements whose names end with ".decision"
+#   unlisted = unlist(results)
+#   decision_items <- unlisted[grepl("\\.decision$", names(unlisted))]
+#
+#   return(list(results = results, decision= decision_items))
+# }
+#
