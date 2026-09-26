@@ -18,6 +18,8 @@ rec_count_bounds(
 \item{alpha}{Numeric significance level in \eqn{(0,0.5)}.
 Default is \code{0.05}.}
 
+\item{approximate}{logical. Optional for "dtrw"}
+
 \item{...}{Additional model-specific parameters:
 
 \describe{

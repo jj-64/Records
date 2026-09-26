@@ -785,7 +785,7 @@ rec_count_dist_ynm <- function(m, T, gamma, s = NULL) {
 #'
 #' @param T Integer. Length of the random walk.
 #'
-#' @param model. character of one of the record-generating processes "ldm", "iid", "ynm" or "dtrw".
+#' @param model character of one of the record-generating processes "ldm", "iid", "ynm" or "dtrw".
 #'
 #' @param alpha Numeric significance level in \eqn{(0,0.5)}.
 #' Default is \code{0.05}.
