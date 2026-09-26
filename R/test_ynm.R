@@ -540,7 +540,7 @@ test_ynm_chisq <- function(X,
 #' #  $decision
 #' #  [1] "no"
 #' @export
-test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
+test_ynm_rec_count <- function(X, gamma = NULL, alpha = 0.05) {
 
   n <- length(X)
 
@@ -549,7 +549,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
   v_gamma = NA_real_
 
   # --- Estimate gamma if not provided ---
-  if (is.null(gamma) | is.na(gamma)) {
+  if (is.null(gamma) || is.na(gamma)) {
 
     est <- estimate_YNM_mle_indicator(
       X,
