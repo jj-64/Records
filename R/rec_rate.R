@@ -9,7 +9,7 @@
 #' @param approximate boolean (Default = FALSE).
 #' @param ... additional arguments specific for each model
 #' @details
-#' For more details look at \code{\link{rec_rate_YNM}}, \code{\link{rec_rate_LDM}},
+#' For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_LDM}},
 #' \code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
 #' @return A numeric value representing the record rate probability.
 #'
@@ -31,7 +31,7 @@ rec_rate <- function(model = c("iid", "dtrw", "ynm", "ldm"), t, approximate = FA
   } else if (model == "dtrw"){
     return(rec_rate_DTRW(t, approximate = approximate))
   } else if (model == "ynm"){
-    return(rec_rate_YNM(gamma = args$gamma, t= t))
+    return(rec_rate_ynm(gamma = args$gamma, t= t))
   } else if (model == "ldm"){
     return(rec_rate_LDM(theta = args$theta, t, scale = args$scale))
   }
@@ -187,12 +187,12 @@ rec_rate_LDM <- function(theta, t = Inf, loc = 0, scale = 1) {
 #' @return A numeric value representing the record rate probability.
 #'
 #' @examples
-#' rec_rate_YNM(gamma = 1.1, t = 10)
-#' rec_rate_YNM(gamma = 1.4, t = Inf)
-#' rec_rate_YNM(gamma = 1.2)  # defaults to asymptotic
+#' rec_rate_ynm(gamma = 1.1, t = 10)
+#' rec_rate_ynm(gamma = 1.4, t = Inf)
+#' rec_rate_ynm(gamma = 1.2)  # defaults to asymptotic
 #'
 #' @export
-rec_rate_YNM <- function(gamma, t = Inf) {
+rec_rate_ynm <- function(gamma, t = Inf) {
   if (is.infinite(t[1]) || is.null(t)) {
     return(1 - 1/gamma)
   } else {

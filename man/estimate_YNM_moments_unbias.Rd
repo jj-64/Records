@@ -49,10 +49,10 @@ The bias term is approximated as:
 where:
 \itemize{
 \item \eqn{P_t = P_t(\gamma)} - record rate at time finite \eqn{t}
-\code{\link{rec_rate_YNM}},
+\code{\link{rec_rate_ynm}},
 \item \eqn{h_T = \frac{1}{T}\sum_{t=1}^T P_t},
 \item \eqn{P = \lim_{t\to\infty} P_t(\gamma)} - record rate at time infinite
-\eqn{t} \code{\link{rec_rate_YNM}}.
+\eqn{t} \code{\link{rec_rate_ynm}}.
 }
 \subsection{Variance Approximation}{
 
@@ -115,10 +115,10 @@ The bias term is approximated as:
 where:
 \itemize{
 \item \eqn{P_t = P_t(\gamma)} - record rate at time finite \eqn{t}
-\code{\link{rec_rate_YNM}},
+\code{\link{rec_rate_ynm}},
 \item \eqn{h_T = \frac{1}{T}\sum_{t=1}^T P_t},
 \item \eqn{P = \lim_{t\to\infty} P_t(\gamma)} - record rate at time infinite
-\eqn{t} \code{\link{rec_rate_YNM}}.
+\eqn{t} \code{\link{rec_rate_ynm}}.
 }
 \subsection{Variance Approximation}{
 

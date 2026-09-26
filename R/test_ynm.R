@@ -578,7 +578,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
       v <- 1 / gamma_hat
       var_hat <- (1 - v) / (n * v^3)
     } else {
-      # Exact Fisher Information (requires rec_count_mean_ynm and rec_rate_YNM)
+      # Exact Fisher Information (requires rec_count_mean_ynm and rec_rate_ynm)
       ent <- rec_count_mean_ynm(T = n, gamma = gamma_hat)
       a <- (1 / (gamma_hat^2 * (gamma_hat - 1)^2)) * ent
       b <- (1 / gamma_hat^2) * (n - ent)
@@ -586,7 +586,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 
       i <- 2:n
       d <- (i - 1) * (1 + (i - 2) * gamma_hat^(i - 1)) *
-        rec_rate_YNM(gamma_hat, i) /
+        rec_rate_ynm(gamma_hat, i) /
         (gamma_hat^2 * (gamma_hat^(i - 1) - 1)^2)
 
       I <- a + b - c - sum(d)

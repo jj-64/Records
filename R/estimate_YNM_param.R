@@ -97,10 +97,10 @@ estimate_YNM_moments <- function(X, variance = TRUE) {
 #' where:
 #' \itemize{
 #'   \item \eqn{P_t = P_t(\gamma)} - record rate at time finite \eqn{t}
-#'   \code{\link{rec_rate_YNM}},
+#'   \code{\link{rec_rate_ynm}},
 #'   \item \eqn{h_T = \frac{1}{T}\sum_{t=1}^T P_t},
 #'   \item \eqn{P = \lim_{t\to\infty} P_t(\gamma)} - record rate at time infinite
-#'   \eqn{t} \code{\link{rec_rate_YNM}}.
+#'   \eqn{t} \code{\link{rec_rate_ynm}}.
 #' }
 #'
 #' ### Variance Approximation
@@ -192,16 +192,16 @@ estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the secon
 
   gamma_biased = Estimated$param
 
-  hT = mean(rec_rate_YNM(gamma_biased,1:T)) ## sum /T
+  hT = mean(rec_rate_ynm(gamma_biased,1:T)) ## sum /T
 
-  P = rec_rate_YNM(gamma_biased, t=Inf)
+  P = rec_rate_ynm(gamma_biased, t=Inf)
 
   ### Bias estimator function
     term1 = (hT-P)/(1-P)^2
 
     term2= 1/(1-P)^3
 
-    term3 = rec_rate_YNM(gamma_biased,t=seq_along(T))^2 + (hT-P)^2
+    term3 = rec_rate_ynm(gamma_biased,t=seq_along(T))^2 + (hT-P)^2
 
     term4=hT/T - (sum(term3))/T^2
 
@@ -214,8 +214,8 @@ estimate_YNM_moments_unbias = function(X, variance = TRUE){ ## compute the secon
   var_out <- NA_real_
   if (isTRUE(variance)) {
     ## Record rate
-    P = rec_rate_YNM(gamma, t=Inf)
-    P_t = rec_rate_YNM(gamma, t=1:T)  ## vectorized
+    P = rec_rate_ynm(gamma, t=Inf)
+    P_t = rec_rate_ynm(gamma, t=1:T)  ## vectorized
 
     ## First order derivative
     dP_t_f = function(gamma, t) (gamma^(t - 2) * (gamma^t - t * gamma + t - 1)) / (gamma^t - 1)^2
@@ -367,7 +367,7 @@ estimate_YNM_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
       v <- 1 / gamma_hat
       var_hat <- (1 - v) / (T * v^3)
     } else {
-      # Exact Fisher Information (requires rec_count_mean_ynm and rec_rate_YNM)
+      # Exact Fisher Information (requires rec_count_mean_ynm and rec_rate_ynm)
       ent <- rec_count_mean_ynm(T = T, gamma = gamma_hat)
       a <- (1 / (gamma_hat^2 * (gamma_hat - 1)^2)) * ent
       b <- (1 / gamma_hat^2) * (T - ent)
@@ -375,7 +375,7 @@ estimate_YNM_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
 
       i <- 2:T
       d <- (i - 1) * (1 + (i - 2) * gamma_hat^(i - 1)) *
-        rec_rate_YNM(gamma_hat, i) /
+        rec_rate_ynm(gamma_hat, i) /
         (gamma_hat^2 * (gamma_hat^(i - 1) - 1)^2)
 
       I <- a + b - c - sum(d)

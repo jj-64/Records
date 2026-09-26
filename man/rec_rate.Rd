@@ -33,10 +33,10 @@ Computes the record rate/Probability ob observing a record at times \eqn{P(R_t)}
 different record process.
 }
 \details{
-For more details look at \code{\link{rec_rate_YNM}}, \code{\link{rec_rate_LDM}},
+For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_LDM}},
 \code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
 
-For more details look at \code{\link{rec_rate_YNM}}, \code{\link{rec_rate_LDM}},
+For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_LDM}},
 \code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
 }
 \examples{

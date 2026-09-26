@@ -593,7 +593,7 @@ rec_count_mean_ynm = function(T,gamma){
   s=0
   for(k in 1:T){
     #s[k] = (gamma^k * (gamma-1)) / (gamma* (gamma^k -1))
-    s[k] = rec_rate_YNM(gamma,k) }
+    s[k] = rec_rate_ynm(gamma,k) }
 
   return(sum(s))
 }
@@ -625,7 +625,7 @@ rec_count_mean_ynm = function(T,gamma){
 rec_count_var_ynm = function(T, gamma){
   s=0; s2=0
   for(k in 1:T){
-    s[k] = rec_rate_YNM(gamma,k)
+    s[k] = rec_rate_ynm(gamma,k)
     s2[k] =s[k]^2
   }
    return(sum(s)-sum(s2))
