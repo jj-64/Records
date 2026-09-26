@@ -181,7 +181,7 @@ for (T_val in T_values) {
 
       ## Likelihood optimizer
        ## All
-        logLik_fun <- loglik_registry[["DTRW"]][["all"]][["unif"]]
+        logLik_fun <- loglik_registry[["dtrw"]][["all"]][["unif"]]
         # MLE_C = estimate_model_mle(logLik_fun_rec, obs_type = "all", data = y,
         #                            lower_bounds=c(max = 0.01),
         #                            upper_bounds = c(max = 50),
@@ -192,7 +192,7 @@ for (T_val in T_values) {
         MLE_C = c( min = -max_est, max = max_est, objective = - logLik_fun(data = y, params = c(max = max_est)) )
 
         ## Records
-        logLik_fun_rec <- loglik_registry[["DTRW"]][["records"]][["unif"]]
+        logLik_fun_rec <- loglik_registry[["dtrw"]][["records"]][["unif"]]
         ## Records Data
         data_rec = list(rec_values = R, rec_times = L, time = T_val)
         data_rec = data.frame(rec_values = R, rec_times = L, time = T_val)

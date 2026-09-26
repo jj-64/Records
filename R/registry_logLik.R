@@ -392,10 +392,10 @@ register_loglik("iid", "records", "weibull",
 )
 
 
-## DTRW, Xt ---------------------------------
+## dtrw, Xt ---------------------------------
 
   ## Normal
-register_loglik("DTRW", "all", "norm",
+register_loglik("dtrw", "all", "norm",
   fun = function(data, params) {
     if(!is.numeric(data)) stop("data should be a numerical vector")
 
@@ -409,7 +409,7 @@ register_loglik("DTRW", "all", "norm",
 )
 
   ##cauchy
-register_loglik("DTRW", "all", "cauchy",
+register_loglik("dtrw", "all", "cauchy",
                 fun = function(data, params) {
                   if(!is.numeric(data)) stop("data should be a numerical vector")
                   if( all(c("location", "scale") %in% names(params)) == FALSE ) stop("parameters location, scale should be present in a list.")
@@ -419,7 +419,7 @@ register_loglik("DTRW", "all", "cauchy",
 )
 
 ## uniform
-register_loglik("DTRW", "all", "unif",
+register_loglik("dtrw", "all", "unif",
                 fun = function(data, params) {
                   if(!is.numeric(data)) stop("data should be a numerical vector")
 
@@ -432,9 +432,9 @@ register_loglik("DTRW", "all", "unif",
                 }
 )
 
-## DTRW, Rn -------------------------------------
+## dtrw, Rn -------------------------------------
   ## Normal
-register_loglik( "DTRW", "records", "norm",
+register_loglik( "dtrw", "records", "norm",
   fun = function(data, params) {
     if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -480,7 +480,7 @@ register_loglik( "DTRW", "records", "norm",
 )
 
   ## Cauchy
-register_loglik( "DTRW", "records", "cauchy",
+register_loglik( "dtrw", "records", "cauchy",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -512,7 +512,7 @@ register_loglik( "DTRW", "records", "cauchy",
 )
 
 ## Uniform
-register_loglik( "DTRW", "records", "unif",
+register_loglik( "dtrw", "records", "unif",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 

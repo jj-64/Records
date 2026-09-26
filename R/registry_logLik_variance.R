@@ -736,7 +736,7 @@ register_var(model = "iid", obs_type = "records", dist = "gumbel", param_name = 
     return(list(Hessian = H, vcov = vcov_mat , var_location = diag(vcov_mat)[1], var_scale = diag(vcov_mat)[2]))
   }
 )
-## DTRW, Xt -------------
+## dtrw, Xt -------------
   ##norm
 register_var( model = "dtrw", obs_type = "all", dist = "norm", param_name = "sd",
               fun = function(data, params) {
@@ -771,7 +771,7 @@ register_var( model = "dtrw", obs_type = "all", dist = "unif", param_name = "max
                 return(var_est )
               }
 )
-## DTRW, Rn -------------
+## dtrw, Rn -------------
   ##norm
 register_var( model = "dtrw", obs_type = "records", dist = "norm", param_name = "sd",
               fun = function(data, params) {
