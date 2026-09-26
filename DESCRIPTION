@@ -19,7 +19,6 @@ Imports:
     utils,
     dplyr,
     tidyr,
-    magrittr,
     caret,
     maxLik,
     VGAM,
@@ -27,14 +26,9 @@ Imports:
     gmp,
     moments,
     numDeriv,
-    forecast,
-    pROC,
     robustbase,
-    tsfeatures,
     zoo,
     psych,
-    randomForest,
-    fExtremes,
     Dowd,
     rlang
 Suggests:
@@ -43,6 +37,12 @@ Suggests:
     rmarkdown,
     devtools,
     VGAM,
-    lawstat
+    lawstat,
+    randomForest,
+    fExtremes,
+    tsfeatures,
+    pROC,
+    magrittr,
+    forecast
 VignetteBuilder: knitr
 
