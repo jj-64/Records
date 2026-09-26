@@ -42,7 +42,7 @@ A list with results from both stages:
 \item{stage1_decision}{Decision of stage 1: \code{"Sameslope"} or \code{"no"}.}
 \item{stage2_z1}{Stage 2 standardized slope for first block comparison.}
 \item{stage2_z2}{Stage 2 standardized slope for third block comparison.}
-\item {drift_direction}{sign of the average value of both slopes.}
+\item{drift_direction}{sign of the average value of both slopes.}
 \item{drift_sd}{Estimated standard deviation of slope differences (stage 2).}
 \item{decision}{Final decision: \code{"ldm"} or \code{"no"}.}
 }

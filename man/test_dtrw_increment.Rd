@@ -57,7 +57,6 @@ under the chosen adjustment method; otherwise "no".
 set.seed(123)
 X <- cumsum(rnorm(100))  # Simulated random walk
 test_dtrw_increment(X, alpha = 0.05, method = "Bonf")
-
 }
 \references{
 Ljung, G. M. and Box, G. E. P. (1978). “On a Measure of Lack of Fit in Time Series Models.”
