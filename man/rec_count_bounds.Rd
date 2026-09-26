@@ -158,7 +158,7 @@ rec_count_bounds(
 )
 }
 \seealso{
-\code{\link{test_dtrw_records}},
+\code{\link{test_dtrw_rec_count}},
 \code{\link{rec_count_stats}}
 \code{\link{test_ldm_rec_count}} for hypothesis testing of the number of records.
 }

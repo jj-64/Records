@@ -496,7 +496,7 @@ test_dtrw_assumptions <- function(
 #' Mathematica Scandinavica, 2, 195-223.
 #'
 #' @seealso
-#' \code{\link{dtrw_record_count_bounds}},
+#' \code{\link{rec_count_bounds}},
 #' \code{\link{rec_count}},
 #' \code{\link{rec_count_mean_DTRW}},
 #' \code{\link{rec_count_var_DTRW}}
