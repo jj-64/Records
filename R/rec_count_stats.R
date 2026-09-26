@@ -389,7 +389,7 @@ rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
     ## Simulation-based estimate
     recs <- numeric(n_sim)
     for (i in 1:n_sim) {
-      X <- LDM_series(T = T, theta = theta, dist = dist, ...)
+      X <- ldm_series(T = T, theta = theta, dist = dist, ...)
       recs[i] <- rec_count(X)
     }
     return(mean(recs))
@@ -448,7 +448,7 @@ rec_count_var_LDM <- function(T,
     ## Simulation-based estimate
     recs <- numeric(n_sim)
     for (i in 1:n_sim) {
-      X <- LDM_series(T = T, theta = theta, dist = dist, ...)
+      X <- ldm_series(T = T, theta = theta, dist = dist, ...)
       recs[i] <- rec_count(X)
     }
     return(var(recs))

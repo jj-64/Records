@@ -91,7 +91,7 @@ simulate_one <- function(i,
   sim  <- (i - 1) %% simulation + 1
 
   ## Generate series
-  y <- DTRW_series(
+  y <- dtrw_series(
     T = T_val,
     dist = "norm",
     mean = 0,
@@ -103,7 +103,7 @@ simulate_one <- function(i,
 
   while(length(R) <= 1) {
 
-    y <- DTRW_series(
+    y <- dtrw_series(
       T = T_val,
       dist = "norm",
       mean = 0,

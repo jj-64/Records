@@ -114,7 +114,7 @@ normal approximation:
 }
 \examples{
 set.seed(123)
-X <- YNM_series(T = 50, dist = "gumbel", gamma = 1.2, location = 0, scale= 1)
+X <- ynm_series(T = 50, dist = "gumbel", gamma = 1.2, location = 0, scale= 1)
 test_ynm_rec_gap(X, alpha = 0.05, K = 4, warmup=2)
 
 # $observed_count
@@ -123,7 +123,7 @@ test_ynm_rec_gap(X, alpha = 0.05, K = 4, warmup=2)
 # $expected_count
 # [1] 1.14 0.82 0.58 1.46
 
-# $statistic
+# $stat
 # [1] 4.421
 
 # $df

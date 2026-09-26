@@ -183,7 +183,7 @@ Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE
 #' @examples
 #'
 #' # sim_results <- Simulation_Permutation_Analysis(n_sim=2,
-#' # T=50,generator = DTRW_series, series_args =list(dist="cauchy",
+#' # T=50,generator = dtrw_series, series_args =list(dist="cauchy",
 #' #  loc=0, scale=1),H0 = "dtrw", obs_type = "all)
 #'
 #' ### 75% of the permutations trees return "dtrw" and 25% return "ynm".
@@ -417,7 +417,7 @@ Test_Permutation_OLD = function(x, sig=0.05){
 #'   (default = \code{FALSE} for two-sided).
 #' @param method Character, p-value combination method: one of
 #'   \code{"Bonf"}, \code{"Holm"}, \code{"Sidak"}, or \code{"Chisq"} (default = "Bonf").
-#' @param K Optional. Number of partitions in Test_YNM_Pearson test.
+#' @param K Optional. Number of partitions in test_ynm_chisq test.
 #'    If given, force exactly K partitions using quantiles.
 #' @param estimate_gamma Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
 #' @param gamma Numeric. Optional. Force if estimated_gamma = FALSE.
@@ -461,7 +461,7 @@ Test_Parallel <- function(X, obs_type = c("all","records") , record_times = NA,
   results$"YNM_NT" = test_ynm_rec_count(X= X, gamma = NA, alpha = alpha)
 
   ## YNM_Pearson
-  results$"YNM_Pearson" = Test_YNM_Pearson(X=X, Partition = NA, gamma = NULL, K=K, estimated = estimate_gamma, alpha = alpha)
+  results$"YNM_Pearson" = test_ynm_chisq(X=X, Partition = NA, gamma = NULL, K=K, estimated = estimate_gamma, alpha = alpha)
 
   ##YNM_Geom
   results$"YNM_Geom" = test_ynm_rec_gap(X = X, alpha=alpha, K=K, warmup=warmup, record_times= record_times)
@@ -645,7 +645,7 @@ Test_Permutation_limited <- function(X, alpha = 0.05, print = TRUE) {
 #' @examples
 #' \dontrun{
 #' sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
-#' generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
+#' generator = dtrw_series, series_args = list(dist="cauchy",loc=0, scale=1),
 #' H0 = "dtrw")
 #'
 #'

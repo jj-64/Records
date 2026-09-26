@@ -16,7 +16,7 @@ true_params <- c(
 series_H0 <- function(T_val, trend, par_H0){
 
   # Exponential Linear Drift Model
-  LDM_series(
+  ldm_series(
     T     = T_val,
     dist  = "exp",
     theta = trend,

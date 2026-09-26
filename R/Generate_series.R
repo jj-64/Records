@@ -31,17 +31,17 @@
 #' @export
 #' @examples
 #' #Gumbel with loc, scale
-#'LDM_series(100, theta = 0.1, dist = "gumbel", loc = 0, scale = 2)
+#'ldm_series(100, theta = 0.1, dist = "gumbel", loc = 0, scale = 2)
 #'
 #' #Weibull
-#'LDM_series(100, theta = 0.05, dist = "weibull", shape = 2, scale = 1)
+#'ldm_series(100, theta = 0.05, dist = "weibull", shape = 2, scale = 1)
 #'
 #' #Beta
-#'LDM_series(100, theta = 0.2, dist = "beta", shape1 = 2, shape2 = 5)
+#'ldm_series(100, theta = 0.2, dist = "beta", shape1 = 2, shape2 = 5)
 #'
 #' #Normal
-#'LDM_series(100, theta = 0.1, dist = "norm", mean = 0, sd = 1)
-LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet",
+#'ldm_series(100, theta = 0.1, dist = "norm", mean = 0, sd = 1)
+ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet",
                                     "norm", "exp", "pareto", "uniform"), ...) {
   dist <- match.arg(dist)   # enforce valid choice
   args <- list(...)
@@ -276,12 +276,12 @@ LDM_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' @return A numeric vector of length T, the simulated YNM process.
 #' @examples
 #' \dontrun{
-#' YNM_series(100, gamma = 1.5, dist = "gumbel", loc = 0, scale = 1)
-#' YNM_series(10, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
-#' YNM_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
+#' ynm_series(100, gamma = 1.5, dist = "gumbel", loc = 0, scale = 1)
+#' ynm_series(10, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
+#' ynm_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
 #' }
 #' @export
-YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
+ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
                                           "frechet", "exp", "pareto",
                                           "norm", "pareto_trunc"), ...) {
   dist <- match.arg(dist)
@@ -546,14 +546,14 @@ YNM_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
 #'
 #' @return A numeric vector of length T, the simulated DTRW process.
 #' @examples
-#' DTRW_series(10,  dist = "cauchy", loc = 0, scale = 1)
+#' dtrw_series(10,  dist = "cauchy", loc = 0, scale = 1)
 #' # [1] -0.6905644  2.1214308  2.7874249  4.1135190  3.3054300  2.6729198
 #' # 2.5556620  1.6442579 15.6275793 15.4525462
 #'
-#' DTRW_series(100,  dist = "uniform", min = -1, max = 1)
-#' DTRW_series(100,  dist = "norm", loc = 0, sd = 1)
+#' dtrw_series(100,  dist = "uniform", min = -1, max = 1)
+#' dtrw_series(100,  dist = "norm", loc = 0, sd = 1)
 #' @export
-DTRW_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
+dtrw_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
   dist <- match.arg(dist)
   args <- list(...)
   X <- numeric(T)

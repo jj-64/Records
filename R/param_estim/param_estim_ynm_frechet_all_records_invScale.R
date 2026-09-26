@@ -174,14 +174,14 @@ for (T_val in T_values) {
       for(sim in no){
 
         ## generate ynm series of frechet underlying distr
-        y= YNM_series(T = T_val,gamma = trend, dist = "frechet",
+        y= ynm_series(T = T_val,gamma = trend, dist = "frechet",
                       shape = shape_obs, scale=scale_obs)
 
         R = rec_values(y)
         L = rec_times(y)
 
         while(length(R)<=1) {
-          y= YNM_series(T = T_val,gamma = trend, dist = "frechet",
+          y= ynm_series(T = T_val,gamma = trend, dist = "frechet",
                         shape = shape_obs, scale=scale_obs)
           R = rec_values(y)
           L = rec_times(y)

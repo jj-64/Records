@@ -177,14 +177,14 @@ for (T_val in T_values) {
       for(sim in no){
 
         ## generate LDM series of frechet underlying distr
-        y= LDM_series(T = T_val,theta = trend, dist = "frechet",
+        y= ldm_series(T = T_val,theta = trend, dist = "frechet",
                       shape = shape_obs, scale=scale_obs)
 
         R = rec_values(y)
         L = rec_times(y)
 
         while(length(R)<=1) {
-          y= LDM_series(T = T_val,theta = trend, dist = "frechet",
+          y= ldm_series(T = T_val,theta = trend, dist = "frechet",
                         shape = shape_obs, scale=scale_obs)
           R = rec_values(y)
           L = rec_times(y)

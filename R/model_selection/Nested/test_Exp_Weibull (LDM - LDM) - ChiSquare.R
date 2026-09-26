@@ -14,13 +14,13 @@ library(stats)
 
 ## Generate series H0
 series_H0 = function(T,trend,par_H0){  ##
-  LDM_series(T=T, dist = "exp",theta=trend, rate = par_H0[1])  ## rate is 1/scale
+  ldm_series(T=T, dist = "exp",theta=trend, rate = par_H0[1])  ## rate is 1/scale
 }
 
 ## Generate series H1
 series_H1=function(T,trend,par_H1){  ## Normal Gumbel
 
-  LDM_series(T=T,dist="weibull", theta=trend, scale = par_H1[2], shape = par_H1[1])
+  ldm_series(T=T,dist="weibull", theta=trend, scale = par_H1[2], shape = par_H1[1])
 }
 
 ## Likelihood function H0

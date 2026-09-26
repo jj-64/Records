@@ -73,7 +73,7 @@ The quantiles (theoretical) of the record distribution are obtained from the cum
 \examples{
 set.seed(123)
 
-x <- LDM_series(T=50, theta=0.5, dist="gumbel", location=0, scale=1)
+x <- ldm_series(T=50, theta=0.5, dist="gumbel", location=0, scale=1)
 
 test_ynm_rec_count(x)
 

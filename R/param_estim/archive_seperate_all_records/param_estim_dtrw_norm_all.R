@@ -140,12 +140,12 @@ for (T_val in T_values) {
     for(sim in no){
 
       ## generate yang series of Frechet underlying distr
-      y = DTRW_series(T=T_val, dist = "norm", mean = 0, sd= sd_obs )
+      y = dtrw_series(T=T_val, dist = "norm", mean = 0, sd= sd_obs )
       R = rec_values(y)
       L = rec_times(y)
 
       while(length(R)<=1) {
-        y=DTRW_series(T=T_val, dist = "norm", mean = 0, sd= sd_obs )
+        y=dtrw_series(T=T_val, dist = "norm", mean = 0, sd= sd_obs )
         R=rec_values(y)
         L = rec_times(y)
       }  ## only one record, ignore

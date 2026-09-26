@@ -28,7 +28,7 @@ library(scales)  # for percentage formatting if needed
 series_H0 <- function(T_val, par){
 
   # Exponential Linear Drift Model
-  YNM_series(
+  ynm_series(
     T     = T_val,
     dist  = "exp",
     gamma = par[["trend"]],
@@ -40,7 +40,7 @@ series_H0 <- function(T_val, par){
 series_H1 <- function(T_val, par){
 
   # Weibull Linear Drift Model
-  YNM_series(
+  ynm_series(
     T      = T_val,
     dist   = "weibull",
     gamma  = par[["trend"]],

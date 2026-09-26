@@ -225,7 +225,7 @@ generate_series_multiple <- function(
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
-        DTRW_series,
+        dtrw_series,
         series_args = list(dist = "norm", mean = 0, sd = 1),
         T_val = T_val
       )
@@ -241,7 +241,7 @@ generate_series_multiple <- function(
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
-        DTRW_series,
+        dtrw_series,
         series_args = list(dist = "norm", mean = 0, scale = 1),
         T_val = T_val
       )
@@ -257,7 +257,7 @@ generate_series_multiple <- function(
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
-        DTRW_series,
+        dtrw_series,
         series_args = list(dist = "uniform", min = -1, scale = 1),
         T_val = T_val
       )
@@ -275,7 +275,7 @@ generate_series_multiple <- function(
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
-        LDM_series,
+        ldm_series,
         series_args = list(theta = runif(1,0.02,0.15),
                            dist = "frechet", shape=5, scale=1),
         T_val = T_val
@@ -292,7 +292,7 @@ generate_series_multiple <- function(
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
-        LDM_series,
+        ldm_series,
         series_args = list(theta = runif(1,0.02,0.15),
                            dist = "weibull", shape = 2, scale=1),
         T_val = T_val
@@ -309,7 +309,7 @@ generate_series_multiple <- function(
     i = 1
     while(i <= n_per_model) {
       s <- generate_series(
-        LDM_series,
+        ldm_series,
         series_args = list(theta = runif(1,0.09,0.2),
                            dist = "gumbel", loc =0 , scale =1),
         T_val = T_val
@@ -327,7 +327,7 @@ generate_series_multiple <- function(
     i=1
     while(i <= n_per_model) {
       s <- generate_series(
-        YNM_series,
+        ynm_series,
         series_args = list(gamma = runif(1,1.2,1.4),
                            dist = "frechet", shape=5, scale=0.1),
         T_val = T_val
@@ -344,7 +344,7 @@ generate_series_multiple <- function(
     i=1
     while(i <= n_per_model) {
       s <- generate_series(
-        YNM_series,
+        ynm_series,
         series_args = list(gamma = runif(1,1.4,1.7),
                            dist = "weibull", shape= 1/2, scale =0.1),
         T_val = T_val
@@ -361,7 +361,7 @@ generate_series_multiple <- function(
     i=1
     while(i <= n_per_model) {
       s <- generate_series(
-        YNM_series,
+        ynm_series,
         series_args = list(gamma = runif(1,1.3,2),
                            dist = "pareto", shape= 10, scale =1),
         T_val = T_val

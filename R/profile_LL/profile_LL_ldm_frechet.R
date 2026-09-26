@@ -9,7 +9,7 @@ shape_obs = 2
 scale_obs = 1
 
 ## generate LDM series of frechet underlying distr
-y= LDM_series(T = T_val,theta = trend, dist = "frechet",
+y= ldm_series(T = T_val,theta = trend, dist = "frechet",
               shape = shape_obs, scale=scale_obs)
 # y= c(0.924219871299229,2.20326092425526,0.870623759490709,1.04964455250712,
 # 5.12134923643906,2.03810714442534,1.62031496550323,2.62095242113047,

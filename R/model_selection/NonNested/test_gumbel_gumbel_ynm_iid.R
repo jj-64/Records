@@ -30,7 +30,7 @@ library(stats)
 series_H0 <- function(T_val, par){
 
   # Exponential Linear Drift Model
-  YNM_series(
+  ynm_series(
     T     = T_val,
     dist  = "gumbel",
     gamma = par[["trend"]],
