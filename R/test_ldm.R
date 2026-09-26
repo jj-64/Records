@@ -278,7 +278,7 @@ test_ldm_trend <- function(
 
   rsq <- sm$adj.r.squared
 
-  nmse <- sum(residuals(fit)^2) /
+  nmse <- sum(stats::residuals(fit)^2) /
     sum((X - mean(X))^2)
 
   decision <- ifelse(
