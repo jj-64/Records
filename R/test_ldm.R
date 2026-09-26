@@ -273,7 +273,7 @@ test_ldm_trend <- function(
 
   ci <- theta_hat +
     c(-1, 1) *
-    qt(1 - alpha/2, fit$df.residual) *
+    stats::qt(1 - alpha/2, fit$df.residual) *
     se_theta
 
   rsq <- sm$adj.r.squared
