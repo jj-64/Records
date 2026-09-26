@@ -571,7 +571,7 @@ extract_record_features <- function(series) {
   extreme_2sd <- mean(abs(s_n - mean(s_n)) > 2 * std)
   #extreme_3sd <- mean(abs(s - arith_ave) > 3 * std)
 
-  #acf1 <- tryCatch(acf(s, plot = FALSE)$acf[2], error = function(e) NA)
+  #acf1 <- tryCatch(stats::acf(s, plot = FALSE)$acf[2], error = function(e) NA)
 
   ## Stationarity proxies
   ndiff_needed <- tryCatch(forecast::ndiffs(s), error = function(e) NA)
@@ -802,7 +802,7 @@ extract_EVT_features <- function(series) {
 
   ## Autocorrelation of exceedances
   if(sum(exceed_series) > 3) { ##
-    exceedance_acf1 <- acf(exceed_series, plot = FALSE, na.action = na.pass)$acf[2,1,1]
+    exceedance_acf1 <- stats::acf(exceed_series, plot = FALSE, na.action = na.pass)$acf[2,1,1]
   } else { exceedance_acf1 <- NA}
 
   ## Return level estimates
