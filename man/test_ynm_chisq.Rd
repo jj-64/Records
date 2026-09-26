@@ -92,6 +92,48 @@ H_A:
 }
 }
 \examples{
-X = ynm_series()
+y = ynm_series(T= 50, gamma = 1.2, dist = "gumbel", location = 0, scale = 1)
+X = rec_values(y)
+# [1] -0.2977312  1.1948392  1.4180956  2.2500336  2.2934494  2.5394996  3.7849791  5.5080575
+# [9]  5.6888119  5.8849358  8.6685735  8.8227260  9.7304792  9.7378211 10.4343276 12.2649062
+part = partition(X = X, min_expected = 3, warmup = 2)
+# part
+# $bin_starts
+# [1] 1
+# $breaks
+# [1]   1 Inf
 
+# $frequency
+# [1] 15
+
+# $labels
+# [1] [1,Inf)
+
+ # $n_gaps
+ # [1] 15
+
+ test_ynm_chisq (y)
+# $observed_count
+# [1] 2 3 3 2
+#
+# $expected_count
+# [1] 2.23 3.08 2.49 2.20
+#
+# $pearson_residuals
+# [1] -0.15540205 -0.04602924  0.32305615 -0.13279561
+#
+# $stat
+# [1] 0.1482684
+#
+# $p_value
+# [1] 0.9285471
+#
+# $gamma_hat
+# [1] 1.287362
+#
+# $df
+# [1] 2
+#
+# $decision
+# [1] "ynm"
 }
