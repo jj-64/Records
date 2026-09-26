@@ -10,7 +10,7 @@
 #' \code{\link{rec_count_mean_DTRW}}
 #' \code{\link{rec_count_var_DTRW}}
 #' \code{\link{rec_count_dist_DTRW}}
-#' \code{\link{rec_count_mean_LDM}}
+#' \code{\link{rec_count_mean_ldm}}
 #' \code{\link{rec_count_var_LDM}}
 #' \code{\link{rec_count_dist_LDM}}
 #' \code{\link{rec_count_mean_ynm}}
@@ -368,15 +368,15 @@ FirstPass=function(n){Survival(n-1)-Survival(n)}
 #' @export
 #'
 #' @examples
-#' rec_count_mean_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
+#' rec_count_mean_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=1)
 #' # [1] 10.93343
 #'
-#' rec_count_mean_LDM(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=2)
+#' rec_count_mean_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100,location=0, scale=2)
 #' # [1] 7.320699
 #'
-#' rec_count_mean_LDM(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
+#' rec_count_mean_ldm(T=25, theta=0.5, dist="norm", n_sim=100,mean=0, sd=1)
 #' # [1] 13.18
-rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), n_sim = 1000, ...) {
+rec_count_mean_ldm <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet", "norm", "exp", "pareto", "uniform"), n_sim = 1000, ...) {
   dist <- match.arg(dist)   # enforce valid choice
   args <- list(...)
 
@@ -418,7 +418,7 @@ rec_count_mean_LDM <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 
 #' For other increment distributions, the variance is estimated by simulation.
 #'
-#' @inheritParams rec_count_mean_LDM
+#' @inheritParams rec_count_mean_ldm
 #' @returns a single value: the variance of the number of records
 #' @export
 #'
@@ -463,7 +463,7 @@ rec_count_var_LDM <- function(T,
 #   N = 1  ## first trivial record
 #   for(i in 2:t) {N[i] = rec_count(X[1:i])}  ## observed number of records series
 #   E=1
-#   for(i in 2:t) {E[i] = rec_count_mean_LDM(T=i, theta=theta)}  ## expected number of records
+#   for(i in 2:t) {E[i] = rec_count_mean_ldm(T=i, theta=theta)}  ## expected number of records
 #   sigm=rec_count_var_LDM(T=1,theta=theta)
 #   for(i in 2:t) {sigm[i] =rec_count_var_LDM(T=i,theta=theta)} ## sum of variance
 #   s=sqrt(cumsum(sigm))

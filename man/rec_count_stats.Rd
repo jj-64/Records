@@ -34,7 +34,7 @@ For model-specific functions and formulas, look at
 \code{\link{rec_count_mean_DTRW}}
 \code{\link{rec_count_var_DTRW}}
 \code{\link{rec_count_dist_DTRW}}
-\code{\link{rec_count_mean_LDM}}
+\code{\link{rec_count_mean_ldm}}
 \code{\link{rec_count_var_LDM}}
 \code{\link{rec_count_dist_LDM}}
 \code{\link{rec_count_mean_ynm}}

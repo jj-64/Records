@@ -42,7 +42,7 @@ register_record_model(
 
 register_record_model(
   "ldm",
-  mean_fun = rec_count_mean_LDM,
+  mean_fun = rec_count_mean_ldm,
   var_fun  = rec_count_var_LDM,
   dist_fun = rec_count_dist_LDM,
   required_args = c("theta")
