@@ -182,7 +182,7 @@ compute_acceleration <- function(x) {
 compute_residual_records <- function(x) {
   time <- 1:length(x)
   # Extract residuals from a linear model
-  resids <- resid(lm(x ~ time))
+  resids <- stats::resid(lm(x ~ time))
 
   # Count how many records occur in the 'cleaned' data
   num_resid_records <- sum(resids == cummax(resids))
