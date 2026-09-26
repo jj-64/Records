@@ -34,7 +34,7 @@ A list containing:
 Test statistic used.
 }
 
-\item{statistic}{
+\item{stat}{
 Observed portmanteau statistic.
 }
 

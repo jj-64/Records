@@ -21,7 +21,7 @@ A list containing:
 Observed number of records.
 }
 
-\item{statistic}{
+\item{stat}{
 Standardized Arnold test statistic.
 }
 
@@ -105,7 +105,7 @@ test_iid_rec_count(x)
 # $rec_count
 # [1] 7
 
-# $statistic
+# $stat
 # [1] 1.115968
 
 # $p_value

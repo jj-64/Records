@@ -129,7 +129,7 @@
 #' Standard error of the drift estimate.
 #' }
 #'
-#' \item{statistic}{
+#' \item{stat}{
 #' Wald t-statistic for testing \eqn{\theta=0}.
 #' }
 #'
@@ -167,7 +167,7 @@
 #' #  $std_error
 #' #  [1] 0.01246424
 #'
-#' #  $statistic
+#' #  $stat
 #' #  [1] 15.22293
 #'
 #' #  $p_value
@@ -194,7 +194,7 @@
 #' # $std_error
 #' # [1] 0.008436433
 #'
-#' # $statistic
+#' # $stat
 #' # [ 1] 25.56449
 #'
 #' # $p_value
@@ -290,7 +290,7 @@ test_ldm_trend <- function(
   return(list(
     theta_hat = theta_hat,
     std_error = se_theta,
-    statistic = t_stat,
+    stat = t_stat,
     p_value = p_value,
     conf_int = ci,
     adj_r_squared = rsq,

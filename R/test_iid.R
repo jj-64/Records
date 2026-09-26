@@ -75,7 +75,7 @@
 #' Observed number of records.
 #' }
 #'
-#' \item{statistic}{
+#' \item{stat}{
 #' Standardized Arnold test statistic.
 #' }
 #'
@@ -107,7 +107,7 @@
 #' # $rec_count
 #' # [1] 7
 #'
-#' # $statistic
+#' # $stat
 #' # [1] 1.115968
 #'
 #' # $p_value
@@ -135,7 +135,7 @@ test_iid_rec_count <- function(X, alpha = 0.05) {
 
   list(
     rec_count = n_records,
-    statistic = z,
+    stat = z,
     p_value = p_value,
     decision = decision
   )
@@ -200,7 +200,7 @@ test_iid_rec_count <- function(X, alpha = 0.05) {
 #' Test statistic used.
 #' }
 #'
-#' \item{statistic}{
+#' \item{stat}{
 #' Observed portmanteau statistic.
 #' }
 #'
@@ -258,7 +258,7 @@ test_iid_serial_independence <- function(
 
   list(
     method = type,
-    statistic = unname(bt$statistic),
+    stat = unname(bt$statistic),
     p_value = bt$p.value,
     decision = decision
   )

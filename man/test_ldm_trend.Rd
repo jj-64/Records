@@ -38,7 +38,7 @@ Estimated drift parameter.
 Standard error of the drift estimate.
 }
 
-\item{statistic}{
+\item{stat}{
 Wald t-statistic for testing \eqn{\theta=0}.
 }
 
@@ -137,7 +137,7 @@ test_ldm_trend(X)
 #  $std_error
 #  [1] 0.01246424
 
-#  $statistic
+#  $stat
 #  [1] 15.22293
 
 #  $p_value
@@ -164,7 +164,7 @@ test_ldm_trend(rec_values(X), obs_type = "records", record_times = rec_times(X))
 # $std_error
 # [1] 0.008436433
 
-# $statistic
+# $stat
 # [ 1] 25.56449
 
 # $p_value

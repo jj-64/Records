@@ -1,58 +1,3 @@
-
-partition_OLD <- function(X, min_expected = 1, warmup = 2, K = NULL) {
-  gaps <- rec_gaps(X)
-
-  # drop early gaps if warmup > 0
-  if (length(gaps) >= (warmup + 5)) {
-    gaps <- gaps[-seq_len(warmup)]
-  }
-
-  # Case 1: user specifies number of partitions
-  if (!is.null(K)) {
-    # use quantiles to split into K groups
-    breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = K + 1))))
-    #breaks <- c(breaks, Inf)  # ensure full coverage
-  } else {
-    # Case 2: adaptive rule based on unique values
-    num_groups <- length(unique(gaps)) + 1
-    breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = num_groups + 1))))
-    breaks <- c(breaks, Inf)
-  }
-
-  # Initial grouping
-  grouped_vec <- cut(gaps, breaks = breaks, include.lowest = TRUE, right = FALSE)
-  freq_table <- table(grouped_vec)
-  break_points <- breaks   # Track breaks explicitly
-
-
-  # Adaptively merge small bins if expected counts are too low only if K not fixed
-  if (is.null(K)) {
-    while (any(freq_table < min_expected) && length(freq_table) > 1) {
-      idx <- which.min(freq_table)
-
-      if (idx == length(freq_table)) {
-        # merge with left neighbor
-        freq_table[idx - 1] <- freq_table[idx - 1] + freq_table[idx]
-        freq_table <- freq_table[-idx]
-        break_points <- break_points[-idx]
-      } else {
-        # merge with right neighbor
-        freq_table[idx + 1] <- freq_table[idx + 1] + freq_table[idx]
-        freq_table <- freq_table[-idx]
-        break_points <- break_points[-(idx + 1)]
-      }
-    }
-  }
-  # Build interval labels
-  interval_labels <- paste0("[", break_points[-length(break_points)], ",", break_points[-1], ")")
-
-  return(list(
-    j = break_points[-length(break_points)],  # partition start points
-    nk = as.numeric(freq_table),              # frequencies
-    labels = interval_labels                  # readable bin labels
-  ))
-}
-
 #' Partition record gaps adaptively (with padding)
 #'
 #' Partitions record gaps into bins for Pearson-type tests.
@@ -79,6 +24,11 @@ partition <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = 
   # }
   if (is.null(warmup)){
     warmup = ceiling(0.3*length(gaps))
+    # safeguard
+    warmup <- min(
+      warmup,
+      length(gaps)-1
+    )
     gaps <- gaps[-seq_len(warmup)]
   }
 
@@ -86,7 +36,8 @@ partition <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = 
   if (!is.null(K)) {
     breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = K + 1))))
   } else {
-    num_groups <- min(length(unique(gaps)) + 1 + ifelse(estimated, 1, 0) , min_K)
+    #num_groups <- min(length(unique(gaps)) + 1 + ifelse(estimated, 1, 0) , min_K)
+    num_groups <- max(min_K, min(6, length(unique(gaps)))  )
     breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = num_groups + 1))))
   }
   breaks <- c(breaks, Inf)
@@ -130,15 +81,96 @@ partition <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = 
   interval_labels <- paste0("[", break_points[-length(break_points)], ",", break_points[-1], ")")
 
   return(list(
-    j = break_points[-length(break_points)], # partition start points
-    nk = as.numeric(freq_table),             # frequencies
-    labels = interval_labels                 # readable bin labels
+    bin_starts = break_points[-length(break_points)], # partition start points
+    breaks = break_points,
+    frequency = as.numeric(freq_table),             # frequencies nk
+    labels = interval_labels,                 # readable bin labels
+    n_gaps = length(gaps)
   ))
+
 }
 
 
-# Pearson chi-square test for YNM
-Test_YNM_Pearson <- function(X, Partition = NA, gamma = NULL, K=NULL, estimated = TRUE, alpha = 0.05) {
+#' Pearson Chi-Squared Goodness-of-Fit Test for the YNM Model
+#'
+#' Tests whether observed record-gap frequencies are consistent
+#' with the geometric gap distribution implied by the
+#' Yule-Nevzorov Model (YNM).
+#'
+#' @details
+#'
+#' Let
+#'
+#' \deqn{
+#' G
+#' }
+#'
+#' denote the waiting time between two consecutive records.
+#'
+#' Under the YNM model,
+#'
+#' \deqn{
+#' P(G=k)
+#' =
+#' \frac{\gamma-1}{\gamma^k},
+#' \qquad k=1,2,\ldots
+#' }
+#'
+#' Record gaps are grouped into K categories and the
+#' Pearson chi-squared statistic is computed:
+#'
+#' \deqn{
+#' \chi^2
+#' =
+#' \sum_{j=1}^K
+#' \frac{(O_j-E_j)^2}
+#' {E_j}.
+#' }
+#'
+#' If \eqn{\gamma} is not provided, it is estimated by minimizing
+#' the chi-squared statistic over the admissible parameter space.
+#'
+#' Degrees of freedom are adjusted by one when
+#' \eqn{\gamma} is estimated from the same data.
+#'
+#' The null hypothesis is:
+#'
+#' \deqn{
+#' H_0:
+#' \text{record gaps follow the YNM distribution}.
+#' }
+#'
+#' The alternative hypothesis is:
+#'
+#' \deqn{
+#' H_A:
+#' \text{record gaps do not follow the YNM distribution}.
+#' }
+#' @param X Numeric vector (time series).
+#' @param Partition Optional. list containing the partition. (default NA)
+#' @param gamma Numeric. Optional. to be estimated if NA (default = NA).
+#' @param K Optional. If given, force exactly K partitions using quantiles.
+#' @param estimated Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
+#' @param alpha Significance level (default = 0.05).
+#' @return A list with:
+#'   \item{j}{Partition start points}
+#'   \item{observed_count}{Frequencies in each partition}
+#'   \item{pearson_residuals}{Pearson Residuals as difference between observed and expected divided by square root of expected}
+#'   \item{stat} Chisquare Test statistic
+#'   \item{p_value} significane level
+#'   \item{gamma_hat} Estimated or provided gamma parameter
+#'   \item{df} Degrees of freedom
+#'   \item{decision} decision if "ynm" or "no"
+#' @examples
+#' X = ynm_series()
+#'
+#' @export
+test_ynm_chisq <- function(X,
+                           Partition = NA,
+                           gamma = NULL,
+                           K=NULL,
+                           estimated = TRUE,
+                           alpha = 0.05) {
 
   if (sum(is_rec(X)) <=4) {
               return(list(decision = "no"))}
@@ -146,63 +178,119 @@ Test_YNM_Pearson <- function(X, Partition = NA, gamma = NULL, K=NULL, estimated 
   # helper: chi-squared term
   x2_term <- function(m_1, pi, n) (n - pi * m_1)^2 / (pi * m_1)
 
+  # helper: P_j
+  proba_frequency <- function(K, gamma, j){
+    P_j <- numeric(K)
+
+    if (K > 1) {
+
+      for (s in 1:(K - 1)) {
+        # p_j <- (gamma - 1) / gamma^(j[s]:(j[s + 1] - 1))
+        # P_j[s] <- sum(na.omit(p_j))
+        P_j[s] <-
+          gamma^(-(j[s] - 1)) -
+          gamma^(-(j[s + 1] - 1))
+
+      }
+
+      P_j[K] <- 1 - sum(P_j[1:(K - 1)]) # last bin absorbs remainder
+
+    } else {
+
+      P_j <- (gamma - 1) / gamma^(j)
+
+    }
+    return(P_j)
+  }
+
   # helper: chi-square loss function when estimating gamma
   x2_term_g <- function(gamma, K, nk, j) {
-      P_j <- numeric(K)
-      if (K>1){
-        for (s in 1:(K - 1)) {
-          p_j <- (gamma - 1) / gamma^(j[s]:(j[s + 1] - 1))
-          P_j[s] <- sum(na.omit(p_j))
-        }
-        P_j[K] <- 1 - sum(P_j[1:(K - 1)])  # last bin absorbs remainder
-      } else {
-        P_j =  (gamma - 1) / gamma^(j)
-      }
-      m_1 <- sum(nk)
-      return(sum(x2_term(m_1, P_j, nk)))
+    P_j = proba_frequency(K = K, gamma = gamma, j =j)
+    m_1 <- sum(nk)
+    return(sum(x2_term(m_1, P_j, nk)))
                                          }
 
   # Partition handling
   if (is.na(Partition)[1]) Partition <- partition(X, K=K)
 
-  K <- length(Partition$nk)
-  nk <- Partition$nk
-  j <- Partition$j
+  K <- length(Partition$frequency)
+  nk <- Partition$frequency
+  bin_starts <- Partition$bin_starts
   m_1 <- sum(nk)
 
-  if (K < (2+ifelse(estimated, 1, 0))) {print("Test cannot be performed: partitions K are not sufficient")
+  if (K < (2+ifelse(estimated, 1, 0)))
+    {print("Test cannot be performed: partitions K are not sufficient")
   return(list("decision" = NA))}
 
    # If gamma not provided -> estimate it
   if (is.null(gamma)) {
-    gammas <- seq(1.000001, 5, by = 0.01)
-    chi_values <- sapply(gammas, function(g) x2_term_g(g, K, nk, j))
-    gamma <- gammas[which.min(chi_values)]
-    obs_stat <-min(chi_values)
+    #gammas <- seq(1.000001, 5, by = 0.01)
+    #chi_values <- sapply(gammas, function(g) x2_term_g(g, K, nk, j = bin_starts))
+    #gamma <- gammas[which.min(chi_values)]
+    #obs_stat <-min(chi_values)
+
+    fit <- optimize(
+      f = x2_term_g,
+      interval = c(1.000001, 10),
+      K = K,
+      nk = nk,
+      j = bin_starts
+    )
+
+    gamma <- fit$minimum
+    obs_stat <- fit$objective
+
     estimated <- TRUE
                       }
     else{
-      obs_stat = x2_term_g(gamma, K, nk, j)
+      obs_stat = x2_term_g(gamma, K, nk, j = bin_starts)
       estimated <- FALSE
     }
 
+  ## Expected
+  expected <- m_1 * proba_frequency(K, gamma, bin_starts)
+
   # Adjust degrees of freedom if gamma estimated
   df <- K - 1 - ifelse(estimated, 1, 0)
+  if(df <= 0) {
+
+    warning(
+      "Insufficient degrees of freedom."
+    )
+
+    return(list(
+      decision = NA
+    ))
+  }
 
   # Critical value and p-value
-  crit_val <- qchisq(p = 1 - alpha, df = df)
-  p_value <- 1 - pchisq(q = obs_stat, df = df)
+  #crit_val <- qchisq(p = 1 - alpha, df = df)
+  p_value <- pchisq(
+    obs_stat,
+    df = df,
+    lower.tail = FALSE
+  )
 
   # Decision
-  decision <- ifelse(obs_stat < crit_val, "ynm", "no")
+  #decision <- ifelse(obs_stat < crit_val, "ynm", "no")
+  decision <- ifelse(
+    p_value >= alpha,
+    "ynm",
+    "no"
+  )
 
-  return(list(
+  list(
+    observed_count = nk,
+    expected_count = round(expected,2),
+    pearson_residuals =
+      (nk-expected)/sqrt(expected),
     stat = obs_stat,
     p_value = p_value,
-    gamma = gamma,
+    gamma_hat = gamma,
     df = df,
     decision = decision
-  ))
+  )
+
 }
 
 
@@ -355,7 +443,7 @@ Test_YNM_Smooth <- function(X, alpha = 0.05) {
 #' @examples
 #' set.seed(123)
 #'
-#' x <- LDM_series(T=50, theta=0.5, dist="gumbel", location=0, scale=1)
+#' x <- ldm_series(T=50, theta=0.5, dist="gumbel", location=0, scale=1)
 #'
 #' test_ynm_rec_count(x)
 #'
@@ -619,7 +707,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 #' @export
 #' @examples
 #' set.seed(123)
-#' X <- YNM_series(T = 50, dist = "gumbel", gamma = 1.2, location = 0, scale= 1)
+#' X <- ynm_series(T = 50, dist = "gumbel", gamma = 1.2, location = 0, scale= 1)
 #' test_ynm_rec_gap(X, alpha = 0.05, K = 4, warmup=2)
 #'
 #' # $observed_count
@@ -628,7 +716,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 #' # $expected_count
 #' # [1] 1.14 0.82 0.58 1.46
 #'
-#' # $statistic
+#' # $stat
 #' # [1] 4.421
 #'
 #' # $df
@@ -766,7 +854,7 @@ test_ynm_rec_gap <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("a
 
     observed_count = obs_count,
     expected_count = round(expected_count,2),
-    statistic = chi2,
+    stat = chi2,
     df = df,
     p_value = p_value,
     mean_gap = mean(gaps),
@@ -816,4 +904,58 @@ test_ynm_rec_gap <- function(X, alpha=0.05, K=NULL, warmup=NULL, obs_type = c("a
 #               p_chisq= p_chisq,
 #               decision = ifelse(p_chisq>alpha, "Geom", "no"))
 #   return(res)
+# }
+
+# partition_OLD <- function(X, min_expected = 1, warmup = 2, K = NULL) {
+#   gaps <- rec_gaps(X)
+#
+#   # drop early gaps if warmup > 0
+#   if (length(gaps) >= (warmup + 5)) {
+#     gaps <- gaps[-seq_len(warmup)]
+#   }
+#
+#   # Case 1: user specifies number of partitions
+#   if (!is.null(K)) {
+#     # use quantiles to split into K groups
+#     breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = K + 1))))
+#     #breaks <- c(breaks, Inf)  # ensure full coverage
+#   } else {
+#     # Case 2: adaptive rule based on unique values
+#     num_groups <- length(unique(gaps)) + 1
+#     breaks <- unique(ceiling(quantile(gaps, probs = seq(0, 1, length.out = num_groups + 1))))
+#     breaks <- c(breaks, Inf)
+#   }
+#
+#   # Initial grouping
+#   grouped_vec <- cut(gaps, breaks = breaks, include.lowest = TRUE, right = FALSE)
+#   freq_table <- table(grouped_vec)
+#   break_points <- breaks   # Track breaks explicitly
+#
+#
+#   # Adaptively merge small bins if expected counts are too low only if K not fixed
+#   if (is.null(K)) {
+#     while (any(freq_table < min_expected) && length(freq_table) > 1) {
+#       idx <- which.min(freq_table)
+#
+#       if (idx == length(freq_table)) {
+#         # merge with left neighbor
+#         freq_table[idx - 1] <- freq_table[idx - 1] + freq_table[idx]
+#         freq_table <- freq_table[-idx]
+#         break_points <- break_points[-idx]
+#       } else {
+#         # merge with right neighbor
+#         freq_table[idx + 1] <- freq_table[idx + 1] + freq_table[idx]
+#         freq_table <- freq_table[-idx]
+#         break_points <- break_points[-(idx + 1)]
+#       }
+#     }
+#   }
+#   # Build interval labels
+#   interval_labels <- paste0("[", break_points[-length(break_points)], ",", break_points[-1], ")")
+#
+#   return(list(
+#     j = break_points[-length(break_points)],  # partition start points
+#     nk = as.numeric(freq_table),              # frequencies
+#     labels = interval_labels                  # readable bin labels
+#   ))
 # }
