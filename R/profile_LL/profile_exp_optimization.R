@@ -27,7 +27,7 @@ series_H0 <- function(T_val, trend, par_H0){
 Likelihood_under_H0 <- function(data_rec, params){
 
   logLik_fun_rec <-
-    loglik_registry[["LDM"]][["records"]][["exp"]]
+    loglik_registry[["ldm"]][["records"]][["exp"]]
 
   logLik_fun_rec(
     data   = data_rec,

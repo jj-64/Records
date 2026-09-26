@@ -1,6 +1,6 @@
 library(stats)
 
-logLik_fun_rec <- loglik_registry[["LDM"]][["records"]][["frechet_inv_scale"]]
+logLik_fun_rec <- loglik_registry[["ldm"]][["records"]][["frechet_inv_scale"]]
 
 # parameters
 trend =0.1

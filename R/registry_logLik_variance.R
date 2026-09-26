@@ -819,10 +819,10 @@ register_var( model = "dtrw", obs_type = "records", dist = "unif", param_name = 
               }
 )
 
-## LDM, Xt --------------
+## ldm, Xt --------------
 
   ##frechet
-register_var( model = "LDM", obs_type = "all", dist = "frechet", param_name = "theta",
+register_var( model = "ldm", obs_type = "all", dist = "frechet", param_name = "theta",
               fun = function(data, params) {
                 if(!is.numeric(data)) stop("data should be a numerical vector")
                 n = length(data)
@@ -842,7 +842,7 @@ register_var( model = "LDM", obs_type = "all", dist = "frechet", param_name = "t
               }
 )
 
-register_var( model = "LDM", obs_type = "all", dist = "frechet", param_name = "scale",
+register_var( model = "ldm", obs_type = "all", dist = "frechet", param_name = "scale",
               fun = function(data, params) {
                 if(!is.numeric(data)) stop("data should be a numerical vector")
                 n = length(data)
@@ -862,7 +862,7 @@ register_var( model = "LDM", obs_type = "all", dist = "frechet", param_name = "s
               }
 )
 
-register_var( model = "LDM", obs_type = "all", dist = "frechet", param_name = "shape",
+register_var( model = "ldm", obs_type = "all", dist = "frechet", param_name = "shape",
               fun = function(data, params) {
                 if(!is.numeric(data)) stop("data should be a numerical vector")
                 n = length(data)
@@ -883,7 +883,7 @@ register_var( model = "LDM", obs_type = "all", dist = "frechet", param_name = "s
               }
 )
 
-register_var(model = "LDM",obs_type = "all",dist = "frechet", param_name = "all",   # 👈 unified
+register_var(model = "ldm",obs_type = "all",dist = "frechet", param_name = "all",   # 👈 unified
   fun = function(data, params) {
 
     # ________________________
@@ -955,7 +955,7 @@ register_var(model = "LDM",obs_type = "all",dist = "frechet", param_name = "all"
   }
 )
 
-register_var(model = "LDM",obs_type = "all",dist = "frechet_inv_scale", param_name = "all",   # 👈 unified
+register_var(model = "ldm",obs_type = "all",dist = "frechet_inv_scale", param_name = "all",   # 👈 unified
   fun <- function(data, params) {
 
     # --- Checks ---
@@ -1033,7 +1033,7 @@ register_var(model = "LDM",obs_type = "all",dist = "frechet_inv_scale", param_na
 )
 
 ## Gumbel
-register_var(model = "LDM",obs_type = "all",dist = "gumbel", param_name = "all",   # 👈 unified
+register_var(model = "ldm",obs_type = "all",dist = "gumbel", param_name = "all",   # 👈 unified
   fun <- function(data, params) {
 
     if (!all(c("theta", "location", "scale") %in% names(params))) {
@@ -1107,10 +1107,10 @@ register_var(model = "LDM",obs_type = "all",dist = "gumbel", param_name = "all",
     return(list(Hessian = H, vcov = vcov_mat , var_theta = diag(vcov_mat)[1] ,  var_location = diag(vcov_mat)[2],var_scale = diag(vcov_mat)[3]) )
   }
 )
-## LDM, Rn --------------
+## ldm, Rn --------------
 
   ##frechet
-register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name = "theta",
+register_var( model = "ldm", obs_type = "records", dist = "frechet", param_name = "theta",
                    fun = function(data, params) {
                      if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1153,7 +1153,7 @@ register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name 
                    }
 )
 
-register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name = "shape",
+register_var( model = "ldm", obs_type = "records", dist = "frechet", param_name = "shape",
               fun = function(data, params) {
                 if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1202,7 +1202,7 @@ register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name 
               }
 )
 
-register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name = "scale",
+register_var( model = "ldm", obs_type = "records", dist = "frechet", param_name = "scale",
               fun = function(data, params) {
                 if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1249,7 +1249,7 @@ register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name 
               }
 )
 
-register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name = "all",
+register_var( model = "ldm", obs_type = "records", dist = "frechet", param_name = "all",
               fun =  function(data, params) {
 
                 ## --- 1. Input checks ---
@@ -1371,7 +1371,7 @@ register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name 
               }
 )
 
-# register_var( model = "LDM", obs_type = "records", dist = "frechet_inv_scale_nohessian", param_name = "all",
+# register_var( model = "ldm", obs_type = "records", dist = "frechet_inv_scale_nohessian", param_name = "all",
 #             fun = function(data, params) {
 #       ## --- 1. Input checks ---
 #       required_data <- c("rec_values", "rec_times", "time")
@@ -1485,7 +1485,7 @@ register_var( model = "LDM", obs_type = "records", dist = "frechet", param_name 
 #     }
 # )
 
-register_var(model = "LDM",obs_type = "records",dist = "frechet_inv_scale", param_name = "all",   # 👈 unified
+register_var(model = "ldm",obs_type = "records",dist = "frechet_inv_scale", param_name = "all",   # 👈 unified
              fun <- function(data, params) {
 
                # --- Checks ---
@@ -1586,7 +1586,7 @@ register_var(model = "LDM",obs_type = "records",dist = "frechet_inv_scale", para
 )
 
 ## Gumbel
-register_var(model = "LDM",obs_type = "records",dist = "gumbel", param_name = "all",   # 👈 unified
+register_var(model = "ldm",obs_type = "records",dist = "gumbel", param_name = "all",   # 👈 unified
   fun <- function(data, params) {
 
     Rn <- data$rec_values
@@ -1681,10 +1681,10 @@ register_var(model = "LDM",obs_type = "records",dist = "gumbel", param_name = "a
     return(list(Hessian = H, vcov = vcov_mat , var_theta = diag(vcov_mat)[1], var_location = diag(vcov_mat)[2], var_scale = diag(vcov_mat)[3]))
   }
 )
-## YNM, Xt -----------------
+## ynm, Xt -----------------
 
   ## frechet
-register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param_name = "gamma",
+register_var( model = "ynm", obs_type = "all", dist = "frechet_inv_scale", param_name = "gamma",
               fun = function(data, params) {
                 if(!is.numeric(data)) stop("data should be a numerical vector")
                 n = length(data)
@@ -1701,7 +1701,7 @@ register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param
               }
 )
 
-register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param_name = "scale",
+register_var( model = "ynm", obs_type = "all", dist = "frechet_inv_scale", param_name = "scale",
               fun = function(data, params) {
                 if(!is.numeric(data)) stop("data should be a numerical vector")
                 n = length(data)
@@ -1719,7 +1719,7 @@ register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param
               }
 )
 
-register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param_name = "shape",
+register_var( model = "ynm", obs_type = "all", dist = "frechet_inv_scale", param_name = "shape",
               fun = function(data, params) {
                 if(!is.numeric(data)) stop("data should be a numerical vector")
                 n = length(data)
@@ -1735,7 +1735,7 @@ register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param
               }
 )
 
-register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param_name = "all",
+register_var( model = "ynm", obs_type = "all", dist = "frechet_inv_scale", param_name = "all",
   fun <- function(data, params) {
 
     # ___ checks ___
@@ -1814,7 +1814,7 @@ register_var( model = "YNM", obs_type = "all", dist = "frechet_inv_scale", param
 )
 
 # Gumbel
-register_var( model = "YNM", obs_type = "all", dist = "gumbel", param_name = "all",
+register_var( model = "ynm", obs_type = "all", dist = "gumbel", param_name = "all",
               fun <- function(data, params) {
 
                 x <- data
@@ -1888,10 +1888,10 @@ register_var( model = "YNM", obs_type = "all", dist = "gumbel", param_name = "al
                 return(list(Hessian = H, vcov = vcov_mat , var_gamma = diag(vcov_mat)[1], var_location = diag(vcov_mat)[2], var_scale = diag(vcov_mat)[3]))
               }
 )
-## YNM, Rn -----------------
+## ynm, Rn -----------------
 
 ## frechet
-register_var( model = "YNM", obs_type = "records", dist = "frechet_inv_scale", param_name = "gamma",
+register_var( model = "ynm", obs_type = "records", dist = "frechet_inv_scale", param_name = "gamma",
               fun = function(data, params) {
                 if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1937,7 +1937,7 @@ register_var( model = "YNM", obs_type = "records", dist = "frechet_inv_scale", p
               }
 )
 
-register_var( model = "YNM", obs_type = "records", dist = "frechet_inv_scale", param_name = "scale",
+register_var( model = "ynm", obs_type = "records", dist = "frechet_inv_scale", param_name = "scale",
               fun = function(data, params) {
                 if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1971,7 +1971,7 @@ register_var( model = "YNM", obs_type = "records", dist = "frechet_inv_scale", p
               }
 )
 
-register_var( model = "YNM", obs_type = "records", dist = "frechet_inv_scale", param_name = "shape",
+register_var( model = "ynm", obs_type = "records", dist = "frechet_inv_scale", param_name = "shape",
               fun = function(data, params) {
                 if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -2006,7 +2006,7 @@ register_var( model = "YNM", obs_type = "records", dist = "frechet_inv_scale", p
               }
 )
 
-register_var(model = "YNM", obs_type = "records", dist = "frechet_inv_scale", param_name = "all",
+register_var(model = "ynm", obs_type = "records", dist = "frechet_inv_scale", param_name = "all",
   fun <- function(data, params) {
 
       if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
@@ -2137,7 +2137,7 @@ register_var(model = "YNM", obs_type = "records", dist = "frechet_inv_scale", pa
     # d2_ga <- -sum(e * dw) / sigma
     # d2_gA <- -sum(e * u * dw) / sigma
 
-    logLik_fun_rec <- loglik_registry[["YNM"]][["records"]][["frechet_inv_scale"]]
+    logLik_fun_rec <- loglik_registry[["ynm"]][["records"]][["frechet_inv_scale"]]
     eps <- 1e-6
     f_gamma <- function(g) {
       params2 <- params
@@ -2207,7 +2207,7 @@ register_var(model = "YNM", obs_type = "records", dist = "frechet_inv_scale", pa
   }
 )
 
-register_var(model = "YNM", obs_type = "records", dist = "gumbel", param_name = "all",
+register_var(model = "ynm", obs_type = "records", dist = "gumbel", param_name = "all",
              fun <- function(data, params) {
 
     if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
@@ -2350,7 +2350,7 @@ register_var(model = "YNM", obs_type = "records", dist = "gumbel", param_name = 
     # _____________________________
     # gamma part (numerical)
     # _____________________________
-    # logLik_fun_rec <- loglik_registry[["YNM"]][["records"]][["gumbel"]]
+    # logLik_fun_rec <- loglik_registry[["ynm"]][["records"]][["gumbel"]]
     # eps <- 1e-15
     # f_gamma <- function(g) {
     #   params2 <- params

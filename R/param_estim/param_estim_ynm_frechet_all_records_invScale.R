@@ -190,7 +190,7 @@ for (T_val in T_values) {
 
         ## All data
         gamma0 = exp(coef(lm(log(y) ~ seq(1,T_val)))[2])[[1]]
-        logLik_fun <- loglik_registry[["YNM"]][["all"]][["frechet_inv_scale"]]
+        logLik_fun <- loglik_registry[["ynm"]][["all"]][["frechet_inv_scale"]]
         MLE_C = estimate_model_mle(logLik_fun, obs_type = "all", data = y,
                                    lower_bounds=c(gamma=1.01, shape = 0.01, scale=0.01, location = 0),
                                    upper_bounds = c(gamma=2, shape = 10, scale=10, location = 0),
@@ -199,7 +199,7 @@ for (T_val in T_values) {
         MLE_C = c(MLE_C$par, "objective" = - MLE_C$objective )
 
         ## Records Data
-        logLik_fun_rec <- loglik_registry[["YNM"]][["records"]][["frechet_inv_scale"]]
+        logLik_fun_rec <- loglik_registry[["ynm"]][["records"]][["frechet_inv_scale"]]
 
         data_rec = list(rec_values = R, rec_times = L, time = T_val)
         data_rec = data.frame(rec_values = R, rec_times = L, time = T_val)

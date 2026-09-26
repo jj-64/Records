@@ -196,7 +196,7 @@ for (T_val in T_values) {
         shape0 <- evd::fgev(x0, scale = sd(x0), std.err = FALSE)$estimate[["shape"]]   # initial approximation
 
         ## All data
-        logLik_fun <- loglik_registry[["LDM"]][["all"]][["frechet_inv_scale"]]
+        logLik_fun <- loglik_registry[["ldm"]][["all"]][["frechet_inv_scale"]]
         MLE_C = estimate_model_mle(logLik_fun, obs_type = "all", data = y,
                                    lower_bounds=c(theta=0.005, location=0, shape = 0.01, scale=0.01),
                                    upper_bounds = c(theta=10, location=0, shape = 10, scale=10),
@@ -205,7 +205,7 @@ for (T_val in T_values) {
         MLE_C = c(MLE_C$par, "objective" = - MLE_C$objective )
 
         ## Records Data
-        logLik_fun_rec <- loglik_registry[["LDM"]][["records"]][["frechet_inv_scale"]]
+        logLik_fun_rec <- loglik_registry[["ldm"]][["records"]][["frechet_inv_scale"]]
 
         data_rec = list(rec_values = R, rec_times = L, time = T_val)
         data_rec = data.frame(rec_values = R, rec_times = L, time = T_val)

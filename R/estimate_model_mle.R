@@ -9,7 +9,7 @@
 #' @examples
 #' \dontrun{
 #'   ## Loglikelihood call
-#' logLik_fun <- loglik_registry[["YNM"]][["all"]][["frechet"]]
+#' logLik_fun <- loglik_registry[["ynm"]][["all"]][["frechet"]]
 #'   ## Optimize
 #' estimate_model_mle(logLik_fun, obs_type = "all", data = c(1,1.5,1,3),
 #'                    lower_bounds=c(gamma = 1.001, shape = 0.001, scale = 0.001),
@@ -40,7 +40,7 @@
 #'
 #'
 #'   ## Loglikelihood call
-#' logLik_fun_rec <- loglik_registry[["YNM"]][["records"]][["frechet"]]
+#' logLik_fun_rec <- loglik_registry[["ynm"]][["records"]][["frechet"]]
 #'   ## Records Data
 #' data_rec = list(rec_values = c(1,5,7,10), rec_times = c(1,2,5,6), time = 10)
 #' data_rec = data.frame(rec_values = c(1,5,7,10), rec_times = c(1,2,5,6), time = 10)

@@ -543,10 +543,10 @@ register_loglik( "DTRW", "records", "unif",
                    return(s1+s2)
                  }
 )
-## YNM, Xt -----------------------------------------
+## ynm, Xt -----------------------------------------
 
   ##Frechet
-register_loglik( "YNM", "all", "frechet",
+register_loglik( "ynm", "all", "frechet",
                  fun = function(data, params) {
                    x=data
                    if(!is.numeric(x)) stop("data should be a numerical vector")
@@ -586,7 +586,7 @@ register_loglik( "YNM", "all", "frechet",
                  }
 )
 
-register_loglik( "YNM", "all", "frechet_inv_scale",
+register_loglik( "ynm", "all", "frechet_inv_scale",
                 fun <- function(data, params) {
 
                    # ___ checks ___
@@ -629,7 +629,7 @@ register_loglik( "YNM", "all", "frechet_inv_scale",
 
 ##Gumbel
 
-register_loglik( "YNM", "all", "gumbel",
+register_loglik( "ynm", "all", "gumbel",
                  fun = function(data, params) {
                    x=data
                    if(!is.numeric(x)) stop("data should be a numerical vector")
@@ -664,7 +664,7 @@ register_loglik( "YNM", "all", "gumbel",
                  }
 )
 
-register_loglik( "YNM", "all", "gumbel_explicit",
+register_loglik( "ynm", "all", "gumbel_explicit",
                  fun <- function(data, params) {
 
                    x <- data
@@ -692,7 +692,7 @@ register_loglik( "YNM", "all", "gumbel_explicit",
                  }
 )
   ##norm
-register_loglik( "YNM", "all", "norm",
+register_loglik( "ynm", "all", "norm",
                  fun = function(data, params) {
                    x=data
                    if(!is.numeric(x)) stop("data should be a numerical vector")
@@ -728,7 +728,7 @@ register_loglik( "YNM", "all", "norm",
 )
 
 ##weibull
-register_loglik( "YNM", "all", "weibull",
+register_loglik( "ynm", "all", "weibull",
                  fun = function(data, params) {
                    x=data
                    if(!is.numeric(x)) stop("data should be a numerical vector")
@@ -762,10 +762,10 @@ register_loglik( "YNM", "all", "weibull",
                    return(s1+s2+s3)
                  }
 )
-## YNM, Rn -----------------------------------------
+## ynm, Rn -----------------------------------------
 
   ## Frechet
-register_loglik( "YNM", "records", "frechet",
+register_loglik( "ynm", "records", "frechet",
   fun = function(data, params) {
     if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -792,7 +792,7 @@ register_loglik( "YNM", "records", "frechet",
     cdf=function(x,par) {VGAM::pfrechet(q=x, location = par$location, shape= par$shape, scale=par$scale, log = TRUE)}
 
 
-    # your exact YNM record-pair likelihood
+    # your exact ynm record-pair likelihood
     s1 = sum(Ln) *log(gamma)
     if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
@@ -817,7 +817,7 @@ register_loglik( "YNM", "records", "frechet",
     }
 )
 
-register_loglik( "YNM", "records", "frechet_inv_scale",
+register_loglik( "ynm", "records", "frechet_inv_scale",
   fun <- function(data, params) {
 
     # --- checks ---
@@ -870,7 +870,7 @@ register_loglik( "YNM", "records", "frechet_inv_scale",
   }
 )
   ## Gumbel
-register_loglik( "YNM", "records", "gumbel",
+register_loglik( "ynm", "records", "gumbel",
   fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -895,7 +895,7 @@ register_loglik( "YNM", "records", "gumbel",
                    cdf=function(x,par) {VGAM::pgumbel(q=x, location=par$location, scale=par$scale, log = TRUE)}
 
 
-                   # your exact YNM record-pair likelihood
+                   # your exact ynm record-pair likelihood
                    s1 = sum(Ln) * log(gamma)
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
@@ -921,7 +921,7 @@ register_loglik( "YNM", "records", "gumbel",
                  }
 )
 
-register_loglik( "YNM", "records", "gumbel_explicit",
+register_loglik( "ynm", "records", "gumbel_explicit",
   fun = function(data, params) {
 
     # --- checks ---
@@ -976,7 +976,7 @@ register_loglik( "YNM", "records", "gumbel_explicit",
 )
 
   ## Norm
-register_loglik( "YNM", "records", "norm",
+register_loglik( "ynm", "records", "norm",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1001,7 +1001,7 @@ register_loglik( "YNM", "records", "norm",
                    cdf=function(x,par) {pnorm(q=x, mean=par$mean, sd=par$sd, log = TRUE)}
 
 
-                   # your exact YNM record-pair likelihood
+                   # your exact ynm record-pair likelihood
                    s1 = sum(Ln) * log(gamma)
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
@@ -1028,7 +1028,7 @@ register_loglik( "YNM", "records", "norm",
 )
 
   ## weibull
-register_loglik( "YNM", "records", "weibull",
+register_loglik( "ynm", "records", "weibull",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1053,7 +1053,7 @@ register_loglik( "YNM", "records", "weibull",
                    cdf=function(x,par) {pweibull(q=x, shape= par$shape, scale=par$scale, log = TRUE)}
 
 
-                   # your exact YNM record-pair likelihood
+                   # your exact ynm record-pair likelihood
                    s1 = log(gamma^(sum(Ln)))
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
@@ -1080,7 +1080,7 @@ register_loglik( "YNM", "records", "weibull",
 )
 
 ## exp
-register_loglik( "YNM", "records", "exp",
+register_loglik( "ynm", "records", "exp",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1105,7 +1105,7 @@ register_loglik( "YNM", "records", "exp",
                    cdf=function(x,par) {pexp(q=x, rate=par$rate, log = TRUE)}
 
 
-                   # your exact YNM record-pair likelihood
+                   # your exact ynm record-pair likelihood
                    s1 = log(gamma^(sum(Ln)))
                    if (is.nan(s1) || !is.finite(s1)) return(-Inf)
 
@@ -1130,10 +1130,10 @@ register_loglik( "YNM", "records", "exp",
                    return(s1+s2+s3+s4)
                  }
 )
-## LDM, Xt -----------------------------------------
+## ldm, Xt -----------------------------------------
 
   ##Norm
-register_loglik( "LDM", "all", "norm",
+register_loglik( "ldm", "all", "norm",
                  fun = function(data, params) {
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
@@ -1162,7 +1162,7 @@ register_loglik( "LDM", "all", "norm",
                  }
 )
   ##Frechet
-register_loglik( "LDM", "all", "frechet",
+register_loglik( "ldm", "all", "frechet",
                  fun = function(data, params) {
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
@@ -1201,7 +1201,7 @@ register_loglik( "LDM", "all", "frechet",
 )
 
 ##Frechet inversted scale
-register_loglik( "LDM", "all", "frechet_inv_scale",
+register_loglik( "ldm", "all", "frechet_inv_scale",
                  fun = function(data, params) {
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
@@ -1240,7 +1240,7 @@ register_loglik( "LDM", "all", "frechet_inv_scale",
                  }
 )
   ##gumbel
-register_loglik( "LDM", "all", "gumbel",
+register_loglik( "ldm", "all", "gumbel",
                  fun = function(data, params) {
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
@@ -1267,7 +1267,7 @@ register_loglik( "LDM", "all", "gumbel",
                  }
 )
 
-register_loglik( "LDM", "all", "gumbel_explicit",
+register_loglik( "ldm", "all", "gumbel_explicit",
                  fun = function(data, params) {
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
@@ -1294,7 +1294,7 @@ register_loglik( "LDM", "all", "gumbel_explicit",
                  }
 )
 ##weibull
-register_loglik( "LDM", "all", "weibull",
+register_loglik( "ldm", "all", "weibull",
                  fun = function(data, params) {
                    y=data
                    if(!is.numeric(y)) stop("data should be a numerical vector")
@@ -1320,10 +1320,10 @@ register_loglik( "LDM", "all", "weibull",
                    return(s1)
                  }
 )
-## LDM, Rn -----------------------------------------
+## ldm, Rn -----------------------------------------
 
     ##Gumbel
-register_loglik( "LDM", "records", "gumbel",
+register_loglik( "ldm", "records", "gumbel",
                  fun = function(data, params) {
 
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
@@ -1376,7 +1376,7 @@ register_loglik( "LDM", "records", "gumbel",
                  }
 )
 
-register_loglik( "LDM", "records", "gumbel_explicit",
+register_loglik( "ldm", "records", "gumbel_explicit",
             fun <- function(data, params) {
 
     # --- checks ---
@@ -1442,7 +1442,7 @@ register_loglik( "LDM", "records", "gumbel_explicit",
 )
 
     ##normal
-register_loglik( "LDM", "records", "norm",
+register_loglik( "ldm", "records", "norm",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1495,7 +1495,7 @@ register_loglik( "LDM", "records", "norm",
 )
 
 ##frechet
-register_loglik( "LDM", "records", "frechet",
+register_loglik( "ldm", "records", "frechet",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1552,7 +1552,7 @@ register_loglik( "LDM", "records", "frechet",
                  }
 )
 ## frechet explicit
-register_loglik( "LDM", "records", "frechet_explicit",
+register_loglik( "ldm", "records", "frechet_explicit",
                  fun <- function(data, params) {
 
 
@@ -1661,7 +1661,7 @@ register_loglik( "LDM", "records", "frechet_explicit",
 )
 
 ##frechet inverted scale
-register_loglik( "LDM", "records", "frechet_inv_scale",
+register_loglik( "ldm", "records", "frechet_inv_scale",
                  fun <- function(data, params) {
 
                    ## 1. Input checks
@@ -1770,7 +1770,7 @@ register_loglik( "LDM", "records", "frechet_inv_scale",
 )
 
 ## frechet inverted scale-explicit
-register_loglik( "LDM", "records", "frechet_inv_scale_explicit",
+register_loglik( "ldm", "records", "frechet_inv_scale_explicit",
                  fun <- function(data, params) {
 
 
@@ -1892,7 +1892,7 @@ register_loglik( "LDM", "records", "frechet_inv_scale_explicit",
 )
 
 ##Weibull
-register_loglik( "LDM", "records", "weibull",
+register_loglik( "ldm", "records", "weibull",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 
@@ -1949,7 +1949,7 @@ register_loglik( "LDM", "records", "weibull",
 )
 
 ##exponential
-register_loglik( "LDM", "records", "exp",
+register_loglik( "ldm", "records", "exp",
                  fun = function(data, params) {
                    if( all(c("rec_values", "rec_times", "time") %in% names(data)) == FALSE ) stop("a list of rec_values, rec_times, and time should be present.")
 

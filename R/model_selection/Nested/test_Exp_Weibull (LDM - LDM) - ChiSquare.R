@@ -26,13 +26,13 @@ series_H1=function(T,trend,par_H1){  ## Normal Gumbel
 ## Likelihood function H0
 Likelihood_under_H0 = function(data_rec, params){
   # Likelihood_Rn_Exp_LDM(R=R,L=L,T=T,params=params)
-  logLik_fun_rec = loglik_registry[["LDM"]][["records"]][["exp"]]
+  logLik_fun_rec = loglik_registry[["ldm"]][["records"]][["exp"]]
   return(logLik_fun_rec(data = data_rec, params = params))
 }
 
 ## Likelihood function H1
 Likelihood_under_H1 = function(data_rec, params){
-  logLik_fun_rec = loglik_registry[["LDM"]][["records"]][["weibull"]]
+  logLik_fun_rec = loglik_registry[["ldm"]][["records"]][["weibull"]]
   return(logLik_fun_rec(data = data_rec, params = params))
 }
 

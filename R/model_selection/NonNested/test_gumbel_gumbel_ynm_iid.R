@@ -52,7 +52,7 @@ series_H1 <- function(T_val, par){
 Likelihood_under_H0 <- function(data_rec, params){
 
   logLik_fun_rec <-
-    loglik_registry[["YNM"]][["records"]][["gumbel"]]
+    loglik_registry[["ynm"]][["records"]][["gumbel"]]
 
   logLik_fun_rec(
     data   = data_rec,

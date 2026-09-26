@@ -188,7 +188,7 @@ for (T_val in T_values) {
 
 
         ## All data
-          logLik_fun <- loglik_registry[["LDM"]][["all"]][["gumbel"]]
+          logLik_fun <- loglik_registry[["ldm"]][["all"]][["gumbel"]]
           MLE_C = estimate_model_mle(logLik_fun, obs_type = "all", data = y,
                                      lower_bounds=c(theta=0.01, location = 0.01, scale=0.01),
                                      upper_bounds = c(theta=10, location = 100, scale=100),
@@ -197,7 +197,7 @@ for (T_val in T_values) {
           MLE_C = c(MLE_C$par, "objective" = - MLE_C$objective )
 
           ## Records Data
-          logLik_fun_rec <- loglik_registry[["LDM"]][["records"]][["gumbel"]]
+          logLik_fun_rec <- loglik_registry[["ldm"]][["records"]][["gumbel"]]
 
           data_rec = list(rec_values = R, rec_times = L, time = T_val)
           data_rec = data.frame(rec_values = R, rec_times = L, time = T_val)
