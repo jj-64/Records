@@ -382,7 +382,7 @@ rec_count_mean_ldm <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 
   if (dist == "gumbel") {
     ## Explicit formula: sum of record probabilities
-    s <- rec_rate_LDM(t = 1:T, theta=theta, loc = 0, scale = args$scale)
+    s <- rec_rate_ldm(t = 1:T, theta=theta, loc = 0, scale = args$scale)
     return(sum(s))
 
   } else {
@@ -441,7 +441,7 @@ rec_count_var_ldm <- function(T,
 
   if (dist == "gumbel") {
     ## Explicit formula
-    s <- rec_rate_LDM(t = 1:T, theta = theta, loc = args$location, scale = args$scale)
+    s <- rec_rate_ldm(t = 1:T, theta = theta, loc = args$location, scale = args$scale)
     return(sum(s * (1 - s)))
 
   } else {

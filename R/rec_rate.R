@@ -9,7 +9,7 @@
 #' @param approximate boolean (Default = FALSE).
 #' @param ... additional arguments specific for each model
 #' @details
-#' For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_LDM}},
+#' For more details look at \code{\link{rec_rate_ynm}}, \code{\link{rec_rate_ldm}},
 #' \code{\link{rec_rate_DTRW}}, \code{\link{rec_rate_iid}}
 #' @return A numeric value representing the record rate probability.
 #'
@@ -33,7 +33,7 @@ rec_rate <- function(model = c("iid", "dtrw", "ynm", "ldm"), t, approximate = FA
   } else if (model == "ynm"){
     return(rec_rate_ynm(gamma = args$gamma, t= t))
   } else if (model == "ldm"){
-    return(rec_rate_LDM(theta = args$theta, t, scale = args$scale))
+    return(rec_rate_ldm(theta = args$theta, t, scale = args$scale))
   }
 }
 
@@ -136,26 +136,26 @@ rec_rate_DTRW <- function(t, approximate = FALSE) {
 #'
 #' @examples
 #' # Finite-time record rate
-#' rec_rate_LDM(theta = 0.5, t = 10, scale = 1, loc = 0)
+#' rec_rate_ldm(theta = 0.5, t = 10, scale = 1, loc = 0)
 #' # [1] 0.3961385
 #'
 #' # Asymptotic record rate (t -> infinity)
-#' rec_rate_LDM(theta = 0.5, t = Inf, scale = 1, loc =0)
+#' rec_rate_ldm(theta = 0.5, t = Inf, scale = 1, loc =0)
 #' # [1] 0.3934693
 #'
 #' # Default behavior returns asymptotic rate
-#' rec_rate_LDM(theta = 0.5, scale = 1, loc = 0)
+#' rec_rate_ldm(theta = 0.5, scale = 1, loc = 0)
 #'  # [1] 0.3934693
 #'
 #' # Compare convergence
 #' t_seq <- 1:100
-#' rates <- sapply(t_seq, function(tt) rec_rate_LDM(0.5, tt, scale = 1))
+#' rates <- sapply(t_seq, function(tt) rec_rate_ldm(0.5, tt, scale = 1))
 #' plot(t_seq, rates, type = "l", col = "blue", lwd = 2,
 #'      ylab = "Record Rate", xlab = "t")
-#' abline(h = rec_rate_LDM(0.5, Inf, scale = 1), col = "red", lty = 2)
+#' abline(h = rec_rate_ldm(0.5, Inf, scale = 1), col = "red", lty = 2)
 #'
 #' @export
-rec_rate_LDM <- function(theta, t = Inf, loc = 0, scale = 1) {
+rec_rate_ldm <- function(theta, t = Inf, loc = 0, scale = 1) {
   if (is.infinite(t[1]) || is.null(t)) {
     # Asymptotic case
     return(1 - exp(-theta / scale))

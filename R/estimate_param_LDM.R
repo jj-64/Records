@@ -148,9 +148,9 @@ estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
   theta_scaled_biased <- theta_biased / scale
 
   # --- 1. Bias correction (vectorized) ---
-  # Precompute P_t vector using your existing rec_rate_LDM implementation
+  # Precompute P_t vector using your existing rec_rate_ldm implementation
   t_seq <- seq_len(T)
-  P_t_vec <- rec_rate_LDM(t = t_seq, theta = theta_biased, scale = scale) # vector length T
+  P_t_vec <- rec_rate_ldm(t = t_seq, theta = theta_biased, scale = scale) # vector length T
   mean_P_t <- mean(P_t_vec)  # 1/T * sum P_t
 
   P_theta <- 1 - exp(-theta_scaled_biased)    # scalar
@@ -158,7 +158,7 @@ estimate_LDM_moments_unbias <- function(X, variance = TRUE, scale = 1) {
   term1 <- (mean_P_t - P_theta) / (1 - P_theta)
   term2 <- 1 / (2 * (1 - P_theta)^2)
 
-  # cc vector: rec_rate_LDM(theta,t)^2 + (mean_P_t - P_theta)^2
+  # cc vector: rec_rate_ldm(theta,t)^2 + (mean_P_t - P_theta)^2
   term3 <- P_t_vec^2 + (mean_P_t - P_theta)^2
   term4<- mean_P_t / T - sum(term3) / (T^2)
 
@@ -319,7 +319,7 @@ estimate_LDM_mle_indicator <- function(X, variance = TRUE, scale = 1, min = 0.00
 
     # --- Terms for variance formula ---
     a <- exp(-2 * theta_scaled) / (1 - exp(-theta_scaled))^2
-    b <- sum(rec_rate_LDM(theta = theta_scaled, t = 1:T, scale = 1))
+    b <- sum(rec_rate_ldm(theta = theta_scaled, t = 1:T, scale = 1))
 
     cc <- T * exp(-T * theta_scaled) * (T + exp(-T * theta_scaled) - 1) /
       (1 - exp(-T * theta_scaled))^2
@@ -327,7 +327,7 @@ estimate_LDM_mle_indicator <- function(X, variance = TRUE, scale = 1, min = 0.00
     # Function d(t, θ)
     d_t <- (2:T - 1) * exp(-theta_scaled * (2:T - 1)) *
       ((2:T - 2) + exp(-theta_scaled * (2:T - 1))) *
-      rec_rate_LDM(theta = theta_scaled, t = 2:T, scale = 1) /
+      rec_rate_ldm(theta = theta_scaled, t = 2:T, scale = 1) /
       (1 - exp(-theta_scaled * (2:T - 1)))^2
 
     dd <- sum(d_t)
