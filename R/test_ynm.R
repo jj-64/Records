@@ -542,7 +542,7 @@ test_ynm_chisq <- function(X,
 #' @export
 test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 
-  T <- length(X)
+  n <- length(X)
 
   obs <- rec_count(X)
 
@@ -576,15 +576,15 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
     if (approximate) {
       # Approximate variance (large-sample)
       v <- 1 / gamma_hat
-      var_hat <- (1 - v) / (T * v^3)
+      var_hat <- (1 - v) / (n * v^3)
     } else {
-      # Exact Fisher Information (requires rec_count_mean_YNM and rec_rate_YNM)
-      ent <- rec_count_mean_YNM(T = T, gamma = gamma_hat)
+      # Exact Fisher Information (requires rec_count_mean_ynm and rec_rate_YNM)
+      ent <- rec_count_mean_ynm(T = n, gamma = gamma_hat)
       a <- (1 / (gamma_hat^2 * (gamma_hat - 1)^2)) * ent
-      b <- (1 / gamma_hat^2) * (T - ent)
-      c <- T * (1 + gamma_hat^T * (T - 1)) / (gamma_hat^2 * (gamma_hat^T - 1)^2)
+      b <- (1 / gamma_hat^2) * (n - ent)
+      c <- n * (1 + gamma_hat^n * (n - 1)) / (gamma_hat^2 * (gamma_hat^n - 1)^2)
 
-      i <- 2:T
+      i <- 2:n
       d <- (i - 1) * (1 + (i - 2) * gamma_hat^(i - 1)) *
         rec_rate_YNM(gamma_hat, i) /
         (gamma_hat^2 * (gamma_hat^(i - 1) - 1)^2)
@@ -616,7 +616,7 @@ test_ynm_rec_count <- function(X, gamma = NA, alpha = 0.05) {
 
   # --- Fallback to exact quantiles ---
   bounds <- rec_count_bounds(
-    T = T,
+    T = n,
     model = "ynm",
     gamma = gamma_hat,
     alpha = alpha
