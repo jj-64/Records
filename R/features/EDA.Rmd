@@ -509,7 +509,7 @@ eta2_summary <- lapply(
       eta2 = round(effectsize::eta_squared(fit, partial = FALSE)$Eta2,3)
     )
   }
-) %>% bind_rows()
+) %>% dplyr::bind_rows()
 
 eta2_summary <- eta2_summary %>%
   arrange(desc(eta2))
@@ -533,7 +533,7 @@ kw_summary <- lapply(
       p_value = round(kt$p.value,5)
     )
   }
-) %>% bind_rows() %>%
+) %>% dplyr::bind_rows() %>%
   arrange(p_value)
 ```
 

@@ -406,18 +406,18 @@ for (T_val in T_values) {
 
 if(save_details){
   # All
-  final_combined_data <- bind_rows(detailed_results)
+  final_combined_data <- dplyr::bind_rows(detailed_results)
   addWorksheet(wb, "All_Results")
   writeData(wb, sheet = "All_Results", final_combined_data, rowNames = FALSE, colNames = TRUE)
 
   # Record
-  final_combined_data_record <- bind_rows(detailed_results_record)
+  final_combined_data_record <- dplyr::bind_rows(detailed_results_record)
   addWorksheet(wb, "All_Results_record")
   writeData(wb, sheet = "All_Results_record", final_combined_data_record, rowNames = FALSE, colNames = TRUE)
 
   ## summary table by Number of records
   summary_table_NT <- final_combined_data %>%
-    group_by(Param_N_T) %>%
+    dplyr::group_by(Param_N_T) %>%
     dplyr::summarise(
       count_sim = n(),
       Proba_N_T = n() / nrow(final_combined_data),

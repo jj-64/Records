@@ -76,7 +76,7 @@ aggregate_by_NT <- function(data,
   }
 
   # Combine all parameters
-  final_df <- bind_rows(results_list)
+  final_df <- dplyr::bind_rows(results_list)
 
   return(final_df)
 }
@@ -183,5 +183,5 @@ aggregate_by_T <- function(data,
     results_list[[param]] <- res
   }
 
-  return(bind_rows(results_list))
+  return(dplyr::bind_rows(results_list))
 }

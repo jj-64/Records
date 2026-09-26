@@ -6,7 +6,7 @@
 #'
 #' @importFrom magrittr %>%
 #'
-#' @importFrom dplyr arrange count filter mutate summarise all_of one_of desc
+#' @importFrom dplyr arrange count filter mutate summarise all_of one_of desc group_by bind_rows
 #' @importFrom tidyr pivot_wider
 #' @importFrom caret confusionMatrix createDataPartition train trainControl
 #' @importFrom maxLik maxLik
@@ -23,4 +23,6 @@
 #' @importFrom randomForest varImpPlot importance randomForest
 #' @importFrom fExtremes gevFit gpdFit
 #' @importFrom Dowd PickandsEstimator
+#' @importFrom rlang .data
+#' @importFrom stats acf na.pass qt resid residuals spec.pgram
 NULL

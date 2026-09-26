@@ -662,7 +662,7 @@ kk <- kk + 1
 # 1. Name the list items and combine into one big dataframe
 final_result <- results_list %>%
   set_names(trend_values) %>%
-  bind_rows(.id = "trend_value") # Creates the column at the start
+  dplyr::bind_rows(.id = "trend_value") # Creates the column at the start
 
 # 2. (Optional) Convert the trend column to numeric if needed
 final_result$trend_value <- as.numeric(final_result$trend_value)
@@ -670,7 +670,7 @@ final_result$trend_value <- as.numeric(final_result$trend_value)
 # 1. Name the list items and combine into one big dataframe
 final_result_power <- results_power_list %>%
   set_names(trend_values) %>%
-  bind_rows(.id = "trend_value") # Creates the column at the start
+  dplyr::bind_rows(.id = "trend_value") # Creates the column at the start
 
 # 2. (Optional) Convert the trend column to numeric if needed
 final_result_power$trend_value <- as.numeric(final_result_power$trend_value)

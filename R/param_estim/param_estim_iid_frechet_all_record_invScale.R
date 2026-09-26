@@ -380,11 +380,11 @@ for (T_val in T_values) {
 }
 
 if(save_details){
-  final_combined_data <- bind_rows(detailed_results)
+  final_combined_data <- dplyr::bind_rows(detailed_results)
   addWorksheet(wb, "All_Results") # 3. Save to a single sheet in Excel
   writeData(wb, sheet = "All_Results", final_combined_data, rowNames = FALSE, colNames = TRUE)
 
-  final_combined_data_record <- bind_rows(detailed_results_record)
+  final_combined_data_record <- dplyr::bind_rows(detailed_results_record)
   addWorksheet(wb, "All_Results_record") # 3. Save to a single sheet in Excel
   writeData(wb, sheet = "All_Results_record", final_combined_data_record, rowNames = FALSE, colNames = TRUE)
 
