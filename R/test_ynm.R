@@ -252,16 +252,19 @@ test_ynm_chisq <- function(X,
                                          }
 
   # Partition handling
-  if (is.na(Partition)[1]) Partition <- partition(X, K=K)
+  if (is.na(Partition)[1]) Partition <- partition(X, K=K,
+                                                  warmup = warmup,
+                                                  estimated = estimated)
 
   K <- length(Partition$frequency)
   nk <- Partition$frequency
   bin_starts <- Partition$bin_starts
   m_1 <- sum(nk)
 
-  if (K < (2+ifelse(estimated, 1, 0)))
-    {print("Test cannot be performed: partitions K are not sufficient")
-  return(list("decision" = NA))}
+  if (K < (2+ifelse(estimated, 1, 0))) {
+    print("Test cannot be performed: partitions K are not sufficient")
+    return(list("decision" = NA))
+    }
 
    # If gamma not provided -> estimate it
   if (is.null(gamma)) {
