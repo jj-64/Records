@@ -894,8 +894,6 @@ rec_count_dist_YNM <- function(m, T, gamma, s = NULL) {
 #'  scale = 1
 #')
 #' @export
-#'
-#'
 rec_count_bounds <- function(
     T,
     model = c("dtrw", "ldm", "ynm", "iid"),

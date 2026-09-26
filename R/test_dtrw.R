@@ -61,7 +61,6 @@
 #' set.seed(123)
 #' X <- cumsum(rnorm(100))  # Simulated random walk
 #' test_dtrw_increment(X, alpha = 0.05, method = "Bonf")
-#'
 test_dtrw_increment = function(X,alpha=0.05, method="Bonf"){
 
   X=X-X[1]
