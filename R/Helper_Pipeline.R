@@ -1223,10 +1223,10 @@ extract_anomaly_features = function(series){
 
   ## --- Feature vector -------------------------------------------------------
   features <- c(
-    mad_outlier_rate = mad_outlier_rate,
+    #mad_outlier_rate = mad_outlier_rate,
     #rolling_outlier_rate = rolling_outlier_rate,
     #rolling_max_z = rolling_max_z,
-    mean_shift_score= mean_shift_score,
+    # mean_shift_score= mean_shift_score,
     spectral_spike_ratio = spectral_spike_ratio,
     #isolation_anomaly_score = isolation_anomaly_score,
     #extreme_jump_rate = extreme_jump_rate
