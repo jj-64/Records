@@ -151,6 +151,7 @@ partition <- function(X, min_expected = 1, warmup = NULL, K = NULL, estimated = 
 #' @param gamma Numeric. Optional. to be estimated if NA (default = NA).
 #' @param K Optional. If given, force exactly K partitions using quantiles.
 #' @param estimated Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
+#' @param warmup Integer. Warm-up parameter for YNM test (default = 2)
 #' @param alpha Significance level (default = 0.05).
 #' @return A list with:
 #'   \item{observed_count}{Frequencies in each partition}
@@ -210,6 +211,7 @@ test_ynm_chisq <- function(X,
                            Partition = NA,
                            gamma = NULL,
                            K=NULL,
+                           warmup = 2,
                            estimated = TRUE,
                            alpha = 0.05) {
 
