@@ -1,11 +1,9 @@
 #' @importFrom stats Box.test IQR aggregate coef cor cov lm median
 #'   na.omit nlminb optim pchisq pnorm predict pt qchisq qnorm quantile
 #'   rbeta rcauchy rexp rnorm runif rweibull sd var mad wilcox.test
-#'
+#'   acf na.pass qt resid residuals spec.pgram optimize
 #' @importFrom utils head tail install.packages setTxtProgressBar txtProgressBar
-#'
 #' @importFrom magrittr %>%
-#'
 #' @importFrom dplyr arrange count filter mutate summarise all_of one_of desc group_by bind_rows
 #' @importFrom tidyr pivot_wider
 #' @importFrom caret confusionMatrix createDataPartition train trainControl
@@ -24,7 +22,7 @@
 #' @importFrom fExtremes gevFit gpdFit
 #' @importFrom Dowd PickandsEstimator
 #' @importFrom rlang .data
-#' @importFrom stats acf na.pass qt resid residuals spec.pgram
 #' @importFrom lawstat symmetry.test
-#' @importFrom magrittr "%>%"
+#' @importFrom MASS ginv
+#' @importFrom vrtest Auto.VR
 NULL

@@ -86,7 +86,6 @@ rec_count_stats <- function(model,
 #' The average expected number of records in an i.i.d process. It is distribution-free,
 #' i.e. independent from the process underlying distribution. It only depends from the length of the series.
 #' @param T numeric, the length of the series
-#' @param approximate logical, if approximated value. default = FALSE
 #'
 #' @returns a single value of the expected number of records
 #' @export
@@ -828,7 +827,7 @@ rec_count_dist_ynm <- function(m, T, gamma, s = NULL) {
 #' \code{\link{test_dtrw_rec_count}},
 #' \code{\link{rec_count_stats}}
 #' \code{\link{test_ldm_rec_count}} for hypothesis testing of the number of records.
-#'
+#' \code{\link{test_ynm_rec_count}} for hypothesis testing of the number of records.
 #'
 #' @examples
 #' rec_count_bounds(

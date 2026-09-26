@@ -12,6 +12,7 @@
 #' @param alpha Numeric. Significance level for all tests (default = 0.05).
 #' @param lag Integer. Lag parameter for Box-Jenkins test (default = 10).
 #' @param warmup Integer. Warm-up parameter for YNM test (default = 2).
+#' @param K Integer. minimum number of observation in bin for YNM test (default is NULL)
 #' @param obs_type String. "all" if data provided is the whole series \eqn{X_t} or
 #' "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 #' record_times must be provided.
@@ -21,7 +22,7 @@
 #'   (default = \code{FALSE} for the exact quantile test). Forced when obs_type = "records".
 #' @param one.sided Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
 #'   (default = \code{FALSE} for two-sided). Forced when obs_type = "records".
-#' @param print logical default is FALSE, summary is not printed
+#' @param verbose logical default is FALSE, summary is not printed
 #' @return A list containing:
 #'
 #' 1 - decision: A data frame with 24 rows:

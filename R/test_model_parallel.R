@@ -17,10 +17,7 @@
 #'   \code{"Bonf"}, \code{"Holm"}, \code{"Sidak"}, or \code{"Chisq"} (default = "Bonf").
 #' @param K Optional. Number of partitions in \link{test_ynm_chisq} test.
 #'    If given, force exactly K partitions using quantiles.
-#' @param estimate_gamma Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)
 #' @param gamma Numeric. Optional. Force if estimated_gamma = FALSE.
-#' @param RSq Numeric, minimum adjusted R-squared required to accept the LDM
-#'   hypothesis (default = 0.8).
 #' @param record_times (Default = NA) record times in case obs_type = "records"
 #' @return A list containing all:
 #' \describe{

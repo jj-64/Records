@@ -274,7 +274,7 @@ test_ynm_chisq <- function(X,
     chi_values <- sapply(gammas, function(g) x2_term_g(g, K, nk, j = bin_starts))
     gamma <- gammas[which.min(chi_values)]
 
-    fit <- optimize(
+    fit <- stats::optimize(
       f = x2_term_g,
       interval = c(1.000001, gamma + 0.2),
       K = K,

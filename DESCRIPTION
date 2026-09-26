@@ -43,6 +43,7 @@ Suggests:
     knitr,
     rmarkdown,
     devtools,
-    VGAM
+    MASS,
+    vrtest
 VignetteBuilder: knitr
 

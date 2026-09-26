@@ -44,11 +44,6 @@ test_model_parallel(
 If given, force exactly K partitions using quantiles.}
 
 \item{gamma}{Numeric. Optional. Force if estimated_gamma = FALSE.}
-
-\item{estimate_gamma}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
-
-\item{RSq}{Numeric, minimum adjusted R-squared required to accept the LDM
-hypothesis (default = 0.8).}
 }
 \value{
 A list containing all:

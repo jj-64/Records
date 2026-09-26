@@ -8,8 +8,6 @@ rec_count_mean_iid(T)
 }
 \arguments{
 \item{T}{numeric, the length of the series}
-
-\item{approximate}{logical, if approximated value. default = FALSE}
 }
 \value{
 a single value of the expected number of records

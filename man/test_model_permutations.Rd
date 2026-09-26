@@ -26,6 +26,10 @@ test_model_permutations(
 
 \item{warmup}{Integer. Warm-up parameter for YNM test (default = 2).}
 
+\item{K}{Integer. minimum number of observation in bin for YNM test (default is NULL)}
+
+\item{verbose}{logical default is FALSE, summary is not printed}
+
 \item{obs_type}{String. "all" if data provided is the whole series \eqn{X_t} or
 "records" if the underlying series is \eqn{R_n}. In this case, the parameter
 record_times must be provided.}
@@ -38,8 +42,6 @@ Forced in case "obs_type" = "records"}
 
 \item{one.sided}{Logical, if \code{TRUE} perform a one-sided test for DTRW \eqn{N_T}-test
 (default = \code{FALSE} for two-sided). Forced when obs_type = "records".}
-
-\item{print}{logical default is FALSE, summary is not printed}
 }
 \value{
 A list containing:

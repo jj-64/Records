@@ -30,35 +30,19 @@ A list containing:
 
 \describe{
 
-\item{theta_hat}{
-Estimated drift parameter.
-}
+\item{theta_hat}{Estimated drift parameter.}
 
-\item{std_error}{
-Standard error of the drift estimate.
-}
+\item{std_error}{Standard error of the drift estimate.}
 
-\item{stat}{
-Wald t-statistic for testing \eqn{\theta=0}.
-}
+\item{stat}{Wald t-statistic for testing \eqn{\theta=0}.}
 
-\item{p_value}{
-Two-sided p-value.
-}
+\item{p_value}{Two-sided p-value.}
 
-\item{adj_r_squared}{
-Adjusted coefficient of determination.
-}
+\item{adj_r_squared}{Adjusted coefficient of determination.}
 
-\item{nmse}{
-Normalized mean squared error.
-Values near zero indicate a strong linear drift component.
-}
+\item{nmse}{Normalized mean squared error.Values near zero indicate a strong linear drift component.}
 
-\item{decision}{
-\code{"ldm"} if the null hypothesis is rejected at level
-\code{alpha}; otherwise \code{"NO"}.
-}
+\item{decision}{\code{"ldm"} if the null hypothesis is rejected at level \code{alpha}; otherwise \code{"NO"}.}
 
 }
 }
@@ -117,10 +101,10 @@ NMSE measures the proportion of variability not explained by the
 estimated linear drift. Smaller values indicate a better fit to
 the Linear Drift Model.
 
-\enumerate{
-\item {NMSE < 0.25}{ : strong support}
-\item {NMSE < 0.50}{ : moderate support}
-\item {NMSE > 0.75}{ : weak practical support}
+\describe{
+\item{NMSE < 0.25}{ : strong support}
+\item{NMSE < 0.50}{ : moderate support}
+\item{NMSE > 0.75}{ : weak practical support}
 }
 }
 \examples{
