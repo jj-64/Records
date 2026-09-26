@@ -36,13 +36,13 @@ Imports:
     tsfeatures,
     pROC,
     magrittr,
-    forecast
+    forecast,
+    lawstat
 Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
     devtools,
-    VGAM,
-    lawstat
+    VGAM
 VignetteBuilder: knitr
 
