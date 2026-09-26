@@ -1196,7 +1196,7 @@ extract_anomaly_features = function(series){
   # Unexpected spikes relative to dominant frequency structure.
   #
   # Remove dominant spectral component and measure residual spikes.
-  spec <- spec.pgram(s, plot = FALSE)
+  spec <- stats::spec.pgram(s, plot = FALSE)
 
   if(length(spec$spec) > 0) {
     dominant_power <- max(spec$spec)
