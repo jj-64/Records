@@ -37,40 +37,52 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' result <- test_model_permutation(X = rnorm(50), obs_type = "all", verbose = FALSE,)
-#'
-#' print(result$decision)
-#' #  Permutation Accepted_Test  decision
-#' # 1         DLCY             C Classical
-#' # 2         DLYC             Y       YNM
-#' # 3         DYLC             Y       YNM
-#' # 4         YDLC             Y       YNM
-#' # 5         YDCL             Y       YNM
-#' # 6         DYCL             Y       YNM
-#' # 7         DCYL             C Classical
-#' # 8         DCLY             C Classical
-#' # 9         CDLY             C Classical
-#' # 10        CDYL             C Classical
-#' # 11        CYDL             C Classical
-#' # 12        YCDL             Y       YNM
-#' # 13        YCLD             Y       YNM
-#' # 14        CYLD             C Classical
-#' # 15        CLYD             C Classical
-#' # 16        CLDY             C Classical
-#' # 17        LCDY             C Classical
-#' # 18        LCYD             C Classical
-#' # 19        LYCD             Y       YNM
-#' # 20        YLCD             Y       YNM
-#' # 21        YLDC             Y       YNM
-#' # 22        LYDC             Y       YNM
-#' # 23        LDYC             Y       YNM
-#' # 24        LDCY             C Classical
-#'
-#' print(result$summary)
-#' #       Var1 Freq
-#' #        1 Classical   12
-#' #        2       YNM   12
-#' }
+#' result <- test_model_permutations(X = rnorm(50),
+#' obs_type = "all",
+#' verbose = FALSE,
+#' lag = 10,
+#' alpha = 0.05)
+#' # result
+#' # $majority_decision
+#' # [1] iid
+#' # Levels: iid
+#' #
+#' # $stability
+#' # [1] 1
+#' #
+#' # $entropy
+#' # [1] 0
+#' #
+#' # $permutation_results
+#' # permutation accepted_test accepted_after model
+#' # 1         DLCY             C              3   iid
+#' # 2         DLYC             C              4   iid
+#' # 3         DYLC             C              4   iid
+#' # 4         YDLC             C              4   iid
+#' # 5         YDCL             C              3   iid
+#' # 6         DYCL             C              3   iid
+#' # 7         DCYL             C              2   iid
+#' # 8         DCLY             C              2   iid
+#' # 9         CDLY             C              1   iid
+#' # 10        CDYL             C              1   iid
+#' # 11        CYDL             C              1   iid
+#' # 12        YCDL             C              2   iid
+#' # 13        YCLD             C              2   iid
+#' # 14        CYLD             C              1   iid
+#' # 15        CLYD             C              1   iid
+#' # 16        CLDY             C              1   iid
+#' # 17        LCDY             C              2   iid
+#' # 18        LCYD             C              2   iid
+#' # 19        LYCD             C              3   iid
+#' # 20        YLCD             C              3   iid
+#' # 21        YLDC             C              4   iid
+#' # 22        LYDC             C              4   iid
+#' # 23        LDYC             C              4   iid
+#' # 24        LDCY             C              3   iid
+#' #
+#' # $summary
+#' # model count proportion
+#' # 1   iid    24          1
 test_model_permutations <- function(
     X,
     alpha = 0.05,
