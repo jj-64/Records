@@ -415,3 +415,190 @@ simulation_permutation_analysis <- function(
 #     accuracy_by_perm = accuracy_by_perm
 #   ))
 # }
+
+
+
+#########------------------Monte Carlo Simulation Limited ---------------######################
+# Monte Carlo Simulation of Record Model Identification via Test Permutations
+#
+# Runs multiple simulations of time series generated under a specified null
+# model (e.g. DTRW, LDM, iid, YNM),
+# applies all 24 possible permutations of four record-based tests (DTRW, LDM,
+# Classical, YNM),
+# and records which test (if any) is accepted by each permutation.
+#
+# @param n_sim Number of simulated series (default = 1000)
+# @param T Length of each time series (default = 50)
+# @param generator String. The name of series generator
+# @param series_args List. Arguments of the generator of the series, the
+# argument "T" is not included
+# @param n_arg Character. default is "T" as some generator functions take "n"
+# @param H0 Character. The true generating process: "dtrw", "ldm",
+# "iid", or "ynm"
+# @param alpha Numeric. Significance level for all tests (default = 0.05)
+# @param print logical default is FALSE, summary is not printed
+# @return A list containing:
+# \describe{
+#   \item{results_all}{Data frame of all simulation × permutation outcomes}
+#   \item{summary_total}{Frequency of accepted decisions across all runs}
+#   \item{perm_dec_table}{Contingency Table of waht each permutation returns}
+#   \item{accuracy_by_perm}{How often each permutation recovered the true H0}
+# }
+# @examples
+# \dontrun{
+# sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
+# generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
+# H0 = "dtrw")
+#
+#
+# ### 75% of the permutations trees return "dtrw" and 25% return "ynm".
+# ### On average, one simulation will return the following:
+# #  summary_total
+# #  decision Freq
+# #  1     DTRW 0.75
+# #  2      YNM 0.25
+#
+#
+#  ### Contingency Table of what each permutation returns
+# #  perm_dec_table
+# #  Permutation DTRW YNM
+# #  1         CDLY  1.0 0.0
+# #  2         CDYL  1.0 0.0
+# #  3         CLDY  1.0 0.0
+# #  4         CLYD  0.5 0.5
+# #  5         CYDL  0.5 0.5
+# #  6         CYLD  1.0 0.0
+# #  7         DCLY  1.0 0.0
+# #  8         DCYL  1.0 0.0
+# #  9         DLCY  1.0 0.0
+# #  10        DLYC  1.0 0.0
+# #  11        DYCL  0.5 0.5
+# #  12        DYLC  0.5 0.5
+# #  13        LCDY  0.5 0.5
+# #  14        LCYD  0.5 0.5
+# #  15        LDCY  0.5 0.5
+# #  16        LDYC  1.0 0.0
+# #  17        LYCD  1.0 0.0
+# #  18        LYDC  0.5 0.5
+# #  19        YCDL  0.5 0.5
+# #  20        YCLD  0.5 0.5
+# #  21        YDCL  0.5 0.5
+# #  22        YDLC  0.5 0.5
+# #  23        YLCD  1.0 0.0
+# #  24        YLDC  1.0 0.0
+#
+#
+#  ## Under HO: "dtrw", those permutations having accuracy 1.0 returned "dtrw"
+#  ##  across all simulations
+# #     Permutation Success_Rate
+# #     1         CDLY          1.0
+# #     2         CDYL          1.0
+# #     3         CLDY          1.0
+# #     4         CLYD          0.5
+# #     5         CYDL          0.5
+# #     6         CYLD          1.0
+# #     7         DCLY          1.0
+# #     8         DCYL          1.0
+# #     9         DLCY          1.0
+# #     10        DLYC          1.0
+# #     11        DYCL          0.5
+# #     12        DYLC          0.5
+# #     13        LCDY          0.5
+# #     14        LCYD          0.5
+# #     15        LDCY          0.5
+# #     16        LDYC          1.0
+# #     17        LYCD          1.0
+# #     18        LYDC          0.5
+# #     19        YCDL          0.5
+# #     20        YCLD          0.5
+# #     21        YDCL          0.5
+# #     22        YDLC          0.5
+# #     23        YLCD          1.0
+# #     24        YLDC          1.0
+# }
+# Simulation_Permutation_Analysis_limited <- function(
+#     n_sim = 1000,
+#     T = 50,
+#     generator, ## function:the function generating the series
+#     series_args=list(), ## arguments of the generator function other than "T" and the "param_name" we are simulating
+#     n_arg="T",
+#     H0 = c("dtrw", "ldm", "iid", "ynm"),
+#     alpha = 0.05,
+#     print = FALSE
+# ) {
+#   H0 <- match.arg(H0)
+#   if (!requireNamespace("combinat", quietly = TRUE)) {
+#     stop("Please install 'combinat' package first.")
+#   }
+#
+#   ## --- Helper: Generate series under true model H0
+#   args <- series_args
+#   args[[n_arg]] <- T   # could be "T" or "n"
+#
+#   ## --- Get all 24 permutations
+#   test_ids <- c("D", "L", "C", "Y")
+#   perms <- sapply(combinat::permn(test_ids), paste, collapse = "")
+#
+#   ## --- Storage
+#   all_results <- expand.grid(
+#     sim_id = 1:n_sim,
+#     Permutation = perms,
+#     stringsAsFactors = FALSE
+#   )
+#   all_results$decision <- NA_character_
+#
+#   ## --- Simulation loop
+#   pb <- txtProgressBar(min = 0, max = n_sim, style = 3)
+#   for (i in seq_len(n_sim)) {
+#     X <- do.call(generator, args)
+#     perm_result <-  Test_Permutation_limited(X, alpha = alpha, print= print)
+#
+#     # store results for this simulation
+#     all_results$decision[all_results$sim_id == i] <- (perm_result$decision)$decision
+#     summary_per_sim =  perm_result$summary
+#     setTxtProgressBar(pb, i)
+#   }
+#   close(pb)
+#
+#   ############## ------------------------ SUMARIES --------------------
+#   # 1) global counts of Decisions (exclude NA)
+#   summary_total <- all_results %>%
+#     filter(!is.na(decision)) %>%
+#     count(decision, name = "Freq") %>%
+#     arrange(desc(Freq))
+#   summary_total = as.data.frame(summary_total)
+#   summary_total$Freq = summary_total$Freq/(n_sim*length(perms))
+#
+#
+#   # 2) contingency table: how many times each permutation returned each decision
+#   perm_dec_table <- all_results %>%
+#     count(Permutation, decision) %>%
+#     pivot_wider(names_from = decision, values_from = n, values_fill = 0)
+#   perm_dec_table = as.data.frame( perm_dec_table)
+#   perm_dec_table[,-1] =  perm_dec_table[,-1]/(n_sim)
+#
+#   ## 3) --- Accuracy by permutation (fraction of runs where decision matches true H0)
+#   accuracy_by_perm <- aggregate(
+#     I(all_results$decision == H0) ~ Permutation, data = all_results, FUN = mean
+#   )
+#   names(accuracy_by_perm)[2] <- "Success_Rate"
+#
+#
+#   if(print){
+#     message("\n===== Overall Summary =====")
+#     print(summary_total)
+#     message("\n===== Contingency Table =====")
+#     print( perm_dec_table)
+#     message("\n===== Accuracy by Permutation =====")
+#     print(accuracy_by_perm[order(-accuracy_by_perm$Success_Rate), ])
+#
+#   }
+#
+#   return(list(
+#     results_all = all_results,
+#     global_accuracy = summary_total,
+#     perm_stability =  perm_dec_table,
+#     accuracy_by_perm = accuracy_by_perm
+#   ))
+# }
+#
