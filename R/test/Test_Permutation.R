@@ -36,7 +36,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' result <- Test_Permutation(X = rnorm(50), print = FALSE, obs_type = "all")
+#' result <- test_model_permutation(X = rnorm(50), print = FALSE, obs_type = "all")
 #'
 #' print(result$decision)
 #' #  Permutation Accepted_Test  Decision
@@ -70,7 +70,7 @@
 #' #        1 Classical   12
 #' #        2       YNM   12
 #' }
-Test_Permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE, obs_type = c("all"), record_times = NA, approximate = FALSE, one.sided= FALSE) {
+test_model_permutation <- function(X, alpha = 0.05, lag = 10, warmup = 2, print = TRUE, obs_type = c("all"), record_times = NA, approximate = FALSE, one.sided= FALSE) {
   # Ensure combinat is available
   if (!requireNamespace("combinat", quietly = TRUE)) {
     stop("Please install the 'combinat' package with install.packages('combinat').")
@@ -292,7 +292,7 @@ Simulation_Permutation_Analysis <- function(
   for (i in seq_len(n_sim)) {
     X <- do.call(generator, args)
     record_times = rec_times(X)
-    perm_result <-  Test_Permutation(X, alpha = alpha, lag = lag, warmup = warmup, print= print, obs_type = obs_type, record_times = record_times,
+    perm_result <-  test_model_permutation(X, alpha = alpha, lag = lag, warmup = warmup, print= print, obs_type = obs_type, record_times = record_times,
                                      approximate = approxiamte, one.sided = one.sided)
 
     # store results for this simulation
