@@ -52,7 +52,6 @@ test_model_parallel <- function(
     one.sided = FALSE,
     method = "Holm",
     K = NULL,
-    estimate_gamma = TRUE,
     gamma = NULL
 ) {
 
@@ -60,9 +59,20 @@ test_model_parallel <- function(
 
   results <- list()
 
+  estimate_gamma = ifelse(is.null(gamma) || is.na(gamma), TRUE, FALSE)
+
   ## ------------------------------------------------------
   ## Record-statistic tests
   ## ------------------------------------------------------
+  if (obs_type == "records") {
+
+    if (is.null(record_times))
+      stop("'record_times' must be supplied.")
+
+    if (length(record_times) != length(X))
+      stop("'record_times' and 'X' must have the same length.")
+
+    }
 
   results$iid_rec_count <- test_iid_rec_count(
     X = X,
@@ -82,7 +92,7 @@ test_model_parallel <- function(
     alpha = alpha
   )
 
-  results$YNM_Pearson <- test_ynm_chisq(
+  results$ynm_chisq <- test_ynm_chisq(
     X = X,
     gamma = gamma,
     K = K,
@@ -90,7 +100,7 @@ test_model_parallel <- function(
     alpha = alpha
   )
 
-  results$YNM_Gaps <- test_ynm_record_gaps(
+  results$ynm_rec_gaps <- test_ynm_rec_gaps(
     X = X,
     alpha = alpha,
     K = K,
@@ -99,17 +109,17 @@ test_model_parallel <- function(
     record_times = record_times
   )
 
-  results$LDM_Record <- test_ldm_records(
+  results$ldm_reC_count <- test_ldm_rec_count(
     X = X,
     alpha = alpha
   )
 
-  results$LDM_Sequential <- test_ldm_sequential(
+  results$ldm_sequential <- test_ldm_sequential(
     X = X,
     alpha = alpha
   )
 
-  results$LDM_Trend <- test_ldm_trend(
+  results$ldm_tred <- test_ldm_trend(
     X = X,
     alpha = alpha
   )

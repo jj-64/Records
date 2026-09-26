@@ -4,7 +4,7 @@
 \alias{test_ynm_rec_count}
 \title{Record-Count Test for the YNM Model}
 \usage{
-test_ynm_rec_count(X, gamma = NA, alpha = 0.05)
+test_ynm_rec_count(X, gamma = NULL, alpha = 0.05)
 }
 \arguments{
 \item{X}{A numeric vector (time series).}
