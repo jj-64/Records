@@ -15,7 +15,6 @@ test_model_parallel(
   one.sided = FALSE,
   method = "Holm",
   K = NULL,
-  estimate_gamma = TRUE,
   gamma = NULL
 )
 }
@@ -44,9 +43,9 @@ test_model_parallel(
 \item{K}{Optional. Number of partitions in \link{test_ynm_chisq} test.
 If given, force exactly K partitions using quantiles.}
 
-\item{estimate_gamma}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
-
 \item{gamma}{Numeric. Optional. Force if estimated_gamma = FALSE.}
+
+\item{estimate_gamma}{Logical. If to estimate \eqn{\gamma} through minimizing \eqn{\chi^2} (Default = TRUE)}
 
 \item{RSq}{Numeric, minimum adjusted R-squared required to accept the LDM
 hypothesis (default = 0.8).}
@@ -54,8 +53,9 @@ hypothesis (default = 0.8).}
 \value{
 A list containing all:
 \describe{
-\item{results}{List of all Test outcomes}
-\item{decision}{Final decision of each test}
+\item{summary}{List summary of final decision, leading_model, agreement proportion. confidence, model_scores,}
+\item{decisions}{dataframe of decision of each test}
+\item{results}{List of detailed results of each test}
 }
 }
 \description{
@@ -63,16 +63,27 @@ Applies all 10 possible Tests (if applicable) of four record-based tests (D, L, 
 on the same series \code{X} independently.
 }
 \examples{
-tests = Test_Parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
-tests$decision
-# iid_NT.decision        DTRW_NT.decision
-# "iid"                  "dtrw"
-# YNM_NT.decision       YNM_Pearson.decision
-#           "no"                      NA
-# YNM_Geom.decision         LDM_NT.decision
-#            "no"                    "no"
-# LDM_Sequential.decision     LDM_Regression.decision
-#     "no"                           "no"
-# iid_Box.decision     DTRW_Indep.decision
-#  "iid"             "no"
+\dontrun{
+tests = test_model_parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
+}
+> tests$summary
+# $final_decision
+# [1] 3
+#
+# $leading_model
+# [1] no
+# Levels: dtrw iid no ynm
+#
+# $agreement
+# [1] 0.7272727
+#
+# $confidence
+# [1] 0.6363636
+#
+# $model_scores
+# model count proportion
+# 3    no     8 0.72727273
+# 1  dtrw     1 0.09090909
+# 2   iid     1 0.09090909
+# 4   ynm     1 0.09090909
 }
