@@ -25,4 +25,5 @@
 #' @importFrom Dowd PickandsEstimator
 #' @importFrom rlang .data
 #' @importFrom stats acf na.pass qt resid residuals spec.pgram
+#' @importFrom lawstat symmetry.test
 NULL
