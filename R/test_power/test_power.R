@@ -12,9 +12,9 @@ T <- seq(40, 100, by = 10)
 save = TRUE
 save_path ="C:/Users/User/OneDrive - Lebanese University/Lebanese University/PhD/Publication 3 - Decision Tree test/Power of Test/"
 
-# -------------------------------
-# Generic Simulation Function
- -------------------------------
+# ______________________________________
+# Generic Simulation Function ----------
+# ______________________________________
 
 simulate_model <- function(param_values, ## vector of values of the parameter that we are simulating upon
                            param_name, ## string: the parameter we are simulation upon "gamma", "theta", "scale"...
@@ -54,9 +54,9 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
   return(results)
 }
 
-# -------------------------------
-# Plotting Function
-# -------------------------------
+# ______________________________________
+# Plotting Function ------------
+# ______________________________________
 
 plot_results <- function(df, param_name, title, ylab_name = "Power of test (1-ß, %)", xlab_name = NULL, ymin=0, ymax=100 ) {
   if (is.null(xlab_name)) xlab_name <- param_name
@@ -114,9 +114,9 @@ save_plot <- function(path, filename, plot){
   ggsave(path = path, filename = filename, plot=plot, width = 7, height = 5, dpi = 600)
 }
 
-# -------------------------------
-# Excel Writer
-# -------------------------------
+# ______________________________________
+# Excel Writer ---------------
+# ______________________________________
 save_results <- function(df, file, sheet) {
   xlsx::write.xlsx(df, file, sheetName=sheet, append=TRUE, row.names=FALSE)
 }
@@ -148,9 +148,9 @@ save_results_with_plot <- function(df, file = "results.xlsx", sheet ,p) {
 }
 
 ######################## 1️⃣ Part 1 -  Classical Model 1️⃣ ##############################
-# -------------------------------
+# ______________________________________
 # Run H0: Classical vs H1: Yang
-# -------------------------------
+# ______________________________________
 gamma <- seq(1.01, 1.4, by=0.01)
 m_c_y <- simulate_model(param_values = gamma,
   T = T,
@@ -164,9 +164,9 @@ m_c_y <- simulate_model(param_values = gamma,
 plot_results(m_c_y, param_name="gamma", title="Classical vs Yang - Gumbel", xlab_name = "γ")
 if(save == TRUE) {save_results(m_c_y, paste0(save_path,"/Classical BoxJenkins.xlsx"), "YNM_Gumbel_0_1")}
 
-# -------------------------------
+# ______________________________________
 # Run H0: Classical vs H1: LDM
-# -------------------------------
+# ______________________________________
 theta_vals <- seq(0.01, 0.5, by=0.05)
 m_c_L <- simulate_model(
   param_values = theta_vals,
@@ -181,9 +181,9 @@ m_c_L <- simulate_model(
 plot_results(m_c_L, param_name="theta",  title = "Classical vs LDM - Frechet", xlab_name = "Θ")
 if(save == TRUE) {save_results(m_c_L, paste0(save_path,"/Classical BoxJenkins.xlsx"), "LDM_Frechet_5_1")}
 
-# -------------------------------
+# ______________________________________
 # Run H0: Classical vs H1: DTRW
-# -------------------------------
+# ______________________________________
 scale_vals <- seq(1, 5, by=0.5)
 m_c_R <- simulate_model(
   param_values = scale_vals,
@@ -203,9 +203,9 @@ if(save == TRUE) {save_results(m_c_R, paste0(save_path,"/Classical BoxJenkins.xl
 # plot(0:(length(v1)-1), y=v1, type = "l", xlab = "X", ylim=c(0,30))
 # lines(0:(length(v1)-1), y=v, type = "l", col = "red")
 
-# -------------------------------
+# ______________________________________
 # Detection Rate: Classical vs Classical
-# -------------------------------
+# ______________________________________
 scale_vals <- seq(1, 5, by=0.5)
 m_c_c <- simulate_model(
   param_values = scale_vals,
@@ -221,9 +221,9 @@ plot_results(m_c_c, param_name="sd", title="Classical Detection Rate", xlab_name
 if(save == TRUE) {save_results(m_c_c, paste0(save_path,"/Classical BoxJenkins.xlsx"), "Detection")}
 
 ############################ 2️⃣ PART 2 : LDM 2️⃣  ####################################################
-# ----------------------------------
+# ______________________________________
 # Run: H0: LDM vs H1: Yang
-# ----------------------------------
+# ______________________________________
 gamma <- c(1.01,seq(1.05, 1.4, by=0.05))
 m_L_y <- simulate_model(
   param_values = gamma,
@@ -238,9 +238,9 @@ m_L_y <- simulate_model(
 plot_results(m_L_y, "gamma", "LDM vs Yang-Nevzorov - Weibull", xlab_name="Gamma (γ)", ymax=100)
 if(save == TRUE) {save_results(m_L_y, paste0(save_path,"/LDM_Sequential.xlsx"), "YNM_Weibull_5_1")}
 
-# ----------------------------------
+# ______________________________________
 # Run H0: LDM vs H1: Classical
-# ----------------------------------
+# ______________________________________
 b <- sqrt(seq(1, 5,1))
 m_L_c <- simulate_model(
   param_values = b,
@@ -255,9 +255,9 @@ m_L_c <- simulate_model(
 plot_results(m_L_c, "sd", title="LDM vs Classical", xlab_name="scale parameter for normal")
 if(save == TRUE) {save_results(m_L_c, paste0(save_path,"/LDM_Sequential.xlsx"), "Classical_Norm")}
 
-# ----------------------------------
+# ______________________________________
 # H0: LDM vs H1: DTRW
-# ----------------------------------
+# ______________________________________
 scale_vals <- seq(1, 5, 1)
 m_L_R <- simulate_model(
   param_values = scale_vals,
@@ -272,9 +272,9 @@ m_L_R <- simulate_model(
 plot_results(m_L_R, "scale", title= "LDM vs DTRW - Cauchy", xlab_name="Scale (σ²)")
 if(save == TRUE) {save_results(m_L_R, paste0(save_path,"/LDM_Sequential.xlsx"), "DTRW_Norm")}
 
-# ----------------------------------
+# ______________________________________
 # H0: LDM vs H1: LDM (should be Low)
-# ----------------------------------
+# ______________________________________
 theta_vals <-c(0.01,seq(0.05,0.3,0.05))
 m_L_L <- simulate_model(
   param_values = theta_vals,
@@ -291,9 +291,9 @@ if(save == TRUE) {save_results(m_L_L, paste0(save_path,"/LDM_Sequential.xlsx"), 
 
 ############################ 3️⃣ PART 3: DTRW 3️⃣ ################################################
 
-# ----------------------------------
+# ______________________________________
 # H0: DTRW vs H1: Yang
-# ----------------------------------
+# ______________________________________
 gamma <- seq(1.01, 1.4, by=0.1)
 m_R_y <- simulate_model(
   param_values = gamma,
@@ -308,9 +308,9 @@ m_R_y <- simulate_model(
 plot_results(m_R_y, "gamma", "DTRW vs YNM - Gumbel", xlab = "Gamma (γ)")
 if(save == TRUE) {save_results(m_R_y, paste0(save_path,"/DTRW_Indep.xlsx"), "YNM_Frechet_5_1")}
 
-# ----------------------------------
+# ______________________________________
 # H0: DTRW vs H1: Classical
-# ----------------------------------
+# ______________________________________
 b <- seq(1, 5, 1)
 m_R_c <- simulate_model(
   param_values = b,
@@ -326,9 +326,9 @@ m_R_c <- simulate_model(
 plot_results(m_R_c, "sd", "DTRW vs Normal i.i.d", xlab= "σ")
 if(save == TRUE) {save_results(m_R_c,paste0(save_path,"/DTRW_Indep.xlsx"), "Classical_Norm")}
 
-# ----------------------------------
+# ______________________________________---
 # DTRW vs LDM
-# ----------------------------------
+# ______________________________________---
 theta_vals <- seq(0.01, 0.1, by=0.02)
 m_R_L <- simulate_model(
   param_values = theta_vals,
@@ -344,9 +344,9 @@ m_R_L <- simulate_model(
 plot_results(m_R_L, "theta", "DTRW vs LDM - Normal", xlab="theta (Θ)")
 if(save == TRUE) {save_results(m_R_L, paste0(save_path,"/DTRW_Indep.xlsx"), "LDM_Weibull_2_1")}
 
-# ----------------------------------
+# ______________________________________---
 # DTRW Detection Rate: should be low (5%)
-# ----------------------------------
+# ______________________________________---
 scale_vals <- seq(1, 2, by=1)
 m_R_R <- simulate_model(
   param_values = scale_vals,
@@ -363,9 +363,9 @@ plot_results(m_R_R, "sd", "Detetction", ylab_name = "Type I Error (%)",xlab_name
 if(save == TRUE) {save_results(m_R_R, paste0(save_path,"/DTRW_Indep.xlsx"), "Detection")}
 
 ########################## 4️⃣ Part 4 - YANG 4️⃣ #######################################
-# ----------------------------------
+# ______________________________________---
 #  Yang vs Classiacl
-# ----------------------------------
+# ______________________________________---
 b <- seq(1, 2, 1)
 m_y_c <- simulate_model(
   param_values = b,
@@ -382,9 +382,9 @@ p = plot_results(m_y_c, "sd", "Yang vs Classical", xlab_name = "Scale (σ²)")
 if(save == TRUE) {save_results(m_y_c, paste0(save_path,"/YNM_Pearson.xlsx"), "Classical_Norm")
 save_plot(path =paste0(save_path, "Figures"), filename = "YNM_Pearson vs Classical_Norm.png" , plot = p)}
 
-# ----------------------------------
+# ______________________________________---
 # Yang vs DTRW (Normal increments)
-# ----------------------------------
+# ______________________________________---
 scale <- seq(1, 2, 1)
 m_y_R <- simulate_model(
   param_values = scale,
@@ -403,9 +403,9 @@ if(save == TRUE) {
   save_results(m_y_R, paste0(save_path,"/YNM_Pearson.xlsx"), "DTRW_Norm")
   save_plot(path =paste0(save_path, "Figures"), filename = "YNM_Pearson vs DTRW_Norm.png" , plot = p)
 }
-# ----------------------------------
+# ______________________________________---
 # Yang vs LDM (Frechet)
-# ----------------------------------
+# ______________________________________---
 theta_vals <- c(0.01,seq(0.05, 0.2, 0.05))
 m_y_L <- simulate_model(
   param_values = theta_vals,
@@ -427,9 +427,9 @@ for(i in 1:1000){
 X= LDM_series(100,0.3,"frechet", shape=5, scale=1)
 rr[i] = Test_YNM_Pearson(X)$decision}
 table(rr)
-# ----------------------------------
+# ______________________________________---
 #  Yang vs Yang (Detection Rate)
-# ----------------------------------
+# ______________________________________---
 gamma <- seq(1.01, 1.5, by=0.05)
 m_y_y <- simulate_model(param_values = gamma,
                         T = T,
