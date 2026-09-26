@@ -61,7 +61,7 @@ on the same series \code{X} independently.
 \dontrun{
 tests = test_model_parallel(X=rnorm(50), obs_type = "all", alpha = 0.05)
 }
-> tests$summary
+# > tests$summary
 # $final_decision
 # [1] 3
 #
