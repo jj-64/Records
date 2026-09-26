@@ -147,7 +147,7 @@
 #' }
 #'
 #' \item{decision}{
-#' \code{"LDM"} if the null hypothesis is rejected at level
+#' \code{"ldm"} if the null hypothesis is rejected at level
 #' \code{alpha}; otherwise \code{"NO"}.
 #' }
 #'
@@ -435,7 +435,7 @@ test_ldm_trend <- function(
 #' }
 #'
 #' \item{decision}{
-#' \code{"LDM"} if the series is consistent with the Linear Drift
+#' \code{"ldm"} if the series is consistent with the Linear Drift
 #' Model and \code{"NO"} otherwise.
 #' }
 #'

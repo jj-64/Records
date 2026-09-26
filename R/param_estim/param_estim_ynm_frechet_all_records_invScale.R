@@ -231,7 +231,7 @@ for (T_val in T_values) {
         LogL_record[sim,1] = MLE_C_record["objective"]
         ##____________________ Variance estimation ________________
         ### Empirical variance
-        var_fun = var_logLik_records("YNM", "all","frechet_inv_scale", "all")
+        var_fun = var_logLik_records("ynm", "all","frechet_inv_scale", "all")
         emp = var_fun(data = y, params=list(gamma = MLE_C["gamma"], scale = MLE_C["scale"], shape = MLE_C["shape"]))
         #H= emp$Hessian
         #cov2cor(solve(-H))
@@ -246,7 +246,7 @@ for (T_val in T_values) {
         Theo_var[sim,"shape"] = theo[["var_shape"]]
 
         ## Empirical Variance _record
-        var_fun = var_logLik_records("YNM", "records","frechet_inv_scale", "all")
+        var_fun = var_logLik_records("ynm", "records","frechet_inv_scale", "all")
         emp = var_fun(data = data_rec, params=list(gamma = MLE_C_record["gamma"], scale = MLE_C_record["scale"], shape = MLE_C_record["shape"]))
         #emp = compute_hessian(loglik_fun = logLik_fun_rec, data = data_rec, par_vec = MLE_C_record[1:3], eps = 1e-1 )
         Emp_var_record[sim,"gamma"] = emp[["var_gamma"]]

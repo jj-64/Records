@@ -230,7 +230,7 @@ for (T_val in T_values) {
 
         ##____________________ Variance estimation ________________
         ### Empirical variance
-        var_fun = var_logLik_records("YNM", "all","gumbel", "all")
+        var_fun = var_logLik_records("ynm", "all","gumbel", "all")
         emp = var_fun(data = y, params=list(gamma = MLE_C["gamma"], scale = MLE_C["scale"], location = MLE_C["location"]))
         #compute_var_hessian(loglik_fun = logLik_fun, y, par_vec = MLE_C, eps = 1e-6 )
         Emp_var[sim,"gamma"] = emp[["var_gamma"]]
@@ -245,7 +245,7 @@ for (T_val in T_values) {
         Theo_var[sim,"location"] = theo[["var_location"]]
 
         ## Empirical Variance _record
-        var_fun = var_logLik_records("YNM", "records","gumbel", "all")
+        var_fun = var_logLik_records("ynm", "records","gumbel", "all")
         emp = var_fun(data = data_rec, params=list(gamma = MLE_C_record["gamma"], scale = MLE_C_record["scale"], location = MLE_C_record["location"]))
         #compute_var_hessian(loglik_fun = logLik_fun_rec, data_rec, par_vec = MLE_C_record, eps = 1e-6 )
         Emp_var_record[sim,"gamma"] = emp[["var_gamma"]]

@@ -8,7 +8,7 @@ estimate_model_param(
   X,
   method = c("moments", "mle_indicator"),
   bias = TRUE,
-  model = c("LDM", "YNM"),
+  model = c("ldm", "ynm"),
   variance = TRUE,
   obs_type = "records",
   ...
@@ -21,7 +21,7 @@ estimate_model_param(
 
 \item{bias}{Logical, if biased estimator when moments estimation (default = TRUE)}
 
-\item{model}{Character string, one of "LDM", "YNM"}
+\item{model}{Character string, one of "ldm", "ynm"}
 
 \item{variance}{logical to return variance or nor (default = TRUE)}
 
@@ -49,20 +49,20 @@ X = c(0.428,1.311,2.023,2.882,2.096,-0.197,1.339,  1.748,1.418, 0.711, 1.999,
 3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,
 3.719, 3.741, 4.729)
 
-estimate_model_param(X, method="moments", bias = TRUE, model = "LDM", scale=1)
+estimate_model_param(X, method="moments", bias = TRUE, model = "ldm", scale=1)
 #  $param
 # [1] 0.4462871
 
 #  $variance
 # [1] 0.5625
 
- estimate_model_param(X, method="moments", bias = FALSE, model = "LDM", scale=1)
+ estimate_model_param(X, method="moments", bias = FALSE, model = "ldm", scale=1)
 #  $param
 #  [1] 0.3601306
 #  $variance
 #  [1] 0.3116952
 
-estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1,
+estimate_model_param(X, method="mle_indicator", model = "ldm", scale = 1,
 min= 0.01, max=2, step = 0.001, approximate = FALSE)
 # $param
 # [1] 0.328
@@ -71,21 +71,21 @@ min= 0.01, max=2, step = 0.001, approximate = FALSE)
 # [1] 0.02128002
 
 
-estimate_model_param(X, method="moments", model = "YNM")
+estimate_model_param(X, method="moments", model = "ynm")
 # $param
 # 1.5625
 
 # $variance
 # [1] 1.373291
 
-estimate_model_param(X, method="moments", bias = FALSE, model = "YNM")
+estimate_model_param(X, method="moments", bias = FALSE, model = "ynm")
 # $param
 # [1] 1.388625
 
 # $variance
 # [1] 0.7497066
 
-estimate_model_param(X, method="mle_indicator", model = "YNM", min= 1,
+estimate_model_param(X, method="mle_indicator", model = "ynm", min= 1,
  max=5, step = 0.001, approximate = FALSE)
 # $param
 # [1] 1.388

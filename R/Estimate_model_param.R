@@ -7,7 +7,7 @@
 #' @param X Numeric vector of the LDM process.
 #' @param method Character string, one of "moments" or "mle_indicator".
 #' @param bias Logical, if biased estimator when moments estimation (default = TRUE)
-#' @param model Character string, one of "LDM", "YNM"
+#' @param model Character string, one of "ldm", "ynm"
 #' @param variance logical to return variance or nor (default = TRUE)
 #' @param obs_type string, one of "records" or "all" (Default = "records")
 #' @param ... additional arguments specific for each model
@@ -23,21 +23,21 @@
 #' 3.598, 3.308, 3.942,2.025,3.282,4.043, 0.492, 4.639, 1.408, 3.525, 5.398,
 #'3.719, 3.741, 4.729)
 #'
-#' estimate_model_param(X, method="moments", bias = TRUE, model = "LDM", scale=1)
+#' estimate_model_param(X, method="moments", bias = TRUE, model = "ldm", scale=1)
 #' #  $param
 #' # [1] 0.4462871
 #'
 #' #  $variance
 #' # [1] 0.5625
 #'
-#'  estimate_model_param(X, method="moments", bias = FALSE, model = "LDM", scale=1)
+#'  estimate_model_param(X, method="moments", bias = FALSE, model = "ldm", scale=1)
 #' #  $param
 #' #  [1] 0.3601306
 # '
 #' #  $variance
 #' #  [1] 0.3116952
 #'
-#' estimate_model_param(X, method="mle_indicator", model = "LDM", scale = 1,
+#' estimate_model_param(X, method="mle_indicator", model = "ldm", scale = 1,
 #' min= 0.01, max=2, step = 0.001, approximate = FALSE)
 #' # $param
 #' # [1] 0.328
@@ -46,21 +46,21 @@
 #' # [1] 0.02128002
 #'
 #'
-#' estimate_model_param(X, method="moments", model = "YNM")
+#' estimate_model_param(X, method="moments", model = "ynm")
 #' # $param
 #' # 1.5625
 #'
 #' # $variance
 #' # [1] 1.373291
 #'
-#' estimate_model_param(X, method="moments", bias = FALSE, model = "YNM")
+#' estimate_model_param(X, method="moments", bias = FALSE, model = "ynm")
 #' # $param
 #' # [1] 1.388625
 #'
 #' # $variance
 #' # [1] 0.7497066
 #'
-#' estimate_model_param(X, method="mle_indicator", model = "YNM", min= 1,
+#' estimate_model_param(X, method="mle_indicator", model = "ynm", min= 1,
 #'  max=5, step = 0.001, approximate = FALSE)
 #' # $param
 #' # [1] 1.388
@@ -68,14 +68,14 @@
 #' # $variance
 #' # [1] 0.0409829
 estimate_model_param <- function(X, method = c("moments","mle_indicator"),
-                                 bias = TRUE ,model=c("LDM","YNM"),
+                                 bias = TRUE ,model=c("ldm","ynm"),
                                  variance = TRUE, obs_type = "records", ...) {
   method <- match.arg(method)
   model <- match.arg(model)
   args <- list(...)
 
   if(obs_type == "records"){
-  if (model == "LDM"){
+  if (model == "ldm"){
     if (method == "moments" && bias == TRUE) {
       est <- estimate_ldm_moments(X, variance = variance, scale=args$scale)
 
@@ -86,7 +86,7 @@ estimate_model_param <- function(X, method = c("moments","mle_indicator"),
       est = estimate_ldm_mle_indicator(X, variance = variance, min = args$min, max=args$max, step=args$step, scale = args$scale)
 
     }
-  } else if(model == "YNM"){
+  } else if(model == "ynm"){
     if (method == "moments" && bias == TRUE) {
       est <- estimate_ynm_moments(X, variance = variance)
 
