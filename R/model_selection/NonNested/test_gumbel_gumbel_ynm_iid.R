@@ -81,7 +81,7 @@ alpha      <- 0.05
 simulation <- 100
 
 trend_values <- seq(1.1, 1.1, by = 0.05)
-#Records::rec_count_mean_YNM(T=100,gamma=0.1,dist="exp",rate=2)
+#Records::rec_count_mean_ynm(T=100,gamma=0.1,dist="exp",rate=2)
 true_params <- c(
   trend = 1.2,
   location  = 1,

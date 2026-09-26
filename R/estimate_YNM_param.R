@@ -367,8 +367,8 @@ estimate_YNM_mle_indicator <- function(X, variance = TRUE, approximate = FALSE,
       v <- 1 / gamma_hat
       var_hat <- (1 - v) / (T * v^3)
     } else {
-      # Exact Fisher Information (requires rec_count_mean_YNM and rec_rate_YNM)
-      ent <- rec_count_mean_YNM(T = T, gamma = gamma_hat)
+      # Exact Fisher Information (requires rec_count_mean_ynm and rec_rate_YNM)
+      ent <- rec_count_mean_ynm(T = T, gamma = gamma_hat)
       a <- (1 / (gamma_hat^2 * (gamma_hat - 1)^2)) * ent
       b <- (1 / gamma_hat^2) * (T - ent)
       c <- T * (1 + gamma_hat^T * (T - 1)) / (gamma_hat^2 * (gamma_hat^T - 1)^2)

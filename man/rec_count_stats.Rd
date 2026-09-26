@@ -37,7 +37,7 @@ For model-specific functions and formulas, look at
 \code{\link{rec_count_mean_LDM}}
 \code{\link{rec_count_var_LDM}}
 \code{\link{rec_count_dist_LDM}}
-\code{\link{rec_count_mean_YNM}}
+\code{\link{rec_count_mean_ynm}}
 \code{\link{rec_count_var_YNM}}
 \code{\link{rec_count_dist_YNM}}
 }

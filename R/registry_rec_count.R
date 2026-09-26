@@ -50,7 +50,7 @@ register_record_model(
 
 register_record_model(
   "ynm",
-  mean_fun = rec_count_mean_YNM,
+  mean_fun = rec_count_mean_ynm,
   var_fun  = rec_count_var_YNM,
   dist_fun = rec_count_dist_YNM,
   required_args = c("gamma")

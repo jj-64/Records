@@ -13,7 +13,7 @@
 #' \code{\link{rec_count_mean_LDM}}
 #' \code{\link{rec_count_var_LDM}}
 #' \code{\link{rec_count_dist_LDM}}
-#' \code{\link{rec_count_mean_YNM}}
+#' \code{\link{rec_count_mean_ynm}}
 #' \code{\link{rec_count_var_YNM}}
 #' \code{\link{rec_count_dist_YNM}}
 #' @param model Character string specifying the model. Available models:
@@ -587,9 +587,9 @@ rec_count_dist_LDM = function(m,T,theta,scale=1,s=NA){  ## number of m, T, theta
 #' @export
 #'
 #' @examples
-#' rec_count_mean_YNM (T=25, gamma=1.1)
+#' rec_count_mean_ynm (T=25, gamma=1.1)
 #' # [1] 5.000207
-rec_count_mean_YNM = function(T,gamma){
+rec_count_mean_ynm = function(T,gamma){
   s=0
   for(k in 1:T){
     #s[k] = (gamma^k * (gamma-1)) / (gamma* (gamma^k -1))
