@@ -789,7 +789,7 @@ rec_count_dist_ynm <- function(m, T, gamma, s = NULL) {
 #'
 #' @param alpha Numeric significance level in \eqn{(0,0.5)}.
 #' Default is \code{0.05}.
-#'
+#' @param approximate logical. Optional for "dtrw"
 #'
 #' @param ... Additional model-specific parameters:
 #'
