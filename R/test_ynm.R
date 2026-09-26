@@ -268,14 +268,15 @@ test_ynm_chisq <- function(X,
 
    # If gamma not provided -> estimate it
   if (is.null(gamma)) {
-    #gammas <- seq(1.000001, 5, by = 0.01)
-    #chi_values <- sapply(gammas, function(g) x2_term_g(g, K, nk, j = bin_starts))
-    #gamma <- gammas[which.min(chi_values)]
-    #obs_stat <-min(chi_values)
+
+    # starting values
+    gammas <- seq(1.000001, 5, by = 0.01)
+    chi_values <- sapply(gammas, function(g) x2_term_g(g, K, nk, j = bin_starts))
+    gamma <- gammas[which.min(chi_values)]
 
     fit <- optimize(
       f = x2_term_g,
-      interval = c(1.000001, 10),
+      interval = c(1.000001, gamma + 0.2),
       K = K,
       nk = nk,
       j = bin_starts
