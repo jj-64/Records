@@ -28,7 +28,7 @@ library(scales)  # for percentage formatting if needed
 series_H0 <- function(T_val, par){
 
   # Exponential Linear Drift Model
-  LDM_series(
+  ldm_series(
     T     = T_val,
     dist  = "exp",
     theta = par[["trend"]],
@@ -40,7 +40,7 @@ series_H0 <- function(T_val, par){
 series_H1 <- function(T_val, par){
 
   # Weibull Linear Drift Model
-  LDM_series(
+  ldm_series(
     T      = T_val,
     dist   = "weibull",
     theta  = par[["trend"]],

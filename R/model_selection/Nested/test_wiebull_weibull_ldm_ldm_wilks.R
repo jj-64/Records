@@ -24,7 +24,7 @@ set.seed(12345)
 series_H0 <- function(T_val, par_H0){
 
   # Exponential Linear Drift Model
-  LDM_series(
+  ldm_series(
     T      = T_val,
     dist   = "weibull",
     theta  = par_H0[["trend"]],
@@ -37,7 +37,7 @@ series_H0 <- function(T_val, par_H0){
 series_H1 <- function(T_val, trend, par_H1){
 
   # Weibull Linear Drift Model
-  LDM_series(
+  ldm_series(
     T      = T_val,
     dist   = "weibull",
     theta  = trend,
