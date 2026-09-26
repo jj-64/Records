@@ -15,6 +15,8 @@ rec_count_bounds(
 \arguments{
 \item{T}{Integer. Length of the random walk.}
 
+\item{model}{character of one of the record-generating processes "ldm", "iid", "ynm" or "dtrw".}
+
 \item{alpha}{Numeric significance level in \eqn{(0,0.5)}.
 Default is \code{0.05}.}
 
@@ -32,8 +34,6 @@ Default is \code{0.05}.}
 \item{approximate}{Logical for the DTRW ("dtrw") If \code{TRUE}, uses the asymptotic approximation of the record-count distribution. If \code{FALSE}, uses the exact distribution whenever available.}
 
 }}
-
-\item{model.}{character of one of the record-generating processes "ldm", "iid", "ynm" or "dtrw".}
 }
 \value{
 A named list containing:
