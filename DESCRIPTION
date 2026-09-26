@@ -30,19 +30,19 @@ Imports:
     zoo,
     psych,
     Dowd,
-    rlang
-Suggests:
-    testthat (>= 3.0.0),
-    knitr,
-    rmarkdown,
-    devtools,
-    VGAM,
-    lawstat,
+    rlang,
     randomForest,
     fExtremes,
     tsfeatures,
     pROC,
     magrittr,
     forecast
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    devtools,
+    VGAM,
+    lawstat
 VignetteBuilder: knitr
 
