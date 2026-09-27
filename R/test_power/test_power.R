@@ -7,11 +7,10 @@ devtools::load_all(".")
 # install_github("jj-64/Records")
 # library(Records)
 
-n_sim <- 1000
+n_sim <- 10
 T <- seq(40, 100, by = 10)
 save = TRUE
-save_path ="C:/Users/User/OneDrive - Lebanese University/Lebanese University/PhD/Publication 3 - Decision Tree test/Power of Test/"
-
+save_path ="~Records/data/test_power_two_by_two/"
 # ______________________________________
 # Generic Simulation Function ----------
 # ______________________________________
@@ -46,7 +45,7 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
         dec[i] <- do.call(test_fun, test_call)$decision
       }
       valid <- na.omit(dec)
-      results[j, k+1] <- mean(valid=="NO") * 100
+      results[j, k+1] <- mean(valid=="no") * 100
     }
   }
 
@@ -82,7 +81,7 @@ plot_results <- function(df, param_name, title, ylab_name = "Power of test (1-ß
   #colors <- rev(viridisLite::viridis(n_T))
 
 
-  p <- ggplot(df_long, aes(x = .data[[param_name]], y = Power, color = T, group = T)) +
+  p <- ggplot2::ggplot(df_long, aes(x = .data[[param_name]], y = Power, color = T, group = T)) +
     geom_line(linewidth = 1.1, alpha = 0.8) +
     geom_line(aes(y = average), df_long, color = "black", linewidth = 1.2, linetype = "dashed") +
     #scale_color_manual(values = colors, name = "Sample size") +
@@ -155,49 +154,49 @@ gamma <- seq(1.01, 1.4, by=0.01)
 m_c_y <- simulate_model(param_values = gamma,
   T = T,
   n_sim = n_sim,
-  generator = YNM_series,
+  generator = ynm_series,
   param_name = "gamma", # varying param
   n_arg = "T",             # custom generator expects T=
-  test_fun = Test_iid_BoxJenkins,#Test_iid_NT,
-  series_args = list(dist = "gumbel", loc=0, scale=1)
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
+  series_args = list(dist = "gumbel", location=0, scale=1)
 )
-plot_results(m_c_y, param_name="gamma", title="Classical vs Yang - Gumbel", xlab_name = "γ")
-if(save == TRUE) {save_results(m_c_y, paste0(save_path,"/Classical BoxJenkins.xlsx"), "YNM_Gumbel_0_1")}
+plot_results(m_c_y, param_name="gamma", title="classical_vs_ynm_gumbel", xlab_name = "γ")
+if(save == TRUE) {save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")}
 
 # ______________________________________
-# Run H0: Classical vs H1: LDM
+# Run H0: Classical vs H1: ldm
 # ______________________________________
 theta_vals <- seq(0.01, 0.5, by=0.05)
 m_c_L <- simulate_model(
   param_values = theta_vals,
   T = T,
   n_sim = n_sim,
-  generator = LDM_series,
+  generator = ldm_series,
   param_name = "theta",
   n_arg = "T",
-  test_fun = Test_iid_BoxJenkins,#Test_iid_NT,
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
   series_args = list(dist="frechet",shape=5, scale=5)
 )
-plot_results(m_c_L, param_name="theta",  title = "Classical vs LDM - Frechet", xlab_name = "Θ")
-if(save == TRUE) {save_results(m_c_L, paste0(save_path,"/Classical BoxJenkins.xlsx"), "LDM_Frechet_5_1")}
+plot_results(m_c_L, param_name="theta",  title = "Classical vs ldm - Frechet", xlab_name = "Θ")
+if(save == TRUE) {save_results(m_c_L, paste0(save_path,"/Classical BoxJenkins.xlsx"), "ldm_Frechet_5_1")}
 
 # ______________________________________
-# Run H0: Classical vs H1: DTRW
+# Run H0: Classical vs H1: dtrw
 # ______________________________________
 scale_vals <- seq(1, 5, by=0.5)
 m_c_R <- simulate_model(
   param_values = scale_vals,
   T = T,
   n_sim = n_sim,
-  generator = DTRW_series,
+  generator = dtrw_series,
   param_name = "scale",  ## sd for norm, scale for cauchy
   n_arg = "T",
-  test_fun = Test_iid_BoxJenkins,#Test_iid_NT,
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
   series_args = list(dist="cauchy",loc=0)
 )
-plot_results(m_c_R, param_name="scale", title="Classical vs DTRW - Cauchy", xlab_name = "σ")
-if(save == TRUE) {save_results(m_c_R, paste0(save_path,"/Classical BoxJenkins.xlsx"), "DTRW_Cauchy")}
-# v1=NT_DTRW(0:10, 10)*100
+plot_results(m_c_R, param_name="scale", title="Classical vs dtrw - Cauchy", xlab_name = "σ")
+if(save == TRUE) {save_results(m_c_R, paste0(save_path,"/Classical BoxJenkins.xlsx"), "dtrw_Cauchy")}
+# v1=NT_dtrw(0:10, 10)*100
 # v=NA
 # for(i in 0:(length(v1)-1)) v[i+1] = 100*NT_iid(i, (length(v1)-1))
 # plot(0:(length(v1)-1), y=v1, type = "l", xlab = "X", ylim=c(0,30))
@@ -214,32 +213,32 @@ m_c_c <- simulate_model(
   generator = rnorm,
   param_name = "sd",  ## sd for norm
   n_arg = "n",
-  test_fun = Test_iid_BoxJenkins,#Test_iid_NT,
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
   series_args = list(mean=0)
 )
 plot_results(m_c_c, param_name="sd", title="Classical Detection Rate", xlab_name = "σ", ymax=25)
 if(save == TRUE) {save_results(m_c_c, paste0(save_path,"/Classical BoxJenkins.xlsx"), "Detection")}
 
-############################ 2️⃣ PART 2 : LDM 2️⃣  ####################################################
+############################ 2️⃣ PART 2 : ldm 2️⃣  ####################################################
 # ______________________________________
-# Run: H0: LDM vs H1: Yang
+# Run: H0: ldm vs H1: Yang
 # ______________________________________
 gamma <- c(1.01,seq(1.05, 1.4, by=0.05))
 m_L_y <- simulate_model(
   param_values = gamma,
   T = T,
   n_sim = n_sim,
-  generator = YNM_series,
+  generator = ynm_series,
   param_name = "gamma",
   n_arg = "T",
-  test_fun = Test_LDM_Sequential,
+  test_fun = Test_ldm_Sequential,
   series_args = list(dist="norm",loc=0, scale=1)
 )
-plot_results(m_L_y, "gamma", "LDM vs Yang-Nevzorov - Weibull", xlab_name="Gamma (γ)", ymax=100)
-if(save == TRUE) {save_results(m_L_y, paste0(save_path,"/LDM_Sequential.xlsx"), "YNM_Weibull_5_1")}
+plot_results(m_L_y, "gamma", "ldm vs Yang-Nevzorov - Weibull", xlab_name="Gamma (γ)", ymax=100)
+if(save == TRUE) {save_results(m_L_y, paste0(save_path,"/ldm_Sequential.xlsx"), "ynm_Weibull_5_1")}
 
 # ______________________________________
-# Run H0: LDM vs H1: Classical
+# Run H0: ldm vs H1: Classical
 # ______________________________________
 b <- sqrt(seq(1, 5,1))
 m_L_c <- simulate_model(
@@ -249,67 +248,67 @@ m_L_c <- simulate_model(
   generator = rnorm, #VGAM::rgumbel,
   param_name = "sd",   # param goes into scale=
   n_arg = "n",           # rgumbel expects n=
-  test_fun =  Test_LDM_Sequential,
+  test_fun =  Test_ldm_Sequential,
   series_args = list(mean=0)
 )
-plot_results(m_L_c, "sd", title="LDM vs Classical", xlab_name="scale parameter for normal")
-if(save == TRUE) {save_results(m_L_c, paste0(save_path,"/LDM_Sequential.xlsx"), "Classical_Norm")}
+plot_results(m_L_c, "sd", title="ldm vs Classical", xlab_name="scale parameter for normal")
+if(save == TRUE) {save_results(m_L_c, paste0(save_path,"/ldm_Sequential.xlsx"), "Classical_Norm")}
 
 # ______________________________________
-# H0: LDM vs H1: DTRW
+# H0: ldm vs H1: dtrw
 # ______________________________________
 scale_vals <- seq(1, 5, 1)
 m_L_R <- simulate_model(
   param_values = scale_vals,
   T = T,
   n_sim = n_sim,
-  generator = DTRW_series,
-  param_name =  "scale",      # sd for DTRW and scale for Cauchy
+  generator = dtrw_series,
+  param_name =  "scale",      # sd for dtrw and scale for Cauchy
   n_arg = "T",
-  test_fun = Test_LDM_Sequential,
+  test_fun = Test_ldm_Sequential,
   series_args = list(dist="cauchy",loc=0)
               )
-plot_results(m_L_R, "scale", title= "LDM vs DTRW - Cauchy", xlab_name="Scale (σ²)")
-if(save == TRUE) {save_results(m_L_R, paste0(save_path,"/LDM_Sequential.xlsx"), "DTRW_Norm")}
+plot_results(m_L_R, "scale", title= "ldm vs dtrw - Cauchy", xlab_name="Scale (σ²)")
+if(save == TRUE) {save_results(m_L_R, paste0(save_path,"/ldm_Sequential.xlsx"), "dtrw_Norm")}
 
 # ______________________________________
-# H0: LDM vs H1: LDM (should be Low)
+# H0: ldm vs H1: ldm (should be Low)
 # ______________________________________
 theta_vals <-c(0.01,seq(0.05,0.3,0.05))
 m_L_L <- simulate_model(
   param_values = theta_vals,
   T = T,
   n_sim = n_sim,
-  generator =LDM_series,
-  param_name = "theta",      # sd for DTRW and scale for Cauchy
+  generator =ldm_series,
+  param_name = "theta",      # sd for dtrw and scale for Cauchy
   n_arg = "T",
-  test_fun = Test_LDM_Regression,
+  test_fun = Test_ldm_Regression,
   series_args = list(dist= "frechet", shape=5, scale=1)
 )
-plot_results(m_L_L, "theta", "LDM vs LDM", xlab_name=" Theta (Θ) ", ymax= 25)
-if(save == TRUE) {save_results(m_L_L, paste0(save_path,"/LDM_Sequential.xlsx"), "Detection")}
+plot_results(m_L_L, "theta", "ldm vs ldm", xlab_name=" Theta (Θ) ", ymax= 25)
+if(save == TRUE) {save_results(m_L_L, paste0(save_path,"/ldm_Sequential.xlsx"), "Detection")}
 
-############################ 3️⃣ PART 3: DTRW 3️⃣ ################################################
+############################ 3️⃣ PART 3: dtrw 3️⃣ ################################################
 
 # ______________________________________
-# H0: DTRW vs H1: Yang
+# H0: dtrw vs H1: Yang
 # ______________________________________
 gamma <- seq(1.01, 1.4, by=0.1)
 m_R_y <- simulate_model(
   param_values = gamma,
   T = T,
   n_sim = n_sim,
-  generator = YNM_series,
+  generator = ynm_series,
   param_name = "gamma",
   n_arg = "T",
-  test_fun = Test_DTRW_Indep, #Test_DTRW_bonf,
+  test_fun = Test_dtrw_Indep, #Test_dtrw_bonf,
   series_args = list(dist="frechet",shape=5, scale=1)
 )
-plot_results(m_R_y, "gamma", "DTRW vs YNM - Gumbel", xlab = "Gamma (γ)")
-if(save == TRUE) {save_results(m_R_y, paste0(save_path,"/DTRW_Indep.xlsx"), "YNM_Frechet_5_1")}
+plot_results(m_R_y, "gamma", "dtrw vs ynm - Gumbel", xlab = "Gamma (γ)")
+if(save == TRUE) {save_results(m_R_y, paste0(save_path,"/dtrw_Indep.xlsx"), "ynm_Frechet_5_1")}
 
 # ______________________________________
-# H0: DTRW vs H1: Classical
+# H0: dtrw vs H1: Classical
 # ______________________________________
 b <- seq(1, 5, 1)
 m_R_c <- simulate_model(
@@ -319,48 +318,48 @@ m_R_c <- simulate_model(
   generator = rnorm,
   param_name= "sd",
   n_arg = "n",
-  test_fun = Test_DTRW_Indep,
+  test_fun = Test_dtrw_Indep,
   #test_args = list(alpha=0.05, method= "Bonf"),
   series_args = list(mean=0)
 )
-plot_results(m_R_c, "sd", "DTRW vs Normal i.i.d", xlab= "σ")
-if(save == TRUE) {save_results(m_R_c,paste0(save_path,"/DTRW_Indep.xlsx"), "Classical_Norm")}
+plot_results(m_R_c, "sd", "dtrw vs Normal i.i.d", xlab= "σ")
+if(save == TRUE) {save_results(m_R_c,paste0(save_path,"/dtrw_Indep.xlsx"), "Classical_Norm")}
 
 # ______________________________________---
-# DTRW vs LDM
+# dtrw vs ldm
 # ______________________________________---
 theta_vals <- seq(0.01, 0.1, by=0.02)
 m_R_L <- simulate_model(
   param_values = theta_vals,
   T = T,
   n_sim = n_sim,
-  generator = LDM_series,
+  generator = ldm_series,
   param_name = "theta",
   n_arg = "T",
-  test_fun = Test_DTRW_Indep,
+  test_fun = Test_dtrw_Indep,
   #test_args = list(method="Bonf"),
   series_args = list(dist="weibull", shape=1, scale=1)
 )
-plot_results(m_R_L, "theta", "DTRW vs LDM - Normal", xlab="theta (Θ)")
-if(save == TRUE) {save_results(m_R_L, paste0(save_path,"/DTRW_Indep.xlsx"), "LDM_Weibull_2_1")}
+plot_results(m_R_L, "theta", "dtrw vs ldm - Normal", xlab="theta (Θ)")
+if(save == TRUE) {save_results(m_R_L, paste0(save_path,"/dtrw_Indep.xlsx"), "ldm_Weibull_2_1")}
 
 # ______________________________________---
-# DTRW Detection Rate: should be low (5%)
+# dtrw Detection Rate: should be low (5%)
 # ______________________________________---
 scale_vals <- seq(1, 2, by=1)
 m_R_R <- simulate_model(
   param_values = scale_vals,
   T = T,
   n_sim = n_sim,
-  generator = DTRW_series,
+  generator = dtrw_series,
   param_name = "sd",
   n_arg = "T",
-  test_fun = Test_DTRW_Indep,
+  test_fun = Test_dtrw_Indep,
   #test_args = list(method="Bonf"),
   series_args = list(dist="norm",loc=0)
 )
 plot_results(m_R_R, "sd", "Detetction", ylab_name = "Type I Error (%)",xlab_name="Scale (σ²)", ymax = 25)
-if(save == TRUE) {save_results(m_R_R, paste0(save_path,"/DTRW_Indep.xlsx"), "Detection")}
+if(save == TRUE) {save_results(m_R_R, paste0(save_path,"/dtrw_Indep.xlsx"), "Detection")}
 
 ########################## 4️⃣ Part 4 - YANG 4️⃣ #######################################
 # ______________________________________---
@@ -374,58 +373,58 @@ m_y_c <- simulate_model(
   generator = rnorm,       # built-in uniform
   param_name = "sd",
   n_arg = "n",
-  test_fun = Test_YNM_Pearson,
+  test_fun = Test_ynm_Pearson,
   series_args = list(mean=0),
   #test_args = list(K=NULL, warmup=2)#list(alpha=0.05, Partition=NA, gamma=1, estimated=1)
 )
 p = plot_results(m_y_c, "sd", "Yang vs Classical", xlab_name = "Scale (σ²)")
-if(save == TRUE) {save_results(m_y_c, paste0(save_path,"/YNM_Pearson.xlsx"), "Classical_Norm")
-save_plot(path =paste0(save_path, "Figures"), filename = "YNM_Pearson vs Classical_Norm.png" , plot = p)}
+if(save == TRUE) {save_results(m_y_c, paste0(save_path,"/ynm_Pearson.xlsx"), "Classical_Norm")
+save_plot(path =paste0(save_path, "Figures"), filename = "ynm_Pearson vs Classical_Norm.png" , plot = p)}
 
 # ______________________________________---
-# Yang vs DTRW (Normal increments)
+# Yang vs dtrw (Normal increments)
 # ______________________________________---
 scale <- seq(1, 2, 1)
 m_y_R <- simulate_model(
   param_values = scale,
   T = T,
   n_sim = n_sim,
-  generator = DTRW_series,
+  generator = dtrw_series,
   param_name = "sd",
   n_arg = "T",
-  test_fun = Test_YNM_Pearson,
+  test_fun = Test_ynm_Pearson,
   series_args = list(dist="norm",loc=0),
   #test_args = list(K=NULL, warmup=NULL) #list(alpha=0.05, Partition=NA,gamma=1, estimated=1)
 )
 p=plot_results(m_y_R, "sd", "", xlab_name = "Scale (σ²)")
 
 if(save == TRUE) {
-  save_results(m_y_R, paste0(save_path,"/YNM_Pearson.xlsx"), "DTRW_Norm")
-  save_plot(path =paste0(save_path, "Figures"), filename = "YNM_Pearson vs DTRW_Norm.png" , plot = p)
+  save_results(m_y_R, paste0(save_path,"/ynm_Pearson.xlsx"), "dtrw_Norm")
+  save_plot(path =paste0(save_path, "Figures"), filename = "ynm_Pearson vs dtrw_Norm.png" , plot = p)
 }
 # ______________________________________---
-# Yang vs LDM (Frechet)
+# Yang vs ldm (Frechet)
 # ______________________________________---
 theta_vals <- c(0.01,seq(0.05, 0.2, 0.05))
 m_y_L <- simulate_model(
   param_values = theta_vals,
   T = T,
   n_sim = n_sim,
-  generator = LDM_series,
+  generator = ldm_series,
   param_name = "theta",
   n_arg = "T",
-  test_fun = Test_YNM_Geom,
+  test_fun = Test_ynm_Geom,
   series_args = list(dist="frechet",shape=5, scale=1),
   #test_args = list(K= 4)
 )
 p= plot_results(m_y_L, "theta", "", xlab = "Theta (Θ)")
-if(save == TRUE) {save_results(m_y_L, paste0(save_path,"/YNM_Pearson.xlsx"), "LDM-Frechet_5_1")
-  save_plot(path =paste0(save_path, "Figures"), filename = "YNM_Pearson vs LDM_Frechet_5_1.png" , plot = p)
+if(save == TRUE) {save_results(m_y_L, paste0(save_path,"/ynm_Pearson.xlsx"), "ldm-Frechet_5_1")
+  save_plot(path =paste0(save_path, "Figures"), filename = "ynm_Pearson vs ldm_Frechet_5_1.png" , plot = p)
 }
 
 for(i in 1:1000){
-X= LDM_series(100,0.3,"frechet", shape=5, scale=1)
-rr[i] = Test_YNM_Pearson(X)$decision}
+X= ldm_series(100,0.3,"frechet", shape=5, scale=1)
+rr[i] = Test_ynm_Pearson(X)$decision}
 table(rr)
 # ______________________________________---
 #  Yang vs Yang (Detection Rate)
@@ -434,14 +433,14 @@ gamma <- seq(1.01, 1.5, by=0.05)
 m_y_y <- simulate_model(param_values = gamma,
                         T = T,
                         n_sim = n_sim,
-                        generator = YNM_series,
+                        generator = ynm_series,
                         param_name = "gamma", # varying param
                         n_arg = "T",             # custom generator expects T=
-                        test_fun = Test_YNM_Pearson,
+                        test_fun = Test_ynm_Pearson,
                         series_args = list(dist = "gumbel", loc=0, scale=1),
                         test_args = list(K=4)#list(alpha=0.05, Partition=NA,gamma=1, estimated=1)
                         )
 p = plot_results(m_y_y, "gamma", "", xlab="Gamma (γ)", ymax= 100)
-if(save == TRUE) {save_results(m_y_y, paste0(save_path,"/YNM_Pearson.xlsx"), "Detection")
-  save_plot(path =paste0(save_path, "Figures"), filename = "YNM_Pearson_typeI.png" , plot = p) }
+if(save == TRUE) {save_results(m_y_y, paste0(save_path,"/ynm_Pearson.xlsx"), "Detection")
+  save_plot(path =paste0(save_path, "Figures"), filename = "ynm_Pearson_typeI.png" , plot = p) }
 
