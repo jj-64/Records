@@ -10,7 +10,7 @@ n_sim <- 1000
 T <- seq(40, 100, by = 10)
 alpha = 0.05
 save = TRUE
-save_path ="data/test_power_two_by_two/"
+save_path ="inst/extdata/test_power_two_by_two/"
 # ______________________________________
 # Generic Simulation Function ----------
 # ______________________________________
