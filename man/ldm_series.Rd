@@ -23,7 +23,7 @@ ldm_series(
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{
 \item{beta}{\code{shape1}, \code{shape2}}
-\item{gumbel}{\code{loc}, \code{scale}}
+\item{gumbel}{\code{location}, \code{scale}}
 \item{weibull}{\code{shape}, \code{scale}}
 \item{frechet}{\code{shape}, \code{scale}}
 \item{norm}{\code{mean}, \code{sd}}
@@ -49,8 +49,8 @@ where:
 }
 }
 \examples{
-#Gumbel with loc, scale
-ldm_series(100, theta = 0.1, dist = "gumbel", loc = 0, scale = 2)
+#Gumbel with location, scale
+ldm_series(100, theta = 0.1, dist = "gumbel", location = 0, scale = 2)
 
 #Weibull
 ldm_series(100, theta = 0.05, dist = "weibull", shape = 2, scale = 1)

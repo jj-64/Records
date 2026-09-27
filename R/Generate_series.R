@@ -19,7 +19,7 @@
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
 #'     \item{beta}{`shape1`, `shape2`}
-#'     \item{gumbel}{`loc`, `scale`}
+#'     \item{gumbel}{`location`, `scale`}
 #'     \item{weibull}{`shape`, `scale`}
 #'     \item{frechet}{`shape`, `scale`}
 #'     \item{norm}{`mean`, `sd`}
@@ -30,8 +30,8 @@
 #' @return A numeric vector representing the LDM series.
 #' @export
 #' @examples
-#' #Gumbel with loc, scale
-#'ldm_series(100, theta = 0.1, dist = "gumbel", loc = 0, scale = 2)
+#' #Gumbel with location, scale
+#'ldm_series(100, theta = 0.1, dist = "gumbel", location = 0, scale = 2)
 #'
 #' #Weibull
 #'ldm_series(100, theta = 0.05, dist = "weibull", shape = 2, scale = 1)
@@ -58,10 +58,10 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
     },
 
     gumbel = {
-      loc   <- args$loc   %||% 0
+      location   <- args$location   %||% 0
       scale <- args$scale %||% 1
       if (scale <= 0) stop("Enter a positive value for scale")
-      VGAM::rgumbel(T, location = loc, scale = scale)
+      VGAM::rgumbel(T, location = location, scale = scale)
     },
 
     weibull = {
@@ -75,7 +75,7 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
       scale <- args$scale %||% 1
       shape <- args$shape %||% 2
       if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-      VGAM::rfrechet(T, loc = 0, scale = scale, shape = shape)
+      VGAM::rfrechet(T, location = 0, scale = scale, shape = shape)
     },
 
     norm = {
@@ -141,15 +141,15 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 # #' Generate an LDM Series with Gumbel Noise
 # #'
 # #' @details
-# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Gumbel}(\text{loc}, \text{scale})}
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \text{Gumbel}(\text{location}, \text{scale})}
 # #'
 # #' @inheritParams LDM_series_Beta
-# #' @param loc Numeric. The location parameter of the Gumbel distribution.
+# #' @param location Numeric. The location parameter of the Gumbel distribution.
 # #' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
 # #' @return A numeric vector representing the LDM series.
-# LDM_series_Gumbel <- function(T, theta, loc = 0, scale = 1) {
+# LDM_series_Gumbel <- function(T, theta, location = 0, scale = 1) {
 # if (scale <= 0) stop("Enter a positive value for scale")
-# y <- VGAM::rgumbel(T, loc, scale)
+# y <- VGAM::rgumbel(T, location, scale)
 # x <- theta * (1:T) + y
 # return(x)
 # }
@@ -181,7 +181,7 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 # #' @return A numeric vector representing the LDM series.
 # LDM_series_Frechet <- function(T, theta, scale = 1, shape = 2) {
 # if (scale <= 0 | shape <= 0) stop("Enter positive values for scale and shape")
-# y <- VGAM::rfrechet(T, loc = 0, scale, shape)
+# y <- VGAM::rfrechet(T, location = 0, scale, shape)
 # x <- theta * (1:T) + y
 # return(x)
 # }
@@ -222,15 +222,15 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 # #' Generate an LDM Series with Normal Noise
 # #'
 # #' @details
-# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \mathcal{N}(\text{loc}, \text{sd})}
+# #' \deqn{x_t = \theta t + y_t, \quad y_t \sim \mathcal{N}(\text{location}, \text{sd})}
 # #'
 # #' @inheritParams LDM_series_Beta
-# #' @param loc Numeric. The mean (location) of the normal distribution.
+# #' @param location Numeric. The mean (location) of the normal distribution.
 # #' @param sd Positive numeric. The standard deviation of the normal distribution.
 # #' @return A numeric vector representing the LDM series.
-# LDM_series_Norm <- function(T, theta, loc = 0, sd = 1) {
+# LDM_series_Norm <- function(T, theta, location = 0, sd = 1) {
 # if (sd <= 0) stop("Enter a positive value for standard deviation")
-# y <- rnorm(T, loc, sd)
+# y <- rnorm(T, location, sd)
 # x <- theta * (1:T) + y
 # return(x)
 # }
@@ -264,7 +264,7 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
 #'     \item{beta}{`shape1`, `shape2`}
-#'     \item{gumbel}{`loc`, `scale`}
+#'     \item{gumbel}{`location`, `scale`}
 #'     \item{weibull}{`shape`, `scale`}
 #'     \item{frechet}{`shape`, `scale`}
 #'     \item{exp}{`rate`}
@@ -276,9 +276,9 @@ ldm_series <- function(T, theta, dist = c("beta", "gumbel", "weibull", "frechet"
 #' @return A numeric vector of length T, the simulated YNM process.
 #' @examples
 #' \dontrun{
-#' ynm_series(100, gamma = 1.5, dist = "gumbel", loc = 0, scale = 1)
+#' ynm_series(100, gamma = 1.5, dist = "gumbel", location = 0, scale = 1)
 #' ynm_series(10, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
-#' ynm_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
+#' ynm_series(100, gamma = 1.2, dist = "norm", location = 0, sd = 1)
 #' }
 #' @export
 ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
@@ -303,10 +303,10 @@ ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
       },
 
       gumbel = {
-        loc   <- args$loc   %||% 0
+        location   <- args$location   %||% 0
         scale <- args$scale %||% 1
         if (scale <= 0) stop("Enter a positive value for scale")
-        loc - scale * log(-log(u^(1/m)))
+        location - scale * log(-log(u^(1/m)))
       },
 
       weibull = {
@@ -337,10 +337,10 @@ ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
       },
 
       norm = {
-        loc <- args$mean %||% 0
+        location <- args$mean %||% 0
         sd  <- args$sd  %||% 1
         if (sd <= 0) stop("Enter positive value for sd")
-        qnorm(u^(1/m), mean = loc, sd = sd)
+        qnorm(u^(1/m), mean = location, sd = sd)
       },
 
       pareto_trunc = {
@@ -396,20 +396,20 @@ ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
 # #' Generate a YNM Series with Gumbel Noise
 # #'
 # #' @details
-# #' \deqn{X_i = \text{loc} - \text{scale} \cdot \log(-\log(U^{1/\gamma^i}))}
+# #' \deqn{X_i = \text{location} - \text{scale} \cdot \log(-\log(U^{1/\gamma^i}))}
 # #' where \eqn{U \sim \text{Uniform}(0,1)}.
 # #'
 # #' @inheritParams YNM_series_Beta
-# #' @param loc Numeric. The location parameter of the Gumbel distribution.
+# #' @param location Numeric. The location parameter of the Gumbel distribution.
 # #' @param scale Positive numeric. The scale parameter of the Gumbel distribution.
 # #' @return A numeric vector representing the YNM series.
 # #' @export
-# YNM_series_Gumbel <- function(T, gamma, loc = 0, scale = 1) {
+# YNM_series_Gumbel <- function(T, gamma, location = 0, scale = 1) {
 # if (scale <= 0) stop("Enter a positive value for scale")
 
 # y <- numeric(T)
 # for (i in 1:T) {
-# y[i] <- loc - scale * log(-log(runif(1)^(1/gamma^i)))
+# y[i] <- location - scale * log(-log(runif(1)^(1/gamma^i)))
 # }
 # return(y)
 # }
@@ -500,7 +500,7 @@ ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
 # #'
 # #' @details
 # #' The series is generated as:
-# #' \deqn{X_i = \max(Y_i), \quad Y_i \sim \mathcal{N}(\text{loc}, \text{sd}), \quad \text{length}(Y_i) = \gamma^i}
+# #' \deqn{X_i = \max(Y_i), \quad Y_i \sim \mathcal{N}(\text{location}, \text{sd}), \quad \text{length}(Y_i) = \gamma^i}
 # #'
 # #' @inheritParams YNM_series_Beta
 # #' @param mean Numeric. The mean (location) of the normal distribution.
@@ -540,18 +540,18 @@ ynm_series <- function(T, gamma, dist = c("beta", "gumbel", "weibull",
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
 #'     \item{norm}{`mean`, `sd`}
-#'     \item{cauchy}{`loc`, `scale`}
+#'     \item{cauchy}{`location`, `scale`}
 #'     \item{uniform}{`min`, `max`}
 #'   }
 #'
 #' @return A numeric vector of length T, the simulated DTRW process.
 #' @examples
-#' dtrw_series(10,  dist = "cauchy", loc = 0, scale = 1)
+#' dtrw_series(10,  dist = "cauchy", location = 0, scale = 1)
 #' # [1] -0.6905644  2.1214308  2.7874249  4.1135190  3.3054300  2.6729198
 #' # 2.5556620  1.6442579 15.6275793 15.4525462
 #'
 #' dtrw_series(100,  dist = "uniform", min = -1, max = 1)
-#' dtrw_series(100,  dist = "norm", loc = 0, sd = 1)
+#' dtrw_series(100,  dist = "norm", location = 0, sd = 1)
 #' @export
 dtrw_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
   dist <- match.arg(dist)
@@ -564,18 +564,18 @@ dtrw_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
       dist,
 
       norm = {
-        loc <- args$mean %||% 0
+        location <- args$mean %||% 0
         sd  <- args$sd  %||% 1
         if (sd <= 0) stop("Enter positive value for sd")
-        rnorm(T, loc, sd)
+        rnorm(T, location, sd)
 
       },
 
       cauchy = {
-        loc <- args$loc %||% 0
+        location <- args$location %||% 0
         scale  <- args$scale  %||% 1
         if (scale <= 0) stop("Enter positive value for scale")
-        rcauchy(T, loc, scale)
+        rcauchy(T, location, scale)
       },
 
       uniform = {
@@ -597,23 +597,23 @@ dtrw_series <- function(T, dist = c("norm", "cauchy", "uniform"), ...) {
 # #'
 # #' @details
 # #' The series is generated recursively as:
-# #' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \text{Cauchy}(\text{loc}, \text{scale})}
+# #' \deqn{x_t = x_{t-1} + e_t, \quad e_t \sim \text{Cauchy}(\text{location}, \text{scale})}
 # #' where:
 # #' - \eqn{T} is the length of the series.
 # #' - \eqn{e_t} are i.i.d. random variables from a Cauchy distribution.
-# #' - \eqn{\text{loc}} is the location parameter.
+# #' - \eqn{\text{location}} is the location parameter.
 # #' - \eqn{\text{scale}} is the scale parameter.
 # #'
 # #' @param T Integer. The length of the series.
-# #' @param loc Numeric. The location parameter of the Cauchy distribution (default = 0).
+# #' @param location Numeric. The location parameter of the Cauchy distribution (default = 0).
 # #' @param scale Positive numeric. The scale parameter of the Cauchy distribution (default = 1).
 # #' @return A numeric vector representing the DTRW series.
 # #' @export
 # #' @examples
-# #' DTRW_series_Cauchy(100, loc = 0, scale = 1)
-# DTRW_series_Cauchy <- function(T, loc = 0, scale = 1) {
+# #' DTRW_series_Cauchy(100, location = 0, scale = 1)
+# DTRW_series_Cauchy <- function(T, location = 0, scale = 1) {
   # if (scale <= 0) stop("Enter a positive value for scale")
-  # e <- rcauchy(T, location = loc, scale = scale) ## Generate increments
+  # e <- rcauchy(T, location = location, scale = scale) ## Generate increments
   # x <- numeric(T)
 
   # for (i in 2:T) {

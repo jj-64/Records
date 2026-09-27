@@ -92,7 +92,7 @@ fit_gev_block_maxima <- function(x, block_size = "sqrt") {
   if(block_size == "sqrt") block_size <- floor(sqrt(length(x)))
 
   n_blocks <- floor(length(x) / block_size)
-  if(n_blocks < 5) return(list(shape = NA, scale = NA, loc = NA, se_shape = NA))
+  if(n_blocks < 5) return(list(shape = NA, scale = NA, location = NA, se_shape = NA))
 
   block_maxima <- sapply(1:n_blocks, function(i) {
     max(x[((i-1)*block_size + 1):(i*block_size)])
@@ -103,9 +103,9 @@ fit_gev_block_maxima <- function(x, block_size = "sqrt") {
     params <- fit@fit$par.ests
     std_err <- fit@fit$par.ses
     list(shape = params["xi"], scale = params["beta"],
-         loc = params["mu"], se_shape = std_err["xi"])
+         location = params["mu"], se_shape = std_err["xi"])
   }, error = function(e) {
-    list(shape = NA, scale = NA, loc = NA, se_shape = NA)
+    list(shape = NA, scale = NA, location = NA, se_shape = NA)
   })
 }
 
@@ -311,7 +311,7 @@ generate_series_multiple <- function(
       s <- generate_series(
         ldm_series,
         series_args = list(theta = runif(1,0.09,0.2),
-                           dist = "gumbel", loc =0 , scale =1),
+                           dist = "gumbel", location =0 , scale =1),
         T_val = T_val
       )
       if(length(rec_gaps(s)) <2 ) next;
@@ -764,7 +764,7 @@ extract_EVT_features <- function(series) {
   gev_fit <- fit_gev_block_maxima(s)
   gev_shape <- gev_fit$shape
   gev_scale <- gev_fit$scale
-  gev_loc <- gev_fit$loc
+  gev_loc <- gev_fit$location
   #gev_shape_se <- gev_fit$se_shape
 
   # 3.2 GPD Parameter Estimates
@@ -806,10 +806,10 @@ extract_EVT_features <- function(series) {
   } else { exceedance_acf1 <- NA}
 
   ## Return level estimates
-  if(!is.na(gev_fit$shape) && !is.na(gev_fit$scale) && !is.na(gev_fit$loc)) {
+  if(!is.na(gev_fit$shape) && !is.na(gev_fit$scale) && !is.na(gev_fit$location)) {
     # 100-year return level (assuming 1 observation per time unit)
     T <- 100 ##
-    return_level_100 <- gev_fit$loc + gev_fit$scale/gev_fit$shape * ((-log(1-1/T))^(-gev_fit$shape) - 1)
+    return_level_100 <- gev_fit$location + gev_fit$scale/gev_fit$shape * ((-log(1-1/T))^(-gev_fit$shape) - 1)
   } else { return_level_100 <- NA}
 
   # 3.5 Extreme Value Mixture Features
@@ -824,10 +824,10 @@ extract_EVT_features <- function(series) {
   }
 
   # Difference between record value distribution and GEV fit
-  # if( rec_nb >= 5 && !is.na(gev_fit$loc)) {
+  # if( rec_nb >= 5 && !is.na(gev_fit$location)) {
   #   # KS test between record values and GEV distribution
   #   pgev = fExtremes::pgev
-  #   ks_gev <- ks.test(rec_vals, "pgev", xi = gev_fit$shape, mu = gev_fit$loc, beta = gev_fit$scale)
+  #   ks_gev <- ks.test(rec_vals, "pgev", xi = gev_fit$shape, mu = gev_fit$location, beta = gev_fit$scale)
   #   record_gev_ks <- ks_gev$statistic ##
   # } else {record_gev_ks <- NA}
   #
@@ -999,7 +999,7 @@ extract_LogLik_features <- function(series) {
   ## Classical -  all
   logLik_all_iid_gumbel = logLik_records(model = "iid", obs_type = "all",
                  dist = "gumbel", data = series,
-                 params = c(loc = mean_all, scale=var_all))
+                 params = c(location = mean_all, scale=var_all))
 
   logLik_all_iid_norm = logLik_records(model = "iid", obs_type = "all",
                                          dist = "norm", data = series,
@@ -1020,7 +1020,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_rec_iid_gumbel = logLik_records(model = "iid", obs_type = "records",
                                        dist = "gumbel", data = data_rec,
-                                       params = c(loc = mean_rec, scale=var_rec))
+                                       params = c(location = mean_rec, scale=var_rec))
 
   logLik_rec_iid_frechet = logLik_records(model = "iid", obs_type = "records",
                                          dist = "frechet", data = data_rec,
@@ -1037,7 +1037,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_all_DTRW_cauchy = logLik_records(model = "dtrw", obs_type = "all",
                                         dist = "cauchy", data = series,
-                                        params = c(loc = mean_all, scale=var_all))
+                                        params = c(location = mean_all, scale=var_all))
 
   ## DTRW - rec
   logLik_rec_DTRW_norm = logLik_records(model = "dtrw", obs_type = "records",
@@ -1046,7 +1046,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_rec_DTRW_cauchy = logLik_records(model = "dtrw", obs_type = "records",
                                           dist = "cauchy", data = data_rec,
-                                          params = c(loc = mean_rec, scale=var_all ))
+                                          params = c(location = mean_rec, scale=var_all ))
 
   ## LDM - Xt
   logLik_all_LDM_norm = logLik_records(model = "ldm", obs_type = "all",
@@ -1055,7 +1055,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_all_LDM_gumbel = logLik_records(model = "ldm", obs_type = "all",
                                          dist = "gumbel", data = series,
-                                         params = c(theta = theta_hat, loc = mean_all, scale=var_all))
+                                         params = c(theta = theta_hat, location = mean_all, scale=var_all))
 
   logLik_all_LDM_frechet = logLik_records(model = "ldm", obs_type = "all",
                                           dist = "frechet", data = series,
@@ -1072,7 +1072,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_rec_LDM_gumbel = logLik_records(model = "ldm", obs_type = "records",
                                          dist = "gumbel", data = data_rec,
-                                         params = c(theta = theta_hat, loc = mean_rec, scale=var_rec))
+                                         params = c(theta = theta_hat, location = mean_rec, scale=var_rec))
 
   logLik_rec_LDM_frechet = logLik_records(model = "ldm", obs_type = "records",
                                           dist = "frechet", data = data_rec,
@@ -1089,7 +1089,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_all_YNM_gumbel = logLik_records(model = "ynm", obs_type = "all",
                                          dist = "gumbel", data = series,
-                                         params = c(gamma = gamma_hat, loc = mean_all, scale=var_all))
+                                         params = c(gamma = gamma_hat, location = mean_all, scale=var_all))
 
   logLik_all_YNM_frechet = logLik_records(model = "ynm", obs_type = "all",
                                           dist = "frechet", data = series,
@@ -1106,7 +1106,7 @@ extract_LogLik_features <- function(series) {
 
   logLik_rec_YNM_gumbel = logLik_records(model = "ynm", obs_type = "records",
                                          dist = "gumbel", data = data_rec,
-                                         params = c(gamma = gamma_hat, loc = mean_rec, scale=var_rec))
+                                         params = c(gamma = gamma_hat, location = mean_rec, scale=var_rec))
 
   logLik_rec_YNM_frechet = logLik_records(model = "ynm", obs_type = "records",
                                           dist = "frechet", data = data_rec,

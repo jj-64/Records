@@ -117,7 +117,7 @@ rec_rate_dtrw <- function(t, approximate = FALSE) {
 #' @param t Time index (integer). If \code{t = Inf} or \code{NULL},
 #'   the asymptotic record rate \eqn{P(R_\infty)} is returned.
 #' @param scale Scale parameter of the Gumbel distribution (default = 1).
-#' @param loc Optional location parameter (not used in the probability formula, included for consistency).
+#' @param location Optional location parameter (not used in the probability formula, included for consistency).
 #' @details
 #' For finite time \eqn{t}, the record rate is given by:
 #' \deqn{
@@ -136,15 +136,15 @@ rec_rate_dtrw <- function(t, approximate = FALSE) {
 #'
 #' @examples
 #' # Finite-time record rate
-#' rec_rate_ldm(theta = 0.5, t = 10, scale = 1, loc = 0)
+#' rec_rate_ldm(theta = 0.5, t = 10, scale = 1, location = 0)
 #' # [1] 0.3961385
 #'
 #' # Asymptotic record rate (t -> infinity)
-#' rec_rate_ldm(theta = 0.5, t = Inf, scale = 1, loc =0)
+#' rec_rate_ldm(theta = 0.5, t = Inf, scale = 1, location =0)
 #' # [1] 0.3934693
 #'
 #' # Default behavior returns asymptotic rate
-#' rec_rate_ldm(theta = 0.5, scale = 1, loc = 0)
+#' rec_rate_ldm(theta = 0.5, scale = 1, location = 0)
 #'  # [1] 0.3934693
 #'
 #' # Compare convergence
@@ -155,7 +155,7 @@ rec_rate_dtrw <- function(t, approximate = FALSE) {
 #' abline(h = rec_rate_ldm(0.5, Inf, scale = 1), col = "red", lty = 2)
 #'
 #' @export
-rec_rate_ldm <- function(theta, t = Inf, loc = 0, scale = 1) {
+rec_rate_ldm <- function(theta, t = Inf, location = 0, scale = 1) {
   if (is.infinite(t[1]) || is.null(t)) {
     # Asymptotic case
     return(1 - exp(-theta / scale))

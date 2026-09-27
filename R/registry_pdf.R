@@ -17,9 +17,9 @@ norm <- list(
 
 gumbel <- list(
   name = "gumbel",
-  dparams = 2, # (loc, scale)
+  dparams = 2, # (location, scale)
   logpdf = function(x, params) {
-    sum(log(VGAM::dgumbel(x, loc = params$loc, scale = params$scale)))
+    sum(log(VGAM::dgumbel(x, location = params$location, scale = params$scale)))
   }
 )
 
@@ -33,9 +33,9 @@ weibull <- list(
 
 cauchy <- list(
   name = "cauchy",
-  dparams = 2, # (loc,  scale)
+  dparams = 2, # (location,  scale)
   logpdf = function(x, params) {
-    sum(log(dcauchy(x, location = params$loc, scale = params$scale)))
+    sum(log(dcauchy(x, location = params$location, scale = params$scale)))
   }
 )
 

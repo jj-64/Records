@@ -42,7 +42,7 @@ series_H0 <- function(T_val, par){
 ## Generate a series under H1
 series_H1 <- function(T_val, par){
 
-  VGAM::rgumbel(n=T_val, loc = par[["location"]], scale = par[["scale"]])
+  VGAM::rgumbel(n=T_val, location = par[["location"]], scale = par[["scale"]])
 }
 
 #_______________________________________________________________

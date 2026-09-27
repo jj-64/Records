@@ -354,10 +354,10 @@ FirstPass=function(n){Survival(n-1)-Survival(n)}
 #' @param ... Additional parameters specific to the chosen distribution:
 #'   \describe{
 #'     \item{beta}{`shape1`, `shape2`}
-#'     \item{gumbel}{`loc`, `scale`}
+#'     \item{gumbel}{`location`, `scale`}
 #'     \item{weibull}{`shape`, `scale`}
 #'     \item{frechet}{`shape`, `scale`}
-#'     \item{norm}{`loc`, `sd`}
+#'     \item{norm}{`location`, `sd`}
 #'     \item{exp}{`rate`}
 #'     \item{pareto}{`scale`, `shape`}
 #'     \item{unifom}{`min`, `max`}
@@ -381,7 +381,7 @@ rec_count_mean_ldm <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 
   if (dist == "gumbel") {
     ## Explicit formula: sum of record probabilities
-    s <- rec_rate_ldm(t = 1:T, theta=theta, loc = 0, scale = args$scale)
+    s <- rec_rate_ldm(t = 1:T, theta=theta, location = 0, scale = args$scale)
     return(sum(s))
 
   } else {
@@ -422,10 +422,10 @@ rec_count_mean_ldm <- function(T, theta, dist = c("beta", "gumbel", "weibull", "
 #' @export
 #'
 #' @examples
-#' rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
+#' rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, location=0, scale=1)
 #' # [1] 5.761166
 #'
-#' rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
+#' rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, location=0, scale=2)
 #' # [1] 4.509757
 #'
 #' rec_count_var_ldm(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)
@@ -440,7 +440,7 @@ rec_count_var_ldm <- function(T,
 
   if (dist == "gumbel") {
     ## Explicit formula
-    s <- rec_rate_ldm(t = 1:T, theta = theta, loc = args$location, scale = args$scale)
+    s <- rec_rate_ldm(t = 1:T, theta = theta, location = args$location, scale = args$scale)
     return(sum(s * (1 - s)))
 
   } else {

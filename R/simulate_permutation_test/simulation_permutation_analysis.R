@@ -257,7 +257,7 @@ simulation_permutation_analysis <- function(
 #
 # # sim_results <- Simulation_Permutation_Analysis(n_sim=2,
 # # T=50,generator = DTRW_series, series_args =list(dist="cauchy",
-# #  loc=0, scale=1),H0 = "dtrw", obs_type = "all)
+# #  location=0, scale=1),H0 = "dtrw", obs_type = "all)
 #
 # ### 75% of the permutations trees return "dtrw" and 25% return "ynm".
 # ### On average, one simulation will return the following:
@@ -447,7 +447,7 @@ simulation_permutation_analysis <- function(
 # @examples
 # \dontrun{
 # sim_results <- Simulation_Permutation_Analysis(n_sim=2, T=50,
-# generator = DTRW_series, series_args = list(dist="cauchy",loc=0, scale=1),
+# generator = DTRW_series, series_args = list(dist="cauchy",location=0, scale=1),
 # H0 = "dtrw")
 #
 #

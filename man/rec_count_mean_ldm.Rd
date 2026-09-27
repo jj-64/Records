@@ -25,10 +25,10 @@ rec_count_mean_ldm(
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{
 \item{beta}{\code{shape1}, \code{shape2}}
-\item{gumbel}{\code{loc}, \code{scale}}
+\item{gumbel}{\code{location}, \code{scale}}
 \item{weibull}{\code{shape}, \code{scale}}
 \item{frechet}{\code{shape}, \code{scale}}
-\item{norm}{\code{loc}, \code{sd}}
+\item{norm}{\code{location}, \code{sd}}
 \item{exp}{\code{rate}}
 \item{pareto}{\code{scale}, \code{shape}}
 \item{unifom}{\code{min}, \code{max}}

@@ -25,10 +25,10 @@ rec_count_var_ldm(
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{
 \item{beta}{\code{shape1}, \code{shape2}}
-\item{gumbel}{\code{loc}, \code{scale}}
+\item{gumbel}{\code{location}, \code{scale}}
 \item{weibull}{\code{shape}, \code{scale}}
 \item{frechet}{\code{shape}, \code{scale}}
-\item{norm}{\code{loc}, \code{sd}}
+\item{norm}{\code{location}, \code{sd}}
 \item{exp}{\code{rate}}
 \item{pareto}{\code{scale}, \code{shape}}
 \item{unifom}{\code{min}, \code{max}}
@@ -55,10 +55,10 @@ An explicit formula exists in the case of Gumbel \eqn{G(\alpha, \beta)} distribu
 For other increment distributions, the variance is estimated by simulation.
 }
 \examples{
-rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=1)
+rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, location=0, scale=1)
 # [1] 5.761166
 
-rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, loc=0, scale=2)
+rec_count_var_ldm(T=25, theta=0.5, dist="gumbel", n_sim=100, location=0, scale=2)
 # [1] 4.509757
 
 rec_count_var_ldm(T=25, theta=0.5, dist="norm", n_sim=100, mean=0, sd=1)

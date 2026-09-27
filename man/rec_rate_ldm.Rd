@@ -4,7 +4,7 @@
 \alias{rec_rate_ldm}
 \title{Record Rate in the Linear Drift Model (LDM)}
 \usage{
-rec_rate_ldm(theta, t = Inf, loc = 0, scale = 1)
+rec_rate_ldm(theta, t = Inf, location = 0, scale = 1)
 }
 \arguments{
 \item{theta}{Drift parameter (\eqn{\theta > 0}).}
@@ -12,7 +12,7 @@ rec_rate_ldm(theta, t = Inf, loc = 0, scale = 1)
 \item{t}{Time index (integer). If \code{t = Inf} or \code{NULL},
 the asymptotic record rate \eqn{P(R_\infty)} is returned.}
 
-\item{loc}{Optional location parameter (not used in the probability formula, included for consistency).}
+\item{location}{Optional location parameter (not used in the probability formula, included for consistency).}
 
 \item{scale}{Scale parameter of the Gumbel distribution (default = 1).}
 }
@@ -40,15 +40,15 @@ is drawn from a Gumbel distribution shifted by a constant drift \eqn{\theta}.
 }
 \examples{
 # Finite-time record rate
-rec_rate_ldm(theta = 0.5, t = 10, scale = 1, loc = 0)
+rec_rate_ldm(theta = 0.5, t = 10, scale = 1, location = 0)
 # [1] 0.3961385
 
 # Asymptotic record rate (t -> infinity)
-rec_rate_ldm(theta = 0.5, t = Inf, scale = 1, loc =0)
+rec_rate_ldm(theta = 0.5, t = Inf, scale = 1, location =0)
 # [1] 0.3934693
 
 # Default behavior returns asymptotic rate
-rec_rate_ldm(theta = 0.5, scale = 1, loc = 0)
+rec_rate_ldm(theta = 0.5, scale = 1, location = 0)
  # [1] 0.3934693
 
 # Compare convergence

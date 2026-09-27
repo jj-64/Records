@@ -23,7 +23,7 @@ ynm_series(
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{
 \item{beta}{\code{shape1}, \code{shape2}}
-\item{gumbel}{\code{loc}, \code{scale}}
+\item{gumbel}{\code{location}, \code{scale}}
 \item{weibull}{\code{shape}, \code{scale}}
 \item{frechet}{\code{shape}, \code{scale}}
 \item{exp}{\code{rate}}
@@ -41,8 +41,8 @@ The YNM process is defined by a parameter gamma > 0 controlling the block maxima
 }
 \examples{
 \dontrun{
-ynm_series(100, gamma = 1.5, dist = "gumbel", loc = 0, scale = 1)
+ynm_series(100, gamma = 1.5, dist = "gumbel", location = 0, scale = 1)
 ynm_series(10, gamma = 2, dist = "beta", shape1 = 2, shape2 = 5)
-ynm_series(100, gamma = 1.2, dist = "norm", loc = 0, sd = 1)
+ynm_series(100, gamma = 1.2, dist = "norm", location = 0, sd = 1)
 }
 }

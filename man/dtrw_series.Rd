@@ -15,7 +15,7 @@ dtrw_series(T, dist = c("norm", "cauchy", "uniform"), ...)
 \item{...}{Additional parameters specific to the chosen distribution:
 \describe{
 \item{norm}{\code{mean}, \code{sd}}
-\item{cauchy}{\code{loc}, \code{scale}}
+\item{cauchy}{\code{location}, \code{scale}}
 \item{uniform}{\code{min}, \code{max}}
 }}
 }
@@ -31,10 +31,10 @@ For DTRW without a drift, the distribution of the errors shall be continuous
 and symmetric.
 }
 \examples{
-dtrw_series(10,  dist = "cauchy", loc = 0, scale = 1)
+dtrw_series(10,  dist = "cauchy", location = 0, scale = 1)
 # [1] -0.6905644  2.1214308  2.7874249  4.1135190  3.3054300  2.6729198
 # 2.5556620  1.6442579 15.6275793 15.4525462
 
 dtrw_series(100,  dist = "uniform", min = -1, max = 1)
-dtrw_series(100,  dist = "norm", loc = 0, sd = 1)
+dtrw_series(100,  dist = "norm", location = 0, sd = 1)
 }
