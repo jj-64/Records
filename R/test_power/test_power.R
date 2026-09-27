@@ -50,6 +50,20 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
   }
 
   results[,"average"] <- rowMeans(results[,2:(length(T)+1)])
+
+  results = results %>% mutate(
+    se_average  =  sqrt(average * (100 - average) / n_sim),
+
+  average_LCL = pmax(
+    0,
+    average - 1.96 * se_average
+  ),
+
+  average_UCL= pmin(
+    100,
+    average + 1.96 * se_average
+  )
+  )
   return(results)
 }
 
@@ -57,7 +71,7 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
 # Plotting Function ------------
 # ______________________________________
 
-plot_results <- function(df, param_name, title, ylab_name = "Power of test (1-ß, %)", xlab_name = NULL, ymin=0, ymax=100 ) {
+plot_results_v1 <- function(df, param_name, title, ylab_name = "Power of test (1-ß, %)", xlab_name = NULL, ymin=0, ymax=100 ) {
   if (is.null(xlab_name)) xlab_name <- param_name
 
   # detect T_ columns
@@ -109,6 +123,154 @@ plot_results <- function(df, param_name, title, ylab_name = "Power of test (1-ß
   return(p)
 }
 
+plot_results <- function(
+    df,
+    param_name,
+    title = NULL,
+    ylab_name = "Power (%)",
+    xlab_name = NULL,
+    ymin = 0,
+    ymax = 100
+) {
+
+  if (is.null(xlab_name))
+    xlab_name <- param_name
+
+  ## _____________________________________________________
+  ## Reshape
+  ## _____________________________________________________
+
+  T_cols <- grep(
+    "^T_",
+    names(df),
+    value = TRUE
+  )
+
+  df_long <- reshape2::melt(
+    df,
+    id.vars = c(param_name, "average"),
+    measure.vars = T_cols,
+    variable.name = "T",
+    value.name = "Power"
+  )
+
+  df_long$T <-
+    factor(
+      gsub("^T_", "", df_long$T),
+      levels = sort(
+        unique(
+          as.numeric(
+            gsub("^T_", "", df_long$T)
+          )
+        )
+      )
+    )
+
+  ## _____________________________________________________
+  ## Plot
+  ## _____________________________________________________
+
+  p <- ggplot2::ggplot(
+    df_long,
+    ggplot2::aes(
+      x = .data[[param_name]],
+      y = Power,
+      colour = T,
+      linetype = T,
+      group = T
+    )
+  ) +
+
+    ggplot2::geom_line(
+      linewidth = 0.8
+    ) +
+
+    ## Average curve
+    ggplot2::geom_line(
+      ggplot2::aes(
+        y = average
+      ),
+      colour = "black",
+      linewidth = 1.4
+    ) +
+
+    ## Average legend entry
+    ggplot2::annotate(
+      "text",
+      x = max(df_long[[param_name]]),
+      y = min(95, ymax),
+      label = "Average",
+      hjust = 1,
+      size = 4
+    ) +
+
+    ggplot2::scale_colour_brewer(
+      palette = "Dark2",
+      name = "Sample size (T)"
+    ) +
+
+    ggplot2::scale_y_continuous(
+      limits = c(ymin, ymax),
+      breaks = seq(
+        ymin,
+        ymax,
+        by = 10
+      )
+    ) +
+
+    ggplot2::scale_x_continuous(
+      n.breaks = 8
+    ) +
+
+    ggplot2::labs(
+      title = title,
+      x = xlab_name,
+      y = ylab_name
+    ) +
+
+    ggplot2::theme_classic(
+      base_size = 13
+    ) +
+
+    ggplot2::theme(
+
+      plot.title =
+        ggplot2::element_text(
+          hjust = 0.5,
+          face = "bold",
+          size = 14
+        ),
+
+      axis.title =
+        ggplot2::element_text(
+          face = "bold",
+          size = 13
+        ),
+
+      axis.text =
+        ggplot2::element_text(
+          size = 11,
+          colour = "black"
+        ),
+
+      legend.position = "bottom",
+
+      legend.title =
+        ggplot2::element_text(
+          face = "bold"
+        ),
+
+      panel.border =
+        ggplot2::element_rect(
+          colour = "black",
+          fill = NA,
+          linewidth = 0.6
+        )
+    )
+
+  return(p)
+}
+
 save_plot <- function(path, filename, plot){
   ggsave(path = path, filename = filename, plot=plot, width = 7, height = 5, dpi = 600)
 }
@@ -150,7 +312,7 @@ save_results_with_plot <- function(df, file = "results.xlsx", sheet ,p) {
 # ______________________________________
 # Run H0: Classical vs H1: Yang
 # ______________________________________
-gamma <- seq(1.01, 1.4, by=0.01)
+gamma <- seq(1.01, 1.2, by=0.01)
 m_c_y <- simulate_model(param_values = gamma,
   T = T,
   n_sim = n_sim,
@@ -160,6 +322,7 @@ m_c_y <- simulate_model(param_values = gamma,
   test_fun = test_iid_serial_independence,#Test_iid_NT,
   series_args = list(dist = "gumbel", location=0, scale=1)
 )
+
 plot_results(m_c_y, param_name="gamma", title="classical_vs_ynm_gumbel", xlab_name = "γ")
 if(save == TRUE) {save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")}
 
