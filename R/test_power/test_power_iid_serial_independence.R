@@ -539,16 +539,16 @@ m_c_y <- simulate_model(param_values = gamma,
                         generator = ynm_series,
                         param_name = "gamma", # varying param
                         n_arg = "T",             # custom generator expects T=
-                        test_fun = test_iid_rec_count,#Test_iid_NT,
+                        test_fun = test_iid_serial_independence,#Test_iid_NT,
                         series_args = list(dist = "gumbel", location=0, scale=1),
-                        test_args = list(alpha = alpha)
+                        test_args = list(alpha = alpha, lag = 10)
 )
 
 p = plot_results(m_c_y, param_name="gamma", title="classical_vs_ynm_gumbel", xlab_name = "γ")
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_y, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_c_y, file = paste0(save_path,"/test_iid_serial_independence_plot.xlsx"),
                           sheet = "ynm_gumbel_0_1",
                           p = p,
                           figure_width = 7,
@@ -568,14 +568,15 @@ m_c_L <- simulate_model(
   generator = ldm_series,
   param_name = "theta",
   n_arg = "T",
-  test_fun = test_iid_rec_count,
-  series_args = list(dist="frechet",shape=5, scale=5)
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
+  series_args = list(dist="frechet",shape=5, scale=5),
+  test_args = list(alpha = alpha, lag = 10)
 )
 p = plot_results(m_c_L, param_name="theta",  title = "Classical vs ldm - Frechet", xlab_name = "Θ")
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_L, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_c_L, file = paste0(save_path,"/test_iid_serial_independence_plot.xlsx"),
                           sheet = "ldm_frechet_5_5",
                           p = p,
                           figure_width = 7,
@@ -594,15 +595,16 @@ m_c_R <- simulate_model(
   generator = dtrw_series,
   param_name = "scale",  ## sd for norm, scale for cauchy
   n_arg = "T",
-  test_fun = test_iid_rec_count,#Test_iid_NT,
-  series_args = list(dist="cauchy",loc=0)
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
+  series_args = list(dist="cauchy",location=0),
+  test_args = list(alpha = alpha, lag = 10)
 )
 
 p= plot_results(m_c_R, param_name="scale", title="Classical vs dtrw - Cauchy", xlab_name = "σ")
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_R, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_c_R, file = paste0(save_path,"/test_iid_serial_independence_plot.xlsx"),
                           sheet = "dtrw_cauchy_0_1",
                           p = p,
                           figure_width = 7,
@@ -621,15 +623,15 @@ m_c_c <- simulate_model(
   generator = rnorm,
   param_name = "sd",  ## sd for norm
   n_arg = "n",
-  test_fun = test_iid_rec_count,#Test_iid_NT,
+  test_fun = test_iid_serial_independence,#Test_iid_NT,
   series_args = list(mean=0),
-  test_args = list(alpha = 0.05)
+  test_args = list(alpha = alpha, lag = 10)
 )
-p = plot_results(m_c_c, param_name="sd", title="Classical Detection Rate", xlab_name = "σ", ymax=20)
+p = plot_results(m_c_c, param_name="sd", title="Classical Detection Rate", xlab_name = "σ", ymax=25)
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_c, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_c_c, file = paste0(save_path,"/test_iid_serial_independence_plot.xlsx"),
                           sheet = "detection",
                           p = p,
                           figure_width = 7,

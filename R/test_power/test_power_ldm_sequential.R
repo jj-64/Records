@@ -54,15 +54,15 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
   results = results %>% mutate(
     se_average  =  sqrt(average * (100 - average) / n_sim),
 
-    average_LCL = pmax(
-      0,
-      average - 1.96 * se_average
-    ),
+  average_LCL = pmax(
+    0,
+    average - 1.96 * se_average
+  ),
 
-    average_UCL= pmin(
-      100,
-      average + 1.96 * se_average
-    )
+  average_UCL= pmin(
+    100,
+    average + 1.96 * se_average
+  )
   )
   return(results)
 }
@@ -528,55 +528,28 @@ save_results_with_plot <- function(
 
 }
 
-######################## 1️⃣ Part 1 -  Classical Model 1️⃣ ##############################
+############################ 2️⃣ PART 2 : ldm 2️⃣  ####################################################
 # ______________________________________
-# Run H0: Classical vs H1: Yang
+# Run: H0: ldm vs H1: Yang
 # ______________________________________
-gamma <- seq(1.01, 1.2, by=0.01)
-m_c_y <- simulate_model(param_values = gamma,
-                        T = T,
-                        n_sim = n_sim,
-                        generator = ynm_series,
-                        param_name = "gamma", # varying param
-                        n_arg = "T",             # custom generator expects T=
-                        test_fun = test_iid_rec_count,#Test_iid_NT,
-                        series_args = list(dist = "gumbel", location=0, scale=1),
-                        test_args = list(alpha = alpha)
-)
-
-p = plot_results(m_c_y, param_name="gamma", title="classical_vs_ynm_gumbel", xlab_name = "γ")
-p
-if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_y, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
-                          sheet = "ynm_gumbel_0_1",
-                          p = p,
-                          figure_width = 7,
-                          figure_height = 5,
-                          dpi = 600
-  )
-}
-
-# ______________________________________
-# Run H0: Classical vs H1: ldm
-# ______________________________________
-theta_vals <- seq(0.02, 0.3, by=0.05)
-m_c_L <- simulate_model(
-  param_values = theta_vals,
+gamma <- c(1.05,seq(1.05, 1.3, by=0.05))
+m_L_y <- simulate_model(
+  param_values = gamma,
   T = T,
   n_sim = n_sim,
-  generator = ldm_series,
-  param_name = "theta",
+  generator = ynm_series,
+  param_name = "gamma",
   n_arg = "T",
-  test_fun = test_iid_rec_count,
-  series_args = list(dist="frechet",shape=5, scale=5)
+  test_fun = test_ldm_sequential,
+  series_args = list(dist="norm",location=0, scale=1),
+  test_args = list(time = NA)
 )
-p = plot_results(m_c_L, param_name="theta",  title = "Classical vs ldm - Frechet", xlab_name = "Θ")
+p = plot_results(m_L_y, "gamma", "ldm vs ynm - Weibull", xlab_name="Gamma (γ)", ymax=100)
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_L, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
-                          sheet = "ldm_frechet_5_5",
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_L_y, file = paste0(save_path,"/test_ldm_sequential_plot.xlsx"),
+                          sheet = "ynm_norm_0_1",
                           p = p,
                           figure_width = 7,
                           figure_height = 5,
@@ -584,26 +557,53 @@ if(save == TRUE) {
   )
 }
 # ______________________________________
-# Run H0: Classical vs H1: dtrw
+# Run H0: ldm vs H1: Classical
 # ______________________________________
-scale_vals <- seq(1, 2, by=1)
-m_c_R <- simulate_model(
+b <- sqrt(seq(1, 2,1))
+m_L_c <- simulate_model(
+  param_values = b,
+  T = T,
+  n_sim = n_sim,
+  generator = rnorm, #VGAM::rgumbel,
+  param_name = "sd",   # param goes into scale=
+  n_arg = "n",           # rgumbel expects n=
+  test_fun =  test_ldm_sequential,
+  series_args = list(mean=0),
+  test_args = list(time = NA)
+)
+p = plot_results(m_L_c, "sd", title="ldm vs Classical", xlab_name="scale parameter for normal")
+p
+if(save == TRUE) {
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_L_c, file = paste0(save_path,"/test_ldm_sequential_plot.xlsx"),
+                          sheet = "iid_norm_0",
+                          p = p,
+                          figure_width = 7,
+                          figure_height = 5,
+                          dpi = 600
+  )
+}
+# ______________________________________
+# H0: ldm vs H1: dtrw
+# ______________________________________
+scale_vals <- seq(1, 2, 1)
+m_L_R <- simulate_model(
   param_values = scale_vals,
   T = T,
   n_sim = n_sim,
   generator = dtrw_series,
-  param_name = "scale",  ## sd for norm, scale for cauchy
+  param_name =  "scale",      # sd for dtrw and scale for Cauchy
   n_arg = "T",
-  test_fun = test_iid_rec_count,#Test_iid_NT,
-  series_args = list(dist="cauchy",loc=0)
-)
-
-p= plot_results(m_c_R, param_name="scale", title="Classical vs dtrw - Cauchy", xlab_name = "σ")
+  test_fun =  test_ldm_sequential,
+  series_args = list(dist="cauchy",location=0),
+  test_args = list(time = NA)
+              )
+p = plot_results(m_L_R, "scale", title= "ldm vs dtrw - Cauchy", xlab_name="Scale (σ²)")
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_R, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
-                          sheet = "dtrw_cauchy_0_1",
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_L_R, file = paste0(save_path,"/test_ldm_sequential_plot.xlsx"),
+                          sheet = "dtrw_cauchy_0",
                           p = p,
                           figure_width = 7,
                           figure_height = 5,
@@ -611,25 +611,26 @@ if(save == TRUE) {
   )
 }
 # ______________________________________
-# Detection Rate: Classical vs Classical
+# H0: ldm vs H1: ldm (should be Low)
 # ______________________________________
-scale_vals <- seq(1, 2, by=1)
-m_c_c <- simulate_model(
-  param_values = scale_vals,
+theta_vals <- seq(0.2,0.5,0.1)
+m_L_L <- simulate_model(
+  param_values = theta_vals,
   T = T,
   n_sim = n_sim,
-  generator = rnorm,
-  param_name = "sd",  ## sd for norm
-  n_arg = "n",
-  test_fun = test_iid_rec_count,#Test_iid_NT,
-  series_args = list(mean=0),
-  test_args = list(alpha = 0.05)
+  generator =ldm_series,
+  param_name = "theta",      # sd for dtrw and scale for Cauchy
+  n_arg = "T",
+  test_fun = test_ldm_sequential,
+  series_args = list(dist= "norm", mean = 0, sd = 1),
+  test_args = list(time = NA)
 )
-p = plot_results(m_c_c, param_name="sd", title="Classical Detection Rate", xlab_name = "σ", ymax=20)
+
+p = plot_results(m_L_L, "theta", "ldm vs ldm", xlab_name=" Theta (Θ) ", ymax= 100)
 p
 if(save == TRUE) {
-  #save_results(m_c_y, paste0(save_path,"/test_iid_rec_count.xlsx"), "ynm_gumbel_0_1")
-  save_results_with_plot( m_c_c, file = paste0(save_path,"/test_iid_rec_count_plot.xlsx"),
+  #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
+  save_results_with_plot( m_L_L, file = paste0(save_path,"/test_ldm_sequential_plot.xlsx"),
                           sheet = "detection",
                           p = p,
                           figure_width = 7,
