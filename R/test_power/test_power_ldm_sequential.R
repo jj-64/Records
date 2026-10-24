@@ -41,7 +41,7 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
         x <- do.call(generator, args)
 
         # Apply test function
-        test_call <- c(list(X=x), test_args)
+        test_call <- c(list(X=x) ,test_args)
         dec[i] <- do.call(test_fun, test_call)$decision
       }
       valid <- na.omit(dec)
@@ -530,9 +530,9 @@ save_results_with_plot <- function(
 
 }
 
-############################ 2️⃣ PART 2 : ldm 2️⃣  ####################################################
+
 # ______________________________________
-# Run: H0: ldm vs H1: Yang
+# Run: H0: ldm vs H1: Yang ------------
 # ______________________________________
 gamma <- c(1.05,seq(1.05, 1.3, by=0.05))
 m_L_y <- simulate_model(
@@ -559,7 +559,7 @@ if(save == TRUE) {
   )
 }
 # ______________________________________
-# Run H0: ldm vs H1: Classical
+# Run H0: ldm vs H1: Classical ---------
 # ______________________________________
 b <- sqrt(seq(1, 2,1))
 m_L_c <- simulate_model(
@@ -586,7 +586,7 @@ if(save == TRUE) {
   )
 }
 # ______________________________________
-# H0: ldm vs H1: dtrw
+# H0: ldm vs H1: dtrw ------------
 # ______________________________________
 scale_vals <- seq(1, 2, 1)
 m_L_R <- simulate_model(
@@ -613,7 +613,7 @@ if(save == TRUE) {
   )
 }
 # ______________________________________
-# H0: ldm vs H1: ldm (should be Low)
+# H0: ldm vs H1: ldm (should be Low) -------------
 # ______________________________________
 theta_vals <- seq(0.2,0.5,0.1)
 m_L_L <- simulate_model(
@@ -624,7 +624,7 @@ m_L_L <- simulate_model(
   param_name = "theta",      # sd for dtrw and scale for Cauchy
   n_arg = "T",
   test_fun = test_ldm_sequential,
-  series_args = list(dist= "norm", mean = 0, sd = 1),
+  series_args = list(dist = "gumbel", loc=0, scale=1), #list(dist= "norm", mean = 0, sd = 1),
   test_args = list(time = NA)
 )
 
