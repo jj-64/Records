@@ -118,6 +118,7 @@
 #' @param record_times Numeric vector containing the occurrence times
 #' of the records when \code{obs_type = "records"}.
 #'
+#' @param min_rsq Numeric. The minimum R-square accepted for a good linear fit (Default = 0.8)
 #' @return A list containing:
 #'
 #' \describe{
@@ -202,7 +203,8 @@ test_ldm_trend <- function(
     X,
     alpha = 0.05,
     obs_type = c("all", "records"),
-    record_times = NULL
+    record_times = NULL,
+    min_rsq = 0.8
   ) {
 
   obs_type <- match.arg(obs_type)
@@ -267,7 +269,7 @@ test_ldm_trend <- function(
     sum((X - mean(X))^2)
 
   decision <- ifelse(
-    p_value < alpha,
+    p_value < alpha & rsq >= min_rsq,
     "ldm",
     "no"
   )
