@@ -49,7 +49,9 @@ simulate_model <- function(param_values, ## vector of values of the parameter th
     }
   }
 
+  if(length(T) >1) {
   results[,"average"] <- rowMeans(results[,2:(length(T)+1)])
+  } else {results[,"average"] <- results[,2]}
 
   results = results %>% mutate(
     se_average  =  sqrt(average * (100 - average) / n_sim),
