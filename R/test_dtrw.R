@@ -1,5 +1,5 @@
 
-############## Perform DTRW test ##############
+### test_dtrw_increment ----------------------
 #' Composite Test of Random-Walk Increment Assumptions
 #'
 #' Performs a composite hypothesis test to assess whether a given time series
@@ -122,6 +122,7 @@ test_dtrw_increment = function(X,alpha=0.05, method="Bonf"){
     ))
 }
 
+### test_dtrw_assumption ----------------------
 #' Composite Test of Random-Walk Increment Assumptions
 #'
 #' Evaluates whether the increments of a stochastic process are
@@ -251,98 +252,98 @@ test_dtrw_increment = function(X,alpha=0.05, method="Bonf"){
 #'
 #' X <- cumsum(rnorm(1000))
 #'
-#' test_dtrw_assumptions(
+#'test_dtrw_assumptions(
 #'   X,
 #'   alpha = 0.05,
 #'   method = "Holm"
 #' )
 test_dtrw_assumptions <- function(
-    X,
-    alpha = 0.05,
-    method = c("max","Holm", "Bonf", "Sidak"),
-    lag = floor(log(length(X)))
-) {
+     X,
+     alpha = 0.05,
+     method = c("max","Holm", "Bonf", "Sidak"),
+     lag = floor(log(length(X)))
+ ) {
 
-  method <- match.arg(method)
+   method <- match.arg(method)
 
-  if (!is.numeric(X))
-    stop("'X' must be numeric.")
+   if (!is.numeric(X))
+     stop("'X' must be numeric.")
 
-  if (length(X) < 20)
-    stop("'X' must contain at least 20 observations.")
+   if (length(X) < 20)
+     stop("'X' must contain at least 20 observations.")
 
-  increments <- diff(X)
+   increments <- diff(X)
 
-  ## Independence
-  lb_test <- Box.test(
-    increments,
-    lag = lag,
-    type = "Ljung-Box"
-  )
+   ## Independence
+   lb_test <- Box.test(
+     increments,
+     lag = lag,
+     type = "Ljung-Box"
+   )
 
-  p_indep <- lb_test$p.value
+   p_indep <- lb_test$p.value
 
-  ## Zero drift
-  drift_test <- wilcox.test(
-    increments,
-    mu = 0,
-    alternative = "two.sided",
-    exact = FALSE
-  )
+   ## Zero drift
+   drift_test <- wilcox.test(
+     increments,
+     mu = 0,
+     alternative = "two.sided",
+     exact = FALSE
+   )
 
-  p_drift <- drift_test$p.value
+   p_drift <- drift_test$p.value
 
-  ## Symmetry
-  sym_test <- lawstat::symmetry.test(
-    increments,
-    option = "MGG"
-  )
+   ## Symmetry
+   sym_test <- lawstat::symmetry.test(
+     increments,
+     option = "MGG"
+   )
 
-  p_sym <- sym_test$p.value
+   p_sym <- sym_test$p.value
 
-  pvals <- c(
-    independence = p_indep,
-    zero_drift   = p_drift,
-    symmetry     = p_sym
-  )
+   pvals <- c(
+     independence = p_indep,
+     zero_drift   = p_drift,
+     symmetry     = p_sym
+   )
 
-  m <- length(pvals)
+   m <- length(pvals)
 
-  if (method == "Bonf") {
+   if (method == "Bonf") {
 
-    pass <- all(pvals > alpha / m)
+     pass <- all(pvals > alpha / m)
 
-  } else if (method == "Holm") {
+   } else if (method == "Holm") {
 
-    pp <- sort(pvals)
+     pp <- sort(pvals)
 
-    pass <- all(
-      pp > alpha / (m:1)
-    )
+     pass <- all(
+       pp > alpha / (m:1)
+     )
 
-  } else if (method == "Sidak") {
+   } else if (method == "Sidak") {
 
-    crit <- 1 - (1 - alpha)^(1 / m)
+     crit <- 1 - (1 - alpha)^(1 / m)
 
-    pass <- all(
-      pvals > crit
-    )
+     pass <- all(
+       pvals > crit
+     )
 
-  }
+   }
 
-  decision <- ifelse(pass, "dtrw", "no")
+   decision <- ifelse(pass, "dtrw", "no")
 
-  return(
-    list(
-      method = method,
-      alpha = alpha,
-      p_value_independence = p_indep,
-      p_value_zero_drift = p_drift,
-      p_value_symmetry = p_sym,
-      decision = decision
-    )
-  )
-}
+   return(
+     list(
+       method = method,
+       alpha = alpha,
+       p_value_independence = p_indep,
+       p_value_zero_drift = p_drift,
+       p_value_symmetry = p_sym,
+       decision = decision
+     )
+   )
+ }
 # test_dtrw_indep2 = function(X,alpha=0.05){
 #
 #   ## Test2:  Perform Ljung-Box test on increments: H0:independently distributed (no autocorrelation)
@@ -360,7 +361,7 @@ test_dtrw_assumptions <- function(
 #     decision = dec
 #   ))
 # }
-### based on exact distribution of number of records #######
+### based on exact distribution of number of records --------
 
 #' Test for Discrete-Time Random Walk (DTRW) Using Record Counts
 #'
