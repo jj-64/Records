@@ -226,6 +226,18 @@ test_ldm_trend <- function(
 
   }
 
+  if(length(X) <= 2){
+    return(list(
+      theta_hat = 0,
+      std_error = NA,
+      stat = NA,
+      p_value = NA,
+      conf_int = NA,
+      adj_r_squared = NA,
+      nmse = NA,
+      decision = "no"
+    ))
+  }
   # # Centralize data
   # t <- t - mean(t)
   # X <- X - mean(X)
@@ -237,7 +249,8 @@ test_ldm_trend <- function(
   fit <- robustbase::lmrob(
     X ~ t,
     data = dat,
-    method = "MM"
+    setting = "KS2014"
+    #method = "MM"
   )
 
   # Fit robust regression without intercept
@@ -442,6 +455,8 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 
     obs <- rec_count(X)
 
+    alpha = as.numeric(alpha)
+
     estimate <- estimate_ldm_mle_indicator(
       X = X,
       variance = TRUE,
@@ -457,7 +472,7 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
     z_theo <- theta_hat / sqrt(var_theta_hat)
 
     drift_detected <-
-      abs(z_theo) > qnorm(1 - alpha/2)
+      abs(as.numeric(z_theo)) > qnorm(1 - alpha/2)
 
 
     # Decision rule

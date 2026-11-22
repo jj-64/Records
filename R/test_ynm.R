@@ -477,6 +477,7 @@ test_ynm_chisq <- function(X,
 #' @param X A numeric vector (time series).
 #' @param gamma Optional. The power parameter of the YNM-Nevzorov Model. If not provided, it will be estimated.
 #' @param alpha Significance level (default = 0.05).
+#' @param approximate if approximate estimation of gamma using MLE and approximate variance (default = FALSE).
 #'
 #' @return A list with:
 #' \item{stat}{Observed number of records.}
@@ -546,7 +547,7 @@ test_ynm_chisq <- function(X,
 #' #  $decision
 #' #  [1] "no"
 #' @export
-test_ynm_rec_count <- function(X, gamma = NULL, alpha = 0.05) {
+test_ynm_rec_count <- function(X, gamma = NULL, alpha = 0.05, approximate = FALSE) {
 
   n <- length(X)
 
@@ -555,12 +556,12 @@ test_ynm_rec_count <- function(X, gamma = NULL, alpha = 0.05) {
   v_gamma = NA_real_
 
   # --- Estimate gamma if not provided ---
-  if (is.null(gamma) || is.na(gamma)) {
+  if (is.null(gamma) || any(is.na(gamma))) {
 
     est <- estimate_ynm_mle_indicator(
       X,
       variance = TRUE,
-      approximate = FALSE,
+      approximate = approximate,
       min = 1.01,
       max = 5,
       step = 0.01
@@ -641,6 +642,7 @@ test_ynm_rec_count <- function(X, gamma = NULL, alpha = 0.05) {
 
   return(list(
       rec_count = obs,
+      approximate = approximate,
       gamma_hat = gamma_hat,
       gamma_variance = var_gamma,
       gamma_source = source,

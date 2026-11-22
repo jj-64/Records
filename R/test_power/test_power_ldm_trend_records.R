@@ -7,7 +7,7 @@ devtools::load_all(".")
 # library(Records)
 
 n_sim <- 1000
-T <- seq(40, 100, by = 10)
+T <- seq(70, 150, by = 10)
 alpha = 0.05
 save = TRUE
 save_path ="inst/extdata/test_power_two_by_two/"
@@ -629,7 +629,7 @@ m_L_L <- simulate_model(
   test_args = list(obs_type = "records")
 )
 
-p = plot_results(m_L_L, "theta", "ldm vs ldm", xlab_name=" Theta (Θ) ", ymax= 100)
+p = plot_results(m_L_L, "theta", "ldm vs ldm", xlab_name=" Theta (Θ) ", ymax= 20)
 p
 if(save == TRUE) {
   #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
