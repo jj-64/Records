@@ -594,10 +594,10 @@ m_L_R <- simulate_model(
   T = T,
   n_sim = n_sim,
   generator = dtrw_series,
-  param_name =  "scale",      # sd for dtrw and scale for Cauchy
+  param_name =  "sd",      # sd for dtrw and scale for Cauchy
   n_arg = "T",
   test_fun =  test_ldm_trend,
-  series_args = list(dist="cauchy",location=0),
+  series_args = list(dist="norm",mean=0),
   test_args = list(obs_type = "records",     alpha = alpha,min_rsq = 0.8)
 )
 

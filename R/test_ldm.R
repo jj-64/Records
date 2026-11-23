@@ -260,21 +260,34 @@ test_ldm_trend <- function(
   # Extract coefficient and standard error
   sm <- summary(fit)
 
-  theta_hat <- coef(fit)[["t"]]
+  theta_hat <- unname(coef(fit)["t"])
 
-  se_theta <- sm$coefficients["t", "Std. Error"]
+  coef_tab <- sm$coefficients
 
-  t_stat <- theta_hat / se_theta
+  se_theta <- tryCatch(
+    coef_tab["t", "Std. Error"],
+    error = function(e) NA_real_
+  )
+
+  t_stat <- if (is.na(se_theta) || se_theta == 0) {
+    NA_real_
+  } else {
+    theta_hat / se_theta
+  }
+
+  ci <- if (is.na(se_theta) || se_theta == 0) {
+    NA_real_
+  } else {
+    theta_hat +
+    c(-1, 1) *
+    stats::qt(1 - alpha/2, fit$df.residual) *
+    se_theta
+  }
 
   p_value <- 2 * pt(
     -abs(t_stat),
     df = fit$df.residual
   )
-
-  ci <- theta_hat +
-    c(-1, 1) *
-    stats::qt(1 - alpha/2, fit$df.residual) *
-    se_theta
 
   rsq <- sm$adj.r.squared
 
