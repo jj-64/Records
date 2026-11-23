@@ -172,7 +172,7 @@
 #' #  [1] "ldm"
 #'
 #' # If we assume we have record values and record times only
-#' test_ldm_trend(rec_values(X), obs_type = "records", record_times = rec_times(X))
+#' test_ldm_trend(rec_values(X), obs_type = "records", record_times = rec_times(X), min_rsq = 0.8)
 #'
 #' #' $theta_hat
 #' # [1] 0.2156731
