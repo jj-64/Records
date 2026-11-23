@@ -543,15 +543,15 @@ m_L_y <- simulate_model(
   param_name = "gamma",
   n_arg = "T",
   test_fun = test_ldm_trend,
-  series_args = list(dist="weibull",loc=0, scale=1),
+  series_args = list(dist="frechet",shape=1, scale=1),
   test_args = list(obs_type = "records")
 )
-p = plot_results(m_L_y, "gamma", "ldm vs ynm - Weibull", xlab_name="Gamma (γ)", ymax=100)
+p = plot_results(m_L_y, "gamma", "ldm vs ynm - Frechet", xlab_name="Gamma (γ)", ymax=100)
 p
 if(save == TRUE) {
   #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
   save_results_with_plot( m_L_y, file = paste0(save_path,"/test_ldm_trend_plot_records.xlsx"),
-                          sheet = "ynm_weibull_0_1",
+                          sheet = "ynm_frechet_1_1",
                           p = p,
                           figure_width = 7,
                           figure_height = 5,
@@ -571,14 +571,14 @@ m_L_c <- simulate_model(
   n_arg = "n",           # rgumbel expects n=
   test_fun =  test_ldm_trend,
   series_args = list(mean=0),
-  test_args = list(obs_type = "records")
+  test_args = list(obs_type = "records",     alpha = alpha,min_rsq = 0.9)
 )
 p = plot_results(m_L_c, "sd", title="ldm vs Classical", xlab_name="scale parameter for normal")
 p
 if(save == TRUE) {
   #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
   save_results_with_plot( m_L_c, file = paste0(save_path,"/test_ldm_trend_plot_records.xlsx"),
-                          sheet = "iid_norm_0",
+                          sheet = "iid_norm_0_rsq0.9",
                           p = p,
                           figure_width = 7,
                           figure_height = 5,
@@ -602,12 +602,12 @@ m_L_R <- simulate_model(
 )
 
 
-p = plot_results(m_L_R, "scale", title= "ldm vs dtrw - Cauchy", xlab_name="Scale (σ²)")
+p = plot_results(m_L_R, "sd", title= "ldm vs dtrw - norm", xlab_name="Scale (σ²)")
 p
 if(save == TRUE) {
   #save_results(m_c_y, paste0(save_path,"/test_iid_serial_independence.xlsx"), "ynm_gumbel_0_1")
   save_results_with_plot( m_L_R, file = paste0(save_path,"/test_ldm_trend_plot_records.xlsx"),
-                          sheet = "dtrw_cauchy_0",
+                          sheet = "dtrw_norm_0",
                           p = p,
                           figure_width = 7,
                           figure_height = 5,

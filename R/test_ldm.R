@@ -258,41 +258,67 @@ test_ldm_trend <- function(
   #robust_model <- robustbase::lmrob(X ~ t - 1, data = train, method = "MM")
 
   # Extract coefficient and standard error
-  sm <- summary(fit)
+  #sm <- summary(fit)
+
+  sm <- tryCatch(
+    summary(fit),
+    error = function(e) NULL
+  )
 
   theta_hat <- unname(coef(fit)["t"])
 
-  coef_tab <- sm$coefficients
+  if (!is.null(sm) &&
+      !is.null(sm$coefficients) &&
+      nrow(sm$coefficients) > 0 &&
+      "t" %in% rownames(sm$coefficients)) {
 
-  se_theta <- tryCatch(
-    coef_tab["t", "Std. Error"],
-    error = function(e) NA_real_
-  )
+    se_theta <- sm$coefficients["t", "Std. Error"]
+    t_stat <- theta_hat / se_theta
+    ci <- theta_hat +
+        c(-1, 1) *
+        stats::qt(1 - alpha/2, fit$df.residual) *
+        se_theta
 
-  t_stat <- if (is.na(se_theta) || se_theta == 0) {
-    NA_real_
+    p_value <- 2 * pt(-abs(t_stat),df = fit$df.residual)
+
+    rsq <- sm$adj.r.squared
+
+    nmse <- sum(stats::residuals(fit)^2) /
+      sum((X - mean(X))^2)
+
   } else {
-    theta_hat / se_theta
+
+    se_theta <- NA_real_
+    t_stat <- NA_real_
+    ci <- NA_real_
+    p_value <- 0
+    rsq <- 0
+    nmse <- Inf
   }
 
-  ci <- if (is.na(se_theta) || se_theta == 0) {
-    NA_real_
-  } else {
-    theta_hat +
-    c(-1, 1) *
-    stats::qt(1 - alpha/2, fit$df.residual) *
-    se_theta
-  }
+  #theta_hat <- unname(coef(fit)["t"])
 
-  p_value <- 2 * pt(
-    -abs(t_stat),
-    df = fit$df.residual
-  )
+  #coef_tab <- sm$coefficients
 
-  rsq <- sm$adj.r.squared
+  # se_theta <- tryCatch(
+  #   coef_tab["t", "Std. Error"],
+  #   error = function(e) NA_real_
+  # )
 
-  nmse <- sum(stats::residuals(fit)^2) /
-    sum((X - mean(X))^2)
+  # t_stat <- if (is.na(se_theta) || se_theta == 0) {
+  #   NA_real_
+  # } else {
+  #   theta_hat / se_theta
+  # }
+
+  # ci <- if (is.na(se_theta) || se_theta == 0) {
+  #   NA_real_
+  # } else {
+  #   theta_hat +
+  #   c(-1, 1) *
+  #   stats::qt(1 - alpha/2, fit$df.residual) *
+  #   se_theta
+  # }
 
   decision <- ifelse(
     p_value < alpha & rsq >= min_rsq,
