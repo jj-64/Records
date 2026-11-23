@@ -598,8 +598,9 @@ m_L_R <- simulate_model(
   n_arg = "T",
   test_fun =  test_ldm_trend,
   series_args = list(dist="cauchy",location=0),
-  test_args = list(obs_type = "records")
-              )
+  test_args = list(obs_type = "records",     alpha = alpha,min_rsq = 0.8)
+)
+
 
 p = plot_results(m_L_R, "scale", title= "ldm vs dtrw - Cauchy", xlab_name="Scale (σ²)")
 p
