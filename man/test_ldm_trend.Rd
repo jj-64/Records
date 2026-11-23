@@ -8,7 +8,8 @@ test_ldm_trend(
   X,
   alpha = 0.05,
   obs_type = c("all", "records"),
-  record_times = NULL
+  record_times = NULL,
+  min_rsq = 0.8
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ values.}
 
 \item{record_times}{Numeric vector containing the occurrence times
 of the records when \code{obs_type = "records"}.}
+
+\item{min_rsq}{Numeric. The minimum R-square accepted for a good linear fit (Default = 0.8)}
 }
 \value{
 A list containing:
@@ -140,7 +143,7 @@ test_ldm_trend(X)
 #  [1] "ldm"
 
 # If we assume we have record values and record times only
-test_ldm_trend(rec_values(X), obs_type = "records", record_times = rec_times(X))
+test_ldm_trend(rec_values(X), obs_type = "records", record_times = rec_times(X), min_rsq = 0.8)
 
 #' $theta_hat
 # [1] 0.2156731

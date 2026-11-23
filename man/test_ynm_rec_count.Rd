@@ -4,7 +4,7 @@
 \alias{test_ynm_rec_count}
 \title{Record-Count Test for the YNM Model}
 \usage{
-test_ynm_rec_count(X, gamma = NULL, alpha = 0.05)
+test_ynm_rec_count(X, gamma = NULL, alpha = 0.05, approximate = FALSE)
 }
 \arguments{
 \item{X}{A numeric vector (time series).}
@@ -12,6 +12,8 @@ test_ynm_rec_count(X, gamma = NULL, alpha = 0.05)
 \item{gamma}{Optional. The power parameter of the YNM-Nevzorov Model. If not provided, it will be estimated.}
 
 \item{alpha}{Significance level (default = 0.05).}
+
+\item{approximate}{if approximate estimation of gamma using MLE and approximate variance (default = FALSE).}
 }
 \value{
 A list with:
