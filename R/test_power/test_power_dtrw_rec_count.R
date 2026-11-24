@@ -541,16 +541,16 @@ m_d_y <- simulate_model(param_values = gamma,
                         param_name = "gamma", # varying param
                         n_arg = "T",             # custom generator expects T=
                         test_fun = test_dtrw_rec_count,#Test_iid_NT,
-                        series_args = list(dist = "gumbel", location=0, scale=1),
+                        series_args = list(dist = "frechet", shape=1, scale=1),
                         test_args = list(alpha = alpha, one.sided = TRUE)
 )
 
-p = plot_results(m_d_y, param_name="gamma", title="dtrw_vs_ynm_gumbel", xlab_name = "γ")
+p = plot_results(m_d_y, param_name="gamma", title="dtrw_vs_ynm_frechet", xlab_name = "γ")
 p
 if(save == TRUE) {
   #save_results(m_d_y, paste0(save_path,"/test_dtrw_rec_count.xlsx"), "ynm_gumbel_0_1")
   save_results_with_plot( m_d_y, file = paste0(save_path,"/test_dtrw_rec_count_plot.xlsx"),
-                          sheet = "ynm_gumbel_0_1",
+                          sheet = "ynm_frechet_1_1",
                           p = p,
                           figure_width = 7,
                           figure_height = 5,

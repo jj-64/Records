@@ -71,16 +71,16 @@ auc_typeI_avg = subset(auc_typeI, Variable == "average")
 auc_Power_avg
 auc_typeI_avg
 
-auc_Power_avg[grepl(pattern = "iid_BoxJenkins", x=auc_Power_avg$File_Sheet) ,]
+auc_Power_avg[grepl(pattern = "iid_serial_independence", x=auc_Power_avg$File_Sheet) ,]
 auc_Power_avg[grepl(pattern = "iid_rec_count", x=auc_Power_avg$File_Sheet) ,]
 
 auc_Power_avg[grepl(pattern = "ynm_rec_count", x=auc_Power_avg$File_Sheet) ,]
-auc_Power_avg[grepl(pattern = "YNM_Geom", x=auc_Power_avg$File_Sheet) ,]
-auc_Power_avg[grepl(pattern = "YNM_Pearson", x=auc_Power_avg$File_Sheet) ,]
+auc_Power_avg[grepl(pattern = "ynm_chisq", x=auc_Power_avg$File_Sheet) ,]
+auc_Power_avg[grepl(pattern = "ynm_rec_gap", x=auc_Power_avg$File_Sheet) ,]
 
 auc_Power_avg[grepl(pattern = "ldm_rec_count", x=auc_Power_avg$File_Sheet) ,]
-auc_Power_avg[grepl(pattern = "LDM_Reg", x=auc_Power_avg$File_Sheet) ,]
-auc_Power_avg[grepl(pattern = "LDM_Sequential", x=auc_Power_avg$File_Sheet) ,]
+auc_Power_avg[grepl(pattern = "ldm_trend", x=auc_Power_avg$File_Sheet) ,]
+auc_Power_avg[grepl(pattern = "ldm_sequential", x=auc_Power_avg$File_Sheet) ,]
 
 auc_Power_avg[grepl(pattern = "dtrw_rec_count", x=auc_Power_avg$File_Sheet) ,]
 auc_Power_avg[grepl(pattern = "dtrw_increment", x=auc_Power_avg$File_Sheet) ,]
