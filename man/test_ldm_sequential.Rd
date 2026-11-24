@@ -26,9 +26,11 @@ test_ldm_sequential_drift_detection_stage2(stage1, alpha = 0.05)
 \arguments{
 \item{X}{Numeric vector of observations.}
 
-\item{record_times}{Numeric vector of the record times. (default = NA means we are using all observed X series)}
+\item{record_times}{Numeric vector of the record times. (default = NA means we are using all observed X series). Mandatory when obs_type = "recordS"}
 
 \item{alpha}{Numeric, significance level (default = 0.05).}
+
+\item{obs_type}{character "all" or "records" depending on the data used}
 
 \item{pooled}{boolean (Default = FALSE), if variance is assumed pooled}
 
@@ -124,7 +126,7 @@ The procedure stops at stage 1 if no drift is detected.
 set.seed(123)
 t <- 1:60
 X <- 0.1 * t + rnorm(60, sd = 1)
-test_ldm_sequential(X, alpha = 0.05)
+test_ldm_sequential(X, alpha = 0.05, record_times = NA, obs_type = "all")
 
 # $block_size
 #  [1] 16
@@ -168,7 +170,7 @@ test_ldm_sequential(X, alpha = 0.05)
 #  $decision
 #  [1] "ldm"
 
-test_ldm_sequential(rnorm(100), alpha = 0.05)
+test_ldm_sequential(rnorm(100), alpha = 0.05, record_times = NA, obs_type = "all")
 
 # $block_size
 #  [1] 33

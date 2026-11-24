@@ -608,11 +608,12 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 #' negative linear drift over the entire observation period.
 #'
 #' @param X Numeric vector of observations.
-#' @param record_times Numeric vector of the record times. (default = NA means we are using all observed X series)
+#' @param record_times Numeric vector of the record times. (default = NA means we are using all observed X series). Mandatory when obs_type = "recordS"
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param pooled Logical, if \code{TRUE}, pooled variance across blocks is used
 #'   in stage 1 for the noise variance estimation. Otherwise, variance is estimated directly
 #'   from residuals (default = \code{FALSE}).
+#' @param obs_type character "all" or "records" depending on the data used
 #' @return A list with results from both stages:
 #' \describe{
 #'   \item{block_size}{Size of each partitioned block.}
@@ -649,7 +650,7 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 #' set.seed(123)
 #' t <- 1:60
 #' X <- 0.1 * t + rnorm(60, sd = 1)
-#' test_ldm_sequential(X, alpha = 0.05)
+#' test_ldm_sequential(X, alpha = 0.05, record_times = NA, obs_type = "all")
 #'
 #' # $block_size
 #' #  [1] 16
@@ -693,7 +694,7 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 #' #  $decision
 #' #  [1] "ldm"
 #'
-#' test_ldm_sequential(rnorm(100), alpha = 0.05)
+#' test_ldm_sequential(rnorm(100), alpha = 0.05, record_times = NA, obs_type = "all")
 #'
 #' # $block_size
 #' #  [1] 33
