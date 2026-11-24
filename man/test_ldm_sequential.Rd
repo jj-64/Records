@@ -170,7 +170,7 @@ test_ldm_sequential(X, alpha = 0.05, record_times = NA, obs_type = "all")
 #  $decision
 #  [1] "ldm"
 
-test_ldm_sequential(rnorm(100), alpha = 0.05, record_times = NA, obs_type = "all")
+test_ldm_sequential(rnorm(100), alpha = 0.05, obs_type = "all")
 
 # $block_size
 #  [1] 33

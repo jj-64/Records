@@ -123,7 +123,6 @@ test_model_parallel <- function(
     K = K,
     warmup = warmup,
     obs_type = obs_type,
-    obs_type = "records",
     record_times = record_times
   )
 
