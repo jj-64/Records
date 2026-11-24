@@ -153,13 +153,13 @@ test_model_parallel <- function(
         method = method
       )
 
-    results$dtrw_assumptions_all <-
-      test_dtrw_assumptions(
-        X = X,
-        alpha = alpha,
-        method = method,
-        lag = lag
-      )
+    # results$dtrw_assumptions_all <-
+    #   test_dtrw_assumptions(
+    #     X = X,
+    #     alpha = alpha,
+    #     method = method,
+    #     lag = lag
+    #   )
   }
 
   ## ------------------------------------------------------
