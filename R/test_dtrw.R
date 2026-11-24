@@ -122,228 +122,228 @@ test_dtrw_increment = function(X,alpha=0.05, method="Bonf"){
     ))
 }
 
-### test_dtrw_assumption ----------------------
-#' Composite Test of Random-Walk Increment Assumptions
-#'
-#' Evaluates whether the increments of a stochastic process are
-#' consistent with the fundamental assumptions of a discrete-time
-#' random walk (DTRW) without drift. Specifically, the function
-#' assesses whether the increment process:
-#'
-#' \enumerate{
-#'   \item is independently distributed;
-#'   \item has zero drift (median increment equal to zero);
-#'   \item is symmetrically distributed around zero.
-#' }
-#'
-#' The test is implemented as a composite procedure combining
-#' the following hypothesis tests:
-#'
-#' \itemize{
-#'   \item \strong{Independence:}
-#'         Ljung-Box test applied to the increment series.
-#'
-#'         Null hypothesis:
-#'         \deqn{H_0: \rho_k = 0}
-#'         for all tested lags.
-#'
-#'         Failure to reject indicates no evidence of serial dependence.
-#'
-#'   \item \strong{Zero Drift:}
-#'         Wilcoxon signed-rank test applied to the increment series.
-#'
-#'         Null hypothesis:
-#'         \deqn{H_0: \mathrm{median}(\Delta X_t)=0}
-#'
-#'         Failure to reject indicates no evidence of systematic upward
-#'         or downward drift.
-#'
-#'   \item \strong{Symmetry:}
-#'         Miao-Gel-Gastwirth symmetry test
-#'         (\code{lawstat::symmetry.test}).
-#'
-#'         Null hypothesis:
-#'         \deqn{H_0: F(x)=1-F(-x)}
-#'
-#'         Failure to reject indicates consistency with a symmetric
-#'         increment distribution.
-#' }
-#'
-#' Individual p-values are combined using a family-wise error control
-#' procedure. A process is classified as \code{"dtrw"} only when
-#' all component tests fail to reject their respective null hypotheses
-#' after adjustment.
-#'
-#' Available combination methods:
-#'
-#' \itemize{
-#'   \item \code{"Bonf"}:
-#'         Bonferroni adjustment.
-#'
-#'   \item \code{"Holm"}:
-#'         Holm-Bonferroni sequential adjustment.
-#'
-#'   \item \code{"Sidak"}:
-#'         Sidak adjustment.
-#' }
-#'
-#' The Holm procedure is recommended because it controls the
-#' family-wise error rate while providing greater power than
-#' Bonferroni.
-#'
-#' @param X Numeric vector representing the observed process path.
-#'
-#' @param alpha Numeric significance level.
-#' Default is \code{0.05}.
-#'
-#' @param method Character string specifying the multiple-testing
-#' adjustment method. Must be one of:
-#' \code{"Bonf"}, \code{"Holm"}, or \code{"Sidak"}.
-#'
-#' @param lag Integer lag used in the Ljung-Box test.
-#' Default is \code{floor(log(length(X)))}.
-#'
-#' @return A list containing:
-#'
-#' \describe{
-#'   \item{method}{
-#'     Multiple-testing adjustment method used.
-#'   }
-#'
-#'   \item{alpha}{
-#'     Significance level.
-#'   }
-#'
-#'   \item{p_value_independence}{
-#'     Ljung-Box p-value.
-#'   }
-#'
-#'   \item{p_value_zero_drift}{
-#'     Wilcoxon signed-rank p-value.
-#'   }
-#'
-#'   \item{p_value_symmetry}{
-#'     Miao-Gel-Gastwirth symmetry-test p-value.
-#'   }
-#'
-#'   \item{decision}{
-#'     Overall classification:
-#'     \code{"dtrw"} or \code{"no"}.
-#'   }
-#' }
-#'
-#' @references
-#' Ljung, G. M. and Box, G. E. P. (1978).
-#' On a Measure of Lack of Fit in Time Series Models.
-#' Biometrika, 65(2), 297-303.
-#'
-#' Holm, S. (1979).
-#' A Simple Sequentially Rejective Multiple Test Procedure.
-#' Scandinavian Journal of Statistics, 6(2), 65-70.
-#'
-#' Miao, W., Gel, Y., and Gastwirth, J. (2006).
-#' A New Test of Symmetry About an Unknown Median.
-#' Random Structures and Algorithms, 29(1), 81-97.
-#'
-#' @export
-#'
-#' @examples
-#' set.seed(123)
-#'
-#' X <- cumsum(rnorm(1000))
-#'
-#'test_dtrw_assumptions(
-#'   X,
-#'   alpha = 0.05,
-#'   method = "Holm"
-#' )
-test_dtrw_assumptions <- function(
-     X,
-     alpha = 0.05,
-     method = c("max","Holm", "Bonf", "Sidak"),
-     lag = floor(log(length(X)))
- ) {
-
-   method <- match.arg(method)
-
-   if (!is.numeric(X))
-     stop("'X' must be numeric.")
-
-   if (length(X) < 20)
-     stop("'X' must contain at least 20 observations.")
-
-   increments <- diff(X)
-
-   ## Independence
-   lb_test <- Box.test(
-     increments,
-     lag = lag,
-     type = "Ljung-Box"
-   )
-
-   p_indep <- lb_test$p.value
-
-   ## Zero drift
-   drift_test <- wilcox.test(
-     increments,
-     mu = 0,
-     alternative = "two.sided",
-     exact = FALSE
-   )
-
-   p_drift <- drift_test$p.value
-
-   ## Symmetry
-   sym_test <- lawstat::symmetry.test(
-     increments,
-     option = "MGG"
-   )
-
-   p_sym <- sym_test$p.value
-
-   pvals <- c(
-     independence = p_indep,
-     zero_drift   = p_drift,
-     symmetry     = p_sym
-   )
-
-   m <- length(pvals)
-
-   if (method == "Bonf") {
-
-     pass <- all(pvals > alpha / m)
-
-   } else if (method == "Holm") {
-
-     pp <- sort(pvals)
-
-     pass <- all(
-       pp > alpha / (m:1)
-     )
-
-   } else if (method == "Sidak") {
-
-     crit <- 1 - (1 - alpha)^(1 / m)
-
-     pass <- all(
-       pvals > crit
-     )
-
-   }
-
-   decision <- ifelse(pass, "dtrw", "no")
-
-   return(
-     list(
-       method = method,
-       alpha = alpha,
-       p_value_independence = p_indep,
-       p_value_zero_drift = p_drift,
-       p_value_symmetry = p_sym,
-       decision = decision
-     )
-   )
- }
+# ### test_dtrw_assumption ----------------------
+# #' Composite Test of Random-Walk Increment Assumptions
+# #'
+# #' Evaluates whether the increments of a stochastic process are
+# #' consistent with the fundamental assumptions of a discrete-time
+# #' random walk (DTRW) without drift. Specifically, the function
+# #' assesses whether the increment process:
+# #'
+# #' \enumerate{
+# #'   \item is independently distributed;
+# #'   \item has zero drift (median increment equal to zero);
+# #'   \item is symmetrically distributed around zero.
+# #' }
+# #'
+# #' The test is implemented as a composite procedure combining
+# #' the following hypothesis tests:
+# #'
+# #' \itemize{
+# #'   \item \strong{Independence:}
+# #'         Ljung-Box test applied to the increment series.
+# #'
+# #'         Null hypothesis:
+# #'         \deqn{H_0: \rho_k = 0}
+# #'         for all tested lags.
+# #'
+# #'         Failure to reject indicates no evidence of serial dependence.
+# #'
+# #'   \item \strong{Zero Drift:}
+# #'         Wilcoxon signed-rank test applied to the increment series.
+# #'
+# #'         Null hypothesis:
+# #'         \deqn{H_0: \mathrm{median}(\Delta X_t)=0}
+# #'
+# #'         Failure to reject indicates no evidence of systematic upward
+# #'         or downward drift.
+# #'
+# #'   \item \strong{Symmetry:}
+# #'         Miao-Gel-Gastwirth symmetry test
+# #'         (\code{lawstat::symmetry.test}).
+# #'
+# #'         Null hypothesis:
+# #'         \deqn{H_0: F(x)=1-F(-x)}
+# #'
+# #'         Failure to reject indicates consistency with a symmetric
+# #'         increment distribution.
+# #' }
+# #'
+# #' Individual p-values are combined using a family-wise error control
+# #' procedure. A process is classified as \code{"dtrw"} only when
+# #' all component tests fail to reject their respective null hypotheses
+# #' after adjustment.
+# #'
+# #' Available combination methods:
+# #'
+# #' \itemize{
+# #'   \item \code{"Bonf"}:
+# #'         Bonferroni adjustment.
+# #'
+# #'   \item \code{"Holm"}:
+# #'         Holm-Bonferroni sequential adjustment.
+# #'
+# #'   \item \code{"Sidak"}:
+# #'         Sidak adjustment.
+# #' }
+# #'
+# #' The Holm procedure is recommended because it controls the
+# #' family-wise error rate while providing greater power than
+# #' Bonferroni.
+# #'
+# #' @param X Numeric vector representing the observed process path.
+# #'
+# #' @param alpha Numeric significance level.
+# #' Default is \code{0.05}.
+# #'
+# #' @param method Character string specifying the multiple-testing
+# #' adjustment method. Must be one of:
+# #' \code{"Bonf"}, \code{"Holm"}, or \code{"Sidak"}.
+# #'
+# #' @param lag Integer lag used in the Ljung-Box test.
+# #' Default is \code{floor(log(length(X)))}.
+# #'
+# #' @return A list containing:
+# #'
+# #' \describe{
+# #'   \item{method}{
+# #'     Multiple-testing adjustment method used.
+# #'   }
+# #'
+# #'   \item{alpha}{
+# #'     Significance level.
+# #'   }
+# #'
+# #'   \item{p_value_independence}{
+# #'     Ljung-Box p-value.
+# #'   }
+# #'
+# #'   \item{p_value_zero_drift}{
+# #'     Wilcoxon signed-rank p-value.
+# #'   }
+# #'
+# #'   \item{p_value_symmetry}{
+# #'     Miao-Gel-Gastwirth symmetry-test p-value.
+# #'   }
+# #'
+# #'   \item{decision}{
+# #'     Overall classification:
+# #'     \code{"dtrw"} or \code{"no"}.
+# #'   }
+# #' }
+# #'
+# #' @references
+# #' Ljung, G. M. and Box, G. E. P. (1978).
+# #' On a Measure of Lack of Fit in Time Series Models.
+# #' Biometrika, 65(2), 297-303.
+# #'
+# #' Holm, S. (1979).
+# #' A Simple Sequentially Rejective Multiple Test Procedure.
+# #' Scandinavian Journal of Statistics, 6(2), 65-70.
+# #'
+# #' Miao, W., Gel, Y., and Gastwirth, J. (2006).
+# #' A New Test of Symmetry About an Unknown Median.
+# #' Random Structures and Algorithms, 29(1), 81-97.
+# #'
+# #' @export
+# #'
+# #' @examples
+# #' set.seed(123)
+# #'
+# #' X <- cumsum(rnorm(1000))
+# #'
+# #'test_dtrw_assumptions(
+# #'   X,
+# #'   alpha = 0.05,
+# #'   method = "Holm"
+# #' )
+# test_dtrw_assumptions <- function(
+#      X,
+#      alpha = 0.05,
+#      method = c("max","Holm", "Bonf", "Sidak"),
+#      lag = floor(log(length(X)))
+#  ) {
+#
+#    method <- match.arg(method)
+#
+#    if (!is.numeric(X))
+#      stop("'X' must be numeric.")
+#
+#    if (length(X) < 20)
+#      stop("'X' must contain at least 20 observations.")
+#
+#    increments <- diff(X)
+#
+#    ## Independence
+#    lb_test <- Box.test(
+#      increments,
+#      lag = lag,
+#      type = "Ljung-Box"
+#    )
+#
+#    p_indep <- lb_test$p.value
+#
+#    ## Zero drift
+#    drift_test <- wilcox.test(
+#      increments,
+#      mu = 0,
+#      alternative = "two.sided",
+#      exact = FALSE
+#    )
+#
+#    p_drift <- drift_test$p.value
+#
+#    ## Symmetry
+#    sym_test <- lawstat::symmetry.test(
+#      increments,
+#      option = "MGG"
+#    )
+#
+#    p_sym <- sym_test$p.value
+#
+#    pvals <- c(
+#      independence = p_indep,
+#      zero_drift   = p_drift,
+#      symmetry     = p_sym
+#    )
+#
+#    m <- length(pvals)
+#
+#    if (method == "Bonf") {
+#
+#      pass <- all(pvals > alpha / m)
+#
+#    } else if (method == "Holm") {
+#
+#      pp <- sort(pvals)
+#
+#      pass <- all(
+#        pp > alpha / (m:1)
+#      )
+#
+#    } else if (method == "Sidak") {
+#
+#      crit <- 1 - (1 - alpha)^(1 / m)
+#
+#      pass <- all(
+#        pvals > crit
+#      )
+#
+#    }
+#
+#    decision <- ifelse(pass, "dtrw", "no")
+#
+#    return(
+#      list(
+#        method = method,
+#        alpha = alpha,
+#        p_value_independence = p_indep,
+#        p_value_zero_drift = p_drift,
+#        p_value_symmetry = p_sym,
+#        decision = decision
+#      )
+#    )
+#  }
 # test_dtrw_indep2 = function(X,alpha=0.05){
 #
 #   ## Test2:  Perform Ljung-Box test on increments: H0:independently distributed (no autocorrelation)
