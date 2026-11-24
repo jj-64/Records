@@ -64,13 +64,14 @@ head(auc_df)
 
 # ✅  Extract Average Power and Type I Error
 auc_Power_avg = subset(auc_df, Variable == "average")
-auc_typeI = auc_df[grepl(pattern = "\\.Detection", x=auc_df$File_Sheet),]
+auc_typeI = auc_df[grepl(pattern = "\\.detection", x=auc_df$File_Sheet),]
 auc_typeI_avg = subset(auc_typeI, Variable == "average")
 
 
 auc_Power_avg
 auc_typeI_avg
 
+# ✅  Extract Average Power  for each test
 auc_Power_avg[grepl(pattern = "iid_serial_independence", x=auc_Power_avg$File_Sheet) ,]
 auc_Power_avg[grepl(pattern = "iid_rec_count", x=auc_Power_avg$File_Sheet) ,]
 
@@ -84,3 +85,90 @@ auc_Power_avg[grepl(pattern = "ldm_sequential", x=auc_Power_avg$File_Sheet) ,]
 
 auc_Power_avg[grepl(pattern = "dtrw_rec_count", x=auc_Power_avg$File_Sheet) ,]
 auc_Power_avg[grepl(pattern = "dtrw_increment", x=auc_Power_avg$File_Sheet) ,]
+
+## Save
+
+save_results <- function(
+    df,
+    file,
+    sheet,
+    overwrite_sheet = TRUE
+) {
+
+  if (file.exists(file)) {
+
+    wb <- openxlsx::loadWorkbook(file)
+
+  } else {
+
+    wb <- openxlsx::createWorkbook()
+
+  }
+
+  ## Remove sheet if already exists
+
+  if (overwrite_sheet &&
+      sheet %in% names(wb)) {
+
+    openxlsx::removeWorksheet(
+      wb,
+      sheet
+    )
+
+  }
+
+  openxlsx::addWorksheet(
+    wb,
+    sheet
+  )
+
+  openxlsx::writeData(
+    wb,
+    sheet,
+    df,
+    withFilter = TRUE
+  )
+
+  ## Header style
+
+  header_style <- openxlsx::createStyle(
+    textDecoration = "bold",
+    fgFill = "#D9EAD3",
+    halign = "center",
+    border = "Bottom"
+  )
+
+  openxlsx::addStyle(
+    wb,
+    sheet,
+    style = header_style,
+    rows = 1,
+    cols = 1:ncol(df),
+    gridExpand = TRUE
+  )
+
+  openxlsx::freezePane(
+    wb,
+    sheet,
+    firstRow = TRUE
+  )
+
+  openxlsx::setColWidths(
+    wb,
+    sheet,
+    cols = 1:ncol(df),
+    widths = "auto"
+  )
+
+  openxlsx::saveWorkbook(
+    wb,
+    file,
+    overwrite = TRUE
+  )
+
+}
+
+save_results( auc_df, file = paste0("inst/extdata/AUC/AUC.xlsx"),sheet = "AUC")
+save_results( auc_Power_avg, file = paste0("inst/extdata/AUC/AUC.xlsx"),sheet = "auc_Power_avg")
+save_results( auc_typeI, file = paste0("inst/extdata/AUC/AUC.xlsx"),sheet = "auc_typeI")
+save_results( auc_typeI_avg, file = paste0("inst/extdata/AUC/AUC.xlsx"),sheet = "auc_typeI_avg")
