@@ -694,7 +694,7 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 #' #  $decision
 #' #  [1] "ldm"
 #'
-#' test_ldm_sequential(rnorm(100), alpha = 0.05, record_times = NA, obs_type = "all")
+#' test_ldm_sequential(rnorm(100), alpha = 0.05, obs_type = "all")
 #'
 #' # $block_size
 #' #  [1] 33
@@ -753,7 +753,10 @@ test_ldm_sequential <- function(X, record_times = NA, alpha = 0.05, obs_type = c
     if (length(record_times) != length(X))
       stop("'record_times' and 'X' must have the same length.")
 
+  } else{
+    record_times = seq(length(X))
   }
+
   # Stage 1
   res1 <- test_ldm_sequential_linearity_stage1(X, record_times=record_times, alpha = 2 * alpha, pooled = FALSE)  # one-sided
 
