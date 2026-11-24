@@ -6,13 +6,19 @@
 \alias{test_ldm_sequential_drift_detection_stage2}
 \title{Sequential Drift Detection Test for the Linear Drift Model}
 \usage{
-test_ldm_sequential(X, time = NA, alpha = 0.05)
+test_ldm_sequential(
+  X,
+  record_times = NA,
+  alpha = 0.05,
+  obs_type = c("records", "all")
+)
 
 test_ldm_sequential_linearity_stage1(
   X,
-  time = NA,
+  record_times = NA,
   alpha = 0.05,
-  pooled = FALSE
+  pooled = FALSE,
+  obs_type = c("records", "all")
 )
 
 test_ldm_sequential_drift_detection_stage2(stage1, alpha = 0.05)
@@ -20,7 +26,7 @@ test_ldm_sequential_drift_detection_stage2(stage1, alpha = 0.05)
 \arguments{
 \item{X}{Numeric vector of observations.}
 
-\item{time}{Numeric vector of the record times. (default = NA means we are using all observed X series)}
+\item{record_times}{Numeric vector of the record times. (default = NA means we are using all observed X series)}
 
 \item{alpha}{Numeric, significance level (default = 0.05).}
 

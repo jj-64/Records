@@ -19,6 +19,10 @@
 #'    If given, force exactly K partitions using quantiles.
 #' @param gamma Numeric. Optional. Force if estimated_gamma = FALSE.
 #' @param record_times (Default = NA) record times in case obs_type = "records"
+#' @param min_rsq Numeric. The minimum R-square accepted for a good linear fit (Default = 0.8)
+#' @param iid_test_type Character string specifying the portmanteau statistic.
+#' One of:
+#' \code{"Ljung-Box"} or \code{"Box-Pierce"}. Default = "Ljung-Box".
 #' @return A list containing all:
 #' \describe{
 #'   \item{summary}{List summary of final decision, leading_model, agreement proportion. confidence, model_scores,}
@@ -61,7 +65,9 @@ test_model_parallel <- function(
     one.sided = FALSE,
     method = "Holm",
     K = NULL,
-    gamma = NULL
+    gamma = NULL,
+    min_rsq = 0.8,
+    iid_test_type = "Ljung-Box"
 ) {
 
   obs_type <- match.arg(obs_type)
@@ -98,6 +104,7 @@ test_model_parallel <- function(
   results$ynm_rec_count <- test_ynm_rec_count(
     X = X,
     gamma = gamma,
+    approximate = approximate,
     alpha = alpha
   )
 
@@ -106,7 +113,8 @@ test_model_parallel <- function(
     gamma = gamma,
     K = K,
     estimated = estimate_gamma,
-    alpha = alpha
+    alpha = alpha,
+    warmup = warmup
   )
 
   results$ynm_rec_gap <- test_ynm_rec_gap(
@@ -115,6 +123,7 @@ test_model_parallel <- function(
     K = K,
     warmup = warmup,
     obs_type = obs_type,
+    obs_type = "records",
     record_times = record_times
   )
 
@@ -130,7 +139,10 @@ test_model_parallel <- function(
 
   results$ldm_trend <- test_ldm_trend(
     X = X,
-    alpha = alpha
+    alpha = alpha,
+    obs_type = "records",
+    record_times = record_times,
+    min_rsq = min_rsq
   )
 
   ## ------------------------------------------------------
@@ -143,7 +155,8 @@ test_model_parallel <- function(
       test_iid_serial_independence(
         X = X,
         alpha = alpha,
-        lags = lag
+        lags = lag,
+        type = iid_test_type
       )
 
     results$dtrw_increment_all <-

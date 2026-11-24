@@ -608,7 +608,7 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 #' negative linear drift over the entire observation period.
 #'
 #' @param X Numeric vector of observations.
-#' @param time Numeric vector of the record times. (default = NA means we are using all observed X series)
+#' @param record_times Numeric vector of the record times. (default = NA means we are using all observed X series)
 #' @param alpha Numeric, significance level (default = 0.05).
 #' @param pooled Logical, if \code{TRUE}, pooled variance across blocks is used
 #'   in stage 1 for the noise variance estimation. Otherwise, variance is estimated directly
@@ -738,11 +738,23 @@ test_ldm_rec_count <-  function(X, alpha = 0.05) {
 #' #  [1] "no"
 #'
 #' @export
-test_ldm_sequential <- function(X, time = NA,alpha = 0.05) {
-  if(length(X)<4) {return(decision = "no")}
+test_ldm_sequential <- function(X, record_times = NA, alpha = 0.05, obs_type = c("records", "all")) {
+  if(length(X)<4) {return(list(decision = "no"))}
 
+  obs_type <- match.arg(obs_type)
+
+  ##Force to provide record times in case only records are used
+  if (obs_type == "records") {
+
+    if (is.null(record_times))
+      stop("'record_times' must be supplied.")
+
+    if (length(record_times) != length(X))
+      stop("'record_times' and 'X' must have the same length.")
+
+  }
   # Stage 1
-  res1 <- test_ldm_sequential_linearity_stage1(X, time=time, alpha = 2 * alpha, pooled = FALSE)  # one-sided
+  res1 <- test_ldm_sequential_linearity_stage1(X, record_times=record_times, alpha = 2 * alpha, pooled = FALSE)  # one-sided
 
   if (res1$stage1_decision == "no") {
     #names(res1)[which(names(res1) == 'stage1_decision')] = "decision"
@@ -759,18 +771,29 @@ test_ldm_sequential <- function(X, time = NA,alpha = 0.05) {
 #' @rdname test_ldm_sequential
 #' @param pooled boolean (Default = FALSE), if variance is assumed pooled
 #' @export
-test_ldm_sequential_linearity_stage1 <- function(X, time=NA, alpha = 0.05, pooled = FALSE) {
+test_ldm_sequential_linearity_stage1 <- function(X, record_times=NA, alpha = 0.05, pooled = FALSE, obs_type = c("records", "all")) {
 
-  if(is.na(time[1])) {time = 1:length(X)}
-  if (length(X) != length(time)) stop("X and time must have the same length")
+  obs_type <- match.arg(obs_type)
+
+  ##Force to provide record times in case only records are used
+  if (obs_type == "records") {
+
+    if (is.null(record_times))
+      stop("'record_times' must be supplied.")
+
+    if (length(record_times) != length(X))
+      stop("'record_times' and 'X' must have the same length.")
+  } else {
+    record_times = 1:length(X)
+    }
 
   #n <- length(X)
   n_blocks <- 3
 
-  # Sort by time
-  ord <- order(time)
+  # Sort by record_times
+  ord <- order(record_times)
   X <- X[ord]
-  time <- time[ord]
+  record_times <- record_times[ord]
 
   block_means <- numeric(n_blocks)
   blocks <- vector("list", n_blocks)
@@ -814,7 +837,7 @@ test_ldm_sequential_linearity_stage1 <- function(X, time=NA, alpha = 0.05, poole
   T_p <- z / sqrt(var_z)
 
   # p_value
-  p_value <- if (max(time) >= 30) {
+  p_value <- if (max(record_times) >= 30) {
     #1 - pnorm(abs(T_p))
     2 * pnorm(-abs(T_p))
   } else {
@@ -879,46 +902,46 @@ test_ldm_sequential_drift_detection_stage2 <- function(stage1, alpha = 0.05) {
 
 
 ##### ------------------  Based on Sen-Slope ------------------ #############
-
-Test_LDM_Sen = function(X, alpha=0.05){
-
-  n= length(X)
-
-  m <- floor(n/2)
-  y1 <- X[1:m]
-  y2 <- X[(m+1):(2*m)]
-  if (length(y1) != length(y2)) y2 = y2[1:length(y1)]
-
-  # block means
-  y1_bar <- mean(y1)
-  y2_bar <- mean(y2)
-
-  # slope and intercept
-  s <- (y2_bar - y1_bar) / m
-  a <- mean(X) - s * mean(1:n)
-
-  ## Fit
-  fit <- a + (1:n) * s
-  noise <- X - fit
-
-  # correlation:order-stat correlation
-  rho <- cor(sort(y1), sort(y2))     # paired correlation between blocks: closer to one, then no trend bcz on 1:1 line
-
-  ## Noise estimation
-  sigma_s = sqrt(8 / n^3 * var(X)) #* sqrt((1 - abs(rho)))
-  #sigma_s_theo = 8* var(x_hat)* (2)/(n^3)
-  #CL_low_H0 = qnorm(alpha/2)* sigma_s  #-1.959 for alpha =0.05
-  #CL_up_H0 = qnorm(1-alpha/2)* sigma_s
-  #"CL_H0" = c(CL_low_H0, CL_up_H0)
-  #decision= ifelse(s >= CL_up_H0 | s<= CL_low_H0, "ldm","no")
-  z=s/sigma_s
-  decision = ifelse(abs(z) >= qnorm(1-alpha/2), "ldm", "no")
-
-   return(list( "stat" = z,"theta_hat"=s,"theta_SD"=sigma_s,"decision"=decision))
-  #abline(a=a, b=s)
-  #plot(sort(y2),sort(y1))
-  #abline(a=0, b=1)
-            }
+#
+# Test_LDM_Sen = function(X, alpha=0.05){
+#
+#   n= length(X)
+#
+#   m <- floor(n/2)
+#   y1 <- X[1:m]
+#   y2 <- X[(m+1):(2*m)]
+#   if (length(y1) != length(y2)) y2 = y2[1:length(y1)]
+#
+#   # block means
+#   y1_bar <- mean(y1)
+#   y2_bar <- mean(y2)
+#
+#   # slope and intercept
+#   s <- (y2_bar - y1_bar) / m
+#   a <- mean(X) - s * mean(1:n)
+#
+#   ## Fit
+#   fit <- a + (1:n) * s
+#   noise <- X - fit
+#
+#   # correlation:order-stat correlation
+#   rho <- cor(sort(y1), sort(y2))     # paired correlation between blocks: closer to one, then no trend bcz on 1:1 line
+#
+#   ## Noise estimation
+#   sigma_s = sqrt(8 / n^3 * var(X)) #* sqrt((1 - abs(rho)))
+#   #sigma_s_theo = 8* var(x_hat)* (2)/(n^3)
+#   #CL_low_H0 = qnorm(alpha/2)* sigma_s  #-1.959 for alpha =0.05
+#   #CL_up_H0 = qnorm(1-alpha/2)* sigma_s
+#   #"CL_H0" = c(CL_low_H0, CL_up_H0)
+#   #decision= ifelse(s >= CL_up_H0 | s<= CL_low_H0, "ldm","no")
+#   z=s/sigma_s
+#   decision = ifelse(abs(z) >= qnorm(1-alpha/2), "ldm", "no")
+#
+#    return(list( "stat" = z,"theta_hat"=s,"theta_SD"=sigma_s,"decision"=decision))
+#   #abline(a=a, b=s)
+#   #plot(sort(y2),sort(y1))
+#   #abline(a=0, b=1)
+#             }
 
 # test_ldm_sequential_linearity_stage1 <- function(X, alpha=0.05, pooled = FALSE) {
 #   n <- length(X)

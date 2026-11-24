@@ -544,7 +544,7 @@ m_L_y <- simulate_model(
   n_arg = "T",
   test_fun = test_ldm_sequential,
   series_args = list(dist="norm",location=0, scale=1),
-  test_args = list(time = NA)
+  test_args = list(record_times = NA, obs_type = "all")
 )
 p = plot_results(m_L_y, "gamma", "ldm vs ynm - Weibull", xlab_name="Gamma (γ)", ymax=100)
 p
@@ -571,7 +571,7 @@ m_L_c <- simulate_model(
   n_arg = "n",           # rgumbel expects n=
   test_fun =  test_ldm_sequential,
   series_args = list(mean=0),
-  test_args = list(time = NA)
+  test_args = list(record_times = NA, obs_type = "all")
 )
 p = plot_results(m_L_c, "sd", title="ldm vs Classical", xlab_name="scale parameter for normal")
 p
@@ -598,7 +598,7 @@ m_L_R <- simulate_model(
   n_arg = "T",
   test_fun =  test_ldm_sequential,
   series_args = list(dist="cauchy",location=0),
-  test_args = list(time = NA)
+  test_args = list(record_times = NA, obs_type = "all")
               )
 p = plot_results(m_L_R, "scale", title= "ldm vs dtrw - Cauchy", xlab_name="Scale (σ²)")
 p
@@ -625,7 +625,7 @@ m_L_L <- simulate_model(
   n_arg = "T",
   test_fun = test_ldm_sequential,
   series_args = list(dist = "gumbel", loc=0, scale=1), #list(dist= "norm", mean = 0, sd = 1),
-  test_args = list(time = NA)
+  test_args = list(record_times = NA, obs_type = "all")
 )
 
 p = plot_results(m_L_L, "theta", "ldm vs ldm", xlab_name=" Theta (Θ) ", ymax= 100)

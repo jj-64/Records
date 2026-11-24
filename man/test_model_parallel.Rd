@@ -15,7 +15,9 @@ test_model_parallel(
   one.sided = FALSE,
   method = "Holm",
   K = NULL,
-  gamma = NULL
+  gamma = NULL,
+  min_rsq = 0.8,
+  iid_test_type = "Ljung-Box"
 )
 }
 \arguments{
@@ -44,6 +46,12 @@ test_model_parallel(
 If given, force exactly K partitions using quantiles.}
 
 \item{gamma}{Numeric. Optional. Force if estimated_gamma = FALSE.}
+
+\item{min_rsq}{Numeric. The minimum R-square accepted for a good linear fit (Default = 0.8)}
+
+\item{iid_test_type}{Character string specifying the portmanteau statistic.
+One of:
+\code{"Ljung-Box"} or \code{"Box-Pierce"}. Default = "Ljung-Box".}
 }
 \value{
 A list containing all:
